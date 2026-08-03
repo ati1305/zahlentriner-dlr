@@ -57,7 +57,8 @@
       min-height:30px; margin-top:14px; text-align:center;
       font-size:18px; font-weight:800;
     }
-    .good { color:var(--good); } .bad { color:var(--bad); }
+    .good { color:var(--good); }
+    .bad { color:var(--bad); }
     .hint { margin-top:10px; text-align:center; color:var(--muted); font-size:13px; }
     .stats {
       display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:16px;
@@ -86,6 +87,7 @@
             <option value="10" selected>10 Ziffern</option>
           </select>
         </label>
+
         <label>
           Zeit pro Ziffer
           <select id="speed">
@@ -120,7 +122,7 @@
       </div>
 
       <div id="result" class="result"></div>
-      <div class="hint">Start drücken – sofort erscheint die erste Ziffer. Führende Null ist möglich.</div>
+      <div class="hint">Ohne Countdown. Jede Ziffer erscheint einzeln. Führende Null ist möglich.</div>
 
       <div class="stats">
         <div class="stat"><b id="correct">0</b><span>Richtig</span></div>
@@ -135,27 +137,39 @@
 const $ = id => document.getElementById(id);
 let target = "";
 let running = false;
-const stats = JSON.parse(localStorage.getItem("zahlentrainerStats") || '{"correct":0,"wrong":0,"streak":0,"best":0}');
+
+const stats = JSON.parse(
+  localStorage.getItem("zahlentrainerStatsV2") ||
+  '{"correct":0,"wrong":0,"streak":0,"best":0}'
+);
 
 function saveStats(){
-  localStorage.setItem("zahlentrainerStats", JSON.stringify(stats));
+  localStorage.setItem("zahlentrainerStatsV2", JSON.stringify(stats));
   $("correct").textContent = stats.correct;
   $("wrong").textContent = stats.wrong;
   $("best").textContent = stats.best;
+
   const total = stats.correct + stats.wrong;
-  $("rate").textContent = total ? Math.round(stats.correct / total * 100) + " %" : "0 %";
+  $("rate").textContent = total
+    ? Math.round(stats.correct / total * 100) + " %"
+    : "0 %";
 }
 
 function makeDigits(length){
-  let s = "";
-  for(let i=0;i<length;i++) s += Math.floor(Math.random()*10);
-  return s;
+  let value = "";
+  for(let i = 0; i < length; i++){
+    value += Math.floor(Math.random() * 10);
+  }
+  return value;
 }
 
-function sleep(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
+function sleep(ms){
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 async function startRound(){
   if(running) return;
+
   running = true;
   $("start").disabled = true;
   $("answerArea").classList.remove("show");
@@ -169,31 +183,37 @@ async function startRound(){
   for(const currentDigit of target){
     $("digit").textContent = currentDigit;
     await sleep(perDigit);
+
     $("digit").textContent = "";
     await sleep(200);
   }
 
-  await sleep(800);
   $("digit").textContent = "?";
   $("answerArea").classList.add("show");
   $("start").disabled = false;
   running = false;
+
   setTimeout(() => $("answer").focus(), 100);
 }
 
-function finish(isCorrect, revealOnly=false){
+function finish(isCorrect, revealOnly = false){
   if(!$("answerArea").classList.contains("show")) return;
 
   if(isCorrect){
     stats.correct++;
     stats.streak++;
     stats.best = Math.max(stats.best, stats.streak);
+
     $("result").textContent = "Richtig ✅";
     $("result").className = "result good";
   } else {
     stats.wrong++;
     stats.streak = 0;
-    $("result").textContent = revealOnly ? `Lösung: ${target}` : `Falsch ❌ – richtig war ${target}`;
+
+    $("result").textContent = revealOnly
+      ? `Lösung: ${target}`
+      : `Falsch ❌ – richtig war ${target}`;
+
     $("result").className = "result bad";
   }
 
@@ -203,11 +223,16 @@ function finish(isCorrect, revealOnly=false){
 }
 
 $("start").addEventListener("click", startRound);
-$("check").addEventListener("click", () => finish($("answer").value.trim() === target));
-$("show").addEventListener("click", () => finish(false, true));
-$("answer").addEventListener("keydown", e => {
-  if(e.key === "Enter") $("check").click();
+$("check").addEventListener("click", () => {
+  finish($("answer").value.trim() === target);
 });
+$("show").addEventListener("click", () => {
+  finish(false, true);
+});
+$("answer").addEventListener("keydown", event => {
+  if(event.key === "Enter") $("check").click();
+});
+
 saveStats();
 </script>
 </body>
