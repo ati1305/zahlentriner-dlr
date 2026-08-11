@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
 <title>DLR Räumliches Vorstellungsvermögen</title>
+<!-- procedural-generator-v1 -->
 
 <style>
 :root{
@@ -521,6 +522,186 @@ body{min-height:100dvh}
         [1,3],[2,4],[5,6],[7,8]
       ]
     }
+,
+    {
+      name:"open-c",
+      points:[
+        v(-1.1,-.7,0),v(-1.4,0,.25),v(-1.1,.7,.45),
+        v(.3,.8,.7),v(1.1,.45,.9),v(1.15,-.35,.75),v(.35,-.8,.55)
+      ],
+      edges:[
+        {type:"curve",a:0,b:1,bend:.22,side:-1},
+        {type:"curve",a:1,b:2,bend:.22,side:-1},
+        {type:"curve",a:2,b:3,bend:.24,side:-1},
+        {type:"curve",a:3,b:4,bend:.22,side:-1},
+        {type:"curve",a:4,b:5,bend:.24,side:-1},
+        {type:"curve",a:5,b:6,bend:.22,side:-1}
+      ]
+    },
+    {
+      name:"u-frame",
+      points:[
+        v(-1,-.8,0),v(-1,.5,.35),v(-.55,1,.55),
+        v(.55,1,.75),v(1,.5,.55),v(1,-.8,.25),
+        v(-.25,.15,1.15),v(.45,.15,1.05)
+      ],
+      edges:[
+        {type:"curve",a:0,b:1,bend:.18,side:1},
+        {type:"curve",a:1,b:2,bend:.18,side:1},
+        {type:"curve",a:2,b:3,bend:.16,side:1},
+        {type:"curve",a:3,b:4,bend:.18,side:1},
+        {type:"curve",a:4,b:5,bend:.18,side:1},
+        [1,6],[6,7],[7,4]
+      ]
+    },
+    {
+      name:"loop-tail",
+      points:[
+        v(-.7,0,.5),v(0,.7,.7),v(.7,0,.9),v(0,-.7,.65),
+        v(1.2,-.4,.45),v(1.6,.1,.25),v(-1.2,.2,.2)
+      ],
+      edges:[
+        {type:"curve",a:0,b:1,bend:.28,side:-1},
+        {type:"curve",a:1,b:2,bend:.28,side:-1},
+        {type:"curve",a:2,b:3,bend:.28,side:-1},
+        {type:"curve",a:3,b:0,bend:.28,side:-1},
+        {type:"curve",a:2,b:4,bend:.25,side:1},
+        [4,5],[0,6]
+      ]
+    },
+    {
+      name:"ring-bridge",
+      points:[
+        v(-.9,0,.5),v(.9,0,.6),v(-1.5,-.5,0),v(1.5,.5,.2),
+        v(0,-.8,1.1),v(0,.8,1.2)
+      ],
+      edges:[
+        {type:"ring",center:0,radius:.62,tilt:15},
+        {type:"ring",center:1,radius:.62,tilt:70},
+        [0,1],[0,2],[1,3],[0,4],[1,5],[4,5]
+      ]
+    },
+    {
+      name:"double-ring-open",
+      points:[
+        v(-.8,-.1,.35),v(.75,.1,.55),v(-1.45,.55,.2),v(1.35,-.55,.3),
+        v(0,0,1.35)
+      ],
+      edges:[
+        {type:"ring",center:0,radius:.55,tilt:30},
+        {type:"ring",center:1,radius:.5,tilt:75},
+        {type:"curve",a:0,b:4,bend:.3,side:1},
+        {type:"curve",a:4,b:1,bend:.3,side:-1},
+        [0,2],[1,3]
+      ]
+    },
+    {
+      name:"s-hook",
+      points:[
+        v(-1.3,.55,.2),v(-.7,.9,.45),v(-.1,.55,.7),
+        v(.2,0,.85),v(.7,-.55,.65),v(1.3,-.8,.4),
+        v(-.1,-.65,.2),v(.7,.55,1.2)
+      ],
+      edges:[
+        {type:"curve",a:0,b:1,bend:.25,side:1},
+        {type:"curve",a:1,b:2,bend:.25,side:-1},
+        {type:"curve",a:2,b:3,bend:.22,side:-1},
+        {type:"curve",a:3,b:4,bend:.22,side:1},
+        {type:"curve",a:4,b:5,bend:.25,side:1},
+        [3,6],[3,7]
+      ]
+    },
+    {
+      name:"open-spiral",
+      points:[
+        v(-1.1,.2,.25),v(-.7,.75,.45),v(0,.9,.65),
+        v(.7,.55,.8),v(.8,-.15,.9),v(.25,-.65,.75),
+        v(-.35,-.45,.55),v(-.25,.1,.65),v(.2,.15,1.2)
+      ],
+      edges:[
+        {type:"curve",a:0,b:1,bend:.2,side:1},
+        {type:"curve",a:1,b:2,bend:.2,side:1},
+        {type:"curve",a:2,b:3,bend:.2,side:1},
+        {type:"curve",a:3,b:4,bend:.2,side:1},
+        {type:"curve",a:4,b:5,bend:.2,side:1},
+        {type:"curve",a:5,b:6,bend:.2,side:1},
+        {type:"curve",a:6,b:7,bend:.2,side:1},
+        [7,8]
+      ]
+    },
+    {
+      name:"arched-cage",
+      points:[
+        v(-1.1,-.8,0),v(1.1,-.8,.1),v(-1.1,.7,.2),v(1.1,.7,.3),
+        v(-.7,-.45,1.2),v(.7,-.45,1.3),v(-.7,.45,1.15),v(.7,.45,1.35)
+      ],
+      edges:[
+        [0,1],[0,2],[1,3],[2,3],
+        {type:"curve",a:4,b:5,bend:.22,side:-1},
+        {type:"curve",a:4,b:6,bend:.22,side:1},
+        {type:"curve",a:5,b:7,bend:.22,side:-1},
+        {type:"curve",a:6,b:7,bend:.22,side:1},
+        [0,4],[1,5],[2,6],[3,7]
+      ]
+    },
+    {
+      name:"circle-spokes",
+      points:[
+        v(0,0,.65),v(-1.2,0,.2),v(1.2,0,.3),v(0,-1,.15),v(0,1,.4),
+        v(-.65,.65,1.25),v(.65,-.65,1.15)
+      ],
+      edges:[
+        {type:"ring",center:0,radius:.9,tilt:45},
+        [0,1],[0,2],[0,3],[0,4],[0,5],[0,6]
+      ]
+    },
+    {
+      name:"broken-ring",
+      points:[
+        v(-1,.2,.2),v(-.6,.8,.45),v(.1,1,.65),v(.8,.65,.8),
+        v(1,.05,.75),v(.6,-.65,.55),v(-.05,-.8,.35),v(-.75,-.4,.15),
+        v(.15,.15,1.25)
+      ],
+      edges:[
+        {type:"curve",a:0,b:1,bend:.18,side:1},
+        {type:"curve",a:1,b:2,bend:.18,side:1},
+        {type:"curve",a:2,b:3,bend:.18,side:1},
+        {type:"curve",a:3,b:4,bend:.18,side:1},
+        {type:"curve",a:4,b:5,bend:.18,side:1},
+        {type:"curve",a:5,b:6,bend:.18,side:1},
+        {type:"curve",a:6,b:7,bend:.18,side:1},
+        [2,8],[6,8]
+      ]
+    },
+    {
+      name:"wave-frame",
+      points:[
+        v(-1.5,-.6,0),v(-.9,.4,.25),v(-.2,-.3,.5),v(.5,.5,.7),v(1.2,-.2,.9),
+        v(-1.2,.8,1.2),v(-.3,.9,1.35),v(.6,.85,1.15),v(1.4,.7,1.3)
+      ],
+      edges:[
+        {type:"curve",a:0,b:1,bend:.24,side:1},
+        {type:"curve",a:1,b:2,bend:.24,side:-1},
+        {type:"curve",a:2,b:3,bend:.24,side:1},
+        {type:"curve",a:3,b:4,bend:.24,side:-1},
+        {type:"curve",a:5,b:6,bend:.2,side:-1},
+        {type:"curve",a:6,b:7,bend:.2,side:1},
+        {type:"curve",a:7,b:8,bend:.2,side:-1},
+        [1,5],[2,6],[3,7],[4,8]
+      ]
+    },
+    {
+      name:"ring-and-fork",
+      points:[
+        v(-.5,0,.55),v(.7,0,.65),v(1.35,.55,.9),v(1.35,-.55,.4),
+        v(-1.2,.45,.2),v(-1.2,-.45,.15),v(.1,0,1.4)
+      ],
+      edges:[
+        {type:"ring",center:0,radius:.62,tilt:55},
+        [0,1],[1,2],[1,3],[0,4],[0,5],
+        {type:"curve",a:0,b:6,bend:.3,side:1}
+      ]
+    }
   ];
 
 
@@ -534,75 +715,144 @@ body{min-height:100dvh}
 
   function deg(d){ return d*Math.PI/180; }
 
-  function rotatePoint(p, yawDeg, pitchDeg=22){
-    const y=deg(yawDeg);
-    const c=Math.cos(y), s=Math.sin(y);
+  function rotateXYZ(p,yawDeg,pitchDeg,rollDeg=0){
+    let x=p.x, y=p.y, z=p.z;
 
-    // yaw around vertical z axis
-    const x1=p.x*c - p.y*s;
-    const y1=p.x*s + p.y*c;
-    const z1=p.z;
+    // yaw around vertical world axis
+    let a=deg(yawDeg), c=Math.cos(a), s=Math.sin(a);
+    let x1=x*c-y*s;
+    let y1=x*s+y*c;
+    let z1=z;
 
-    // tilt/elevation
-    const pitch=deg(pitchDeg);
-    const cp=Math.cos(pitch), sp=Math.sin(pitch);
+    // pitch around camera-horizontal axis
+    a=deg(pitchDeg); c=Math.cos(a); s=Math.sin(a);
+    let x2=x1;
+    let y2=y1*c-z1*s;
+    let z2=y1*s+z1*c;
 
-    const y2=y1*cp - z1*sp;
-    const z2=y1*sp + z1*cp;
+    // slight roll for variation
+    a=deg(rollDeg); c=Math.cos(a); s=Math.sin(a);
+    let x3=x2*c-y2*s;
+    let y3=x2*s+y2*c;
+    let z3=z2;
 
-    return {x:x1,y:y2,z:z2};
+    return {x:x3,y:y3,z:z3};
   }
 
-  function projectedGeometry(m,yaw){
+  function modelRadius(m){
+    let r=.1;
+    m.points.forEach(p=>{
+      r=Math.max(r,Math.hypot(p.x,p.y,p.z));
+    });
+    return r;
+  }
+
+  function projectedGeometry(m,camera){
+    const radius=modelRadius(m);
+    const cameraDistance=radius*4.4+2.0;
+    const baseScale=94/Math.max(1,radius);
+
     const pts=m.points.map((p,i)=>{
-      const r=rotatePoint(p,yaw);
-      return {i,x:r.x,y:r.y,z:r.z};
+      const r=rotateXYZ(p,camera.yaw,camera.pitch,camera.roll||0);
+      const denom=Math.max(.85,cameraDistance-r.z);
+      const perspective=cameraDistance/denom;
+
+      return {
+        i,
+        x:r.x,
+        y:r.y,
+        z:r.z,
+        perspective,
+        sx:210+r.x*baseScale*perspective,
+        sy:170-r.y*baseScale*perspective
+      };
     });
 
-    // fit to viewport
-    const xs=pts.map(p=>p.x), ys=pts.map(p=>p.y);
-    const minX=Math.min(...xs),maxX=Math.max(...xs);
-    const minY=Math.min(...ys),maxY=Math.max(...ys);
-    const w=Math.max(.01,maxX-minX),h=Math.max(.01,maxY-minY);
-    const scale=Math.min(255/w,228/h);
+    const edges=m.edges.map(edge=>{
+      if(Array.isArray(edge)){
+        const [a,b]=edge;
+        const pa=pts[a],pb=pts[b];
+        return {
+          type:"line",a,b,
+          depth:(pa.z+pb.z)/2,
+          perspective:(pa.perspective+pb.perspective)/2
+        };
+      }
 
-    pts.forEach(p=>{
-      p.sx=210+(p.x-(minX+maxX)/2)*scale;
-      p.sy=170-(p.y-(minY+maxY)/2)*scale;
-    });
+      if(edge.type==="curve"){
+        const pa=pts[edge.a],pb=pts[edge.b];
+        return {
+          type:"curve",
+          a:edge.a,b:edge.b,
+          bend:edge.bend ?? .35,
+          side:edge.side ?? 1,
+          depth:(pa.z+pb.z)/2,
+          perspective:(pa.perspective+pb.perspective)/2
+        };
+      }
 
-    const edges=m.edges.map(([a,b])=>{
-      const pa=pts[a],pb=pts[b];
-      return {a,b,depth:(pa.z+pb.z)/2};
-    }).sort((a,b)=>a.depth-b.depth);
+      if(edge.type==="ring"){
+        const pc=pts[edge.center];
+        return {
+          type:"ring",
+          center:edge.center,
+          radius:edge.radius ?? .55,
+          tilt:edge.tilt ?? 0,
+          depth:pc.z,
+          perspective:pc.perspective
+        };
+      }
 
-    return {pts,edges};
+      return null;
+    }).filter(Boolean).sort((a,b)=>a.depth-b.depth);
+
+    return {pts,edges,radius};
   }
 
-  function renderModel(svg,m,yaw){
-    svg.innerHTML="";
-    const g=projectedGeometry(m,yaw);
+  function viewDifference(m,c1,c2){
+    const g1=projectedGeometry(m,c1);
+    const g2=projectedGeometry(m,c2);
 
+    const mean=arr=>({
+      x:arr.reduce((s,p)=>s+p.sx,0)/arr.length,
+      y:arr.reduce((s,p)=>s+p.sy,0)/arr.length
+    });
+
+    const m1=mean(g1.pts);
+    const m2=mean(g2.pts);
+
+    let sum=0;
+    for(let i=0;i<g1.pts.length;i++){
+      const dx=(g1.pts[i].sx-m1.x)-(g2.pts[i].sx-m2.x);
+      const dy=(g1.pts[i].sy-m1.y)-(g2.pts[i].sy-m2.y);
+      sum+=dx*dx+dy*dy;
+    }
+    return Math.sqrt(sum/g1.pts.length);
+  }
+
+  function renderModel(svg,m,camera){
+    svg.innerHTML="";
+    const g=projectedGeometry(m,camera);
     const ns="http://www.w3.org/2000/svg";
 
     const defs=document.createElementNS(ns,"defs");
 
     const nodeGrad=document.createElementNS(ns,"radialGradient");
     nodeGrad.setAttribute("id","nodeGrad");
-    nodeGrad.setAttribute("cx","32%");
-    nodeGrad.setAttribute("cy","28%");
-    nodeGrad.setAttribute("r","72%");
-
+    nodeGrad.setAttribute("cx","30%");
+    nodeGrad.setAttribute("cy","25%");
+    nodeGrad.setAttribute("r","74%");
     [
-      ["0%","#8edcf0"],
-      ["28%","#2aa3c2"],
-      ["68%","#0d7898"],
-      ["100%","#064e68"]
+      ["0%","#d7f5fb"],
+      ["16%","#84d5e8"],
+      ["42%","#2496b5"],
+      ["72%","#0b6e8d"],
+      ["100%","#05465e"]
     ].forEach(([offset,color])=>{
-      const stop=document.createElementNS(ns,"stop");
-      stop.setAttribute("offset",offset);
-      stop.setAttribute("stop-color",color);
-      nodeGrad.appendChild(stop);
+      const s=document.createElementNS(ns,"stop");
+      s.setAttribute("offset",offset);
+      s.setAttribute("stop-color",color);
+      nodeGrad.appendChild(s);
     });
 
     const rodGrad=document.createElementNS(ns,"linearGradient");
@@ -611,165 +861,444 @@ body{min-height:100dvh}
     rodGrad.setAttribute("y1","0%");
     rodGrad.setAttribute("x2","0%");
     rodGrad.setAttribute("y2","100%");
-
     [
-      ["0%","#72c6dc"],
-      ["38%","#1785a4"],
-      ["72%","#0a6684"],
-      ["100%","#064b63"]
+      ["0%","#8fd8e8"],
+      ["28%","#2b9ab8"],
+      ["68%","#0c6d8c"],
+      ["100%","#054b64"]
     ].forEach(([offset,color])=>{
-      const stop=document.createElementNS(ns,"stop");
-      stop.setAttribute("offset",offset);
-      stop.setAttribute("stop-color",color);
-      rodGrad.appendChild(stop);
+      const s=document.createElementNS(ns,"stop");
+      s.setAttribute("offset",offset);
+      s.setAttribute("stop-color",color);
+      rodGrad.appendChild(s);
     });
 
     const shadow=document.createElementNS(ns,"filter");
     shadow.setAttribute("id","softShadow");
-    shadow.setAttribute("x","-30%");
-    shadow.setAttribute("y","-30%");
-    shadow.setAttribute("width","160%");
-    shadow.setAttribute("height","160%");
-
-    const blur=document.createElementNS(ns,"feGaussianBlur");
-    blur.setAttribute("in","SourceAlpha");
-    blur.setAttribute("stdDeviation","2.2");
-    blur.setAttribute("result","blur");
-    shadow.appendChild(blur);
-
-    const off=document.createElementNS(ns,"feOffset");
-    off.setAttribute("dx","1.7");
-    off.setAttribute("dy","2.4");
-    off.setAttribute("result","off");
-    shadow.appendChild(off);
-
-    const flood=document.createElementNS(ns,"feFlood");
-    flood.setAttribute("flood-color","#000");
-    flood.setAttribute("flood-opacity",".22");
-    flood.setAttribute("result","flood");
-    shadow.appendChild(flood);
-
-    const comp=document.createElementNS(ns,"feComposite");
-    comp.setAttribute("in","flood");
-    comp.setAttribute("in2","off");
-    comp.setAttribute("operator","in");
-    comp.setAttribute("result","shadowColor");
-    shadow.appendChild(comp);
-
-    const merge=document.createElementNS(ns,"feMerge");
-    const m1=document.createElementNS(ns,"feMergeNode");
-    m1.setAttribute("in","shadowColor");
-    const m2=document.createElementNS(ns,"feMergeNode");
-    m2.setAttribute("in","SourceGraphic");
-    merge.appendChild(m1);
-    merge.appendChild(m2);
-    shadow.appendChild(merge);
+    shadow.setAttribute("x","-35%");
+    shadow.setAttribute("y","-35%");
+    shadow.setAttribute("width","170%");
+    shadow.setAttribute("height","170%");
+    shadow.innerHTML=`
+      <feDropShadow dx="1.8" dy="2.4" stdDeviation="1.8"
+                    flood-color="#000" flood-opacity=".24"/>
+    `;
 
     defs.appendChild(nodeGrad);
     defs.appendChild(rodGrad);
     defs.appendChild(shadow);
     svg.appendChild(defs);
 
-    // rods: dark outer stroke + lighter inner stroke for cylindrical look
-    g.edges.forEach(e=>{
-      const a=g.pts[e.a], b=g.pts[e.b];
+    function widthFor(persp,base){
+      return base*Math.max(.72,Math.min(1.38,persp||1));
+    }
 
-      const outer=document.createElementNS(ns,"line");
-      outer.setAttribute("x1",a.sx);
-      outer.setAttribute("y1",a.sy);
-      outer.setAttribute("x2",b.sx);
-      outer.setAttribute("y2",b.sy);
-      outer.setAttribute("stroke","#064e68");
-      outer.setAttribute("stroke-width","10");
+    function addPath(d,perspective=1){
+      const outer=document.createElementNS(ns,"path");
+      outer.setAttribute("d",d);
+      outer.setAttribute("fill","none");
+      outer.setAttribute("stroke","#05485f");
+      outer.setAttribute("stroke-width",widthFor(perspective,9.2));
       outer.setAttribute("stroke-linecap","round");
+      outer.setAttribute("stroke-linejoin","round");
       outer.setAttribute("filter","url(#softShadow)");
       svg.appendChild(outer);
 
-      const inner=document.createElementNS(ns,"line");
-      inner.setAttribute("x1",a.sx);
-      inner.setAttribute("y1",a.sy);
-      inner.setAttribute("x2",b.sx);
-      inner.setAttribute("y2",b.sy);
+      const inner=document.createElementNS(ns,"path");
+      inner.setAttribute("d",d);
+      inner.setAttribute("fill","none");
       inner.setAttribute("stroke","url(#rodGrad)");
-      inner.setAttribute("stroke-width","6.5");
+      inner.setAttribute("stroke-width",widthFor(perspective,5.8));
       inner.setAttribute("stroke-linecap","round");
+      inner.setAttribute("stroke-linejoin","round");
       svg.appendChild(inner);
 
-      const highlight=document.createElementNS(ns,"line");
-      highlight.setAttribute("x1",a.sx);
-      highlight.setAttribute("y1",a.sy-1.1);
-      highlight.setAttribute("x2",b.sx);
-      highlight.setAttribute("y2",b.sy-1.1);
-      highlight.setAttribute("stroke","#9ee0ef");
-      highlight.setAttribute("stroke-opacity",".32");
-      highlight.setAttribute("stroke-width","1.4");
-      highlight.setAttribute("stroke-linecap","round");
-      svg.appendChild(highlight);
+      const shine=document.createElementNS(ns,"path");
+      shine.setAttribute("d",d);
+      shine.setAttribute("fill","none");
+      shine.setAttribute("stroke","#c4eef6");
+      shine.setAttribute("stroke-opacity",".30");
+      shine.setAttribute("stroke-width",widthFor(perspective,1.1));
+      shine.setAttribute("stroke-linecap","round");
+      svg.appendChild(shine);
+    }
+
+    // Back-to-front rendering gives actual visual depth.
+    g.edges.forEach(e=>{
+      if(e.type==="line"){
+        const a=g.pts[e.a],b=g.pts[e.b];
+        addPath(`M ${a.sx} ${a.sy} L ${b.sx} ${b.sy}`,e.perspective);
+        return;
+      }
+
+      if(e.type==="curve"){
+        const a=g.pts[e.a],b=g.pts[e.b];
+        const dx=b.sx-a.sx,dy=b.sy-a.sy;
+        const len=Math.max(1,Math.hypot(dx,dy));
+        const nx=-dy/len,ny=dx/len;
+        const amp=len*e.bend*e.side;
+        const cx=(a.sx+b.sx)/2+nx*amp;
+        const cy=(a.sy+b.sy)/2+ny*amp;
+        addPath(`M ${a.sx} ${a.sy} Q ${cx} ${cy} ${b.sx} ${b.sy}`,e.perspective);
+        return;
+      }
+
+      if(e.type==="ring"){
+        const c=g.pts[e.center];
+        const rx=e.radius*56*(e.perspective||1);
+        const ry=rx*(.38+.42*Math.abs(Math.cos(deg(e.tilt))));
+
+        const outer=document.createElementNS(ns,"ellipse");
+        outer.setAttribute("cx",c.sx);
+        outer.setAttribute("cy",c.sy);
+        outer.setAttribute("rx",rx);
+        outer.setAttribute("ry",ry);
+        outer.setAttribute("fill","none");
+        outer.setAttribute("stroke","#05485f");
+        outer.setAttribute("stroke-width",widthFor(e.perspective,9.2));
+        outer.setAttribute("filter","url(#softShadow)");
+        svg.appendChild(outer);
+
+        const inner=document.createElementNS(ns,"ellipse");
+        inner.setAttribute("cx",c.sx);
+        inner.setAttribute("cy",c.sy);
+        inner.setAttribute("rx",rx);
+        inner.setAttribute("ry",ry);
+        inner.setAttribute("fill","none");
+        inner.setAttribute("stroke","url(#rodGrad)");
+        inner.setAttribute("stroke-width",widthFor(e.perspective,5.8));
+        svg.appendChild(inner);
+      }
     });
 
-    // nodes depth sorted; larger and shaded
     [...g.pts].sort((a,b)=>a.z-b.z).forEach(p=>{
+      const r=widthFor(p.perspective,11.1);
+
       const c=document.createElementNS(ns,"circle");
       c.setAttribute("cx",p.sx);
       c.setAttribute("cy",p.sy);
-      c.setAttribute("r","12.5");
+      c.setAttribute("r",r);
       c.setAttribute("fill","url(#nodeGrad)");
-      c.setAttribute("stroke","#064e68");
-      c.setAttribute("stroke-width","2");
+      c.setAttribute("stroke","#05485f");
+      c.setAttribute("stroke-width",widthFor(p.perspective,1.8));
       c.setAttribute("filter","url(#softShadow)");
       svg.appendChild(c);
 
       const hi=document.createElementNS(ns,"circle");
-      hi.setAttribute("cx",p.sx-3.4);
-      hi.setAttribute("cy",p.sy-4.1);
-      hi.setAttribute("r","3.2");
-      hi.setAttribute("fill","#d7f5fb");
-      hi.setAttribute("fill-opacity",".72");
+      hi.setAttribute("cx",p.sx-r*.28);
+      hi.setAttribute("cy",p.sy-r*.32);
+      hi.setAttribute("r",r*.22);
+      hi.setAttribute("fill","#e5f9fd");
+      hi.setAttribute("fill-opacity",".76");
       svg.appendChild(hi);
     });
   }
 
-  function transformedModel(base){
-    // Spiegelung und kleine Achsenvariation erzeugen weitere Varianten,
-    // ohne die Topologie des Modells zu verändern.
-    const mirrorX = Math.random() < 0.5 ? -1 : 1;
-    const mirrorY = Math.random() < 0.5 ? -1 : 1;
-    const stretchZ = 0.88 + Math.random() * 0.28;
+
+  function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
+
+  function addEdgeUnique(edges,edge,keySet){
+    let key;
+    if(Array.isArray(edge)){
+      const a=Math.min(edge[0],edge[1]), b=Math.max(edge[0],edge[1]);
+      key="L:"+a+":"+b;
+    }else if(edge.type==="curve"){
+      const a=Math.min(edge.a,edge.b), b=Math.max(edge.a,edge.b);
+      key="C:"+a+":"+b+":"+Math.round((edge.bend||.3)*100)+":"+(edge.side||1);
+    }else if(edge.type==="ring"){
+      key="R:"+edge.center+":"+Math.round((edge.radius||.5)*100)+":"+Math.round(edge.tilt||0);
+    }else{
+      return;
+    }
+    if(!keySet.has(key)){
+      keySet.add(key);
+      edges.push(edge);
+    }
+  }
+
+  function nearestIndices(points,index,count=3){
+    const p=points[index];
+    return points
+      .map((q,i)=>({i,d:i===index?Infinity:Math.hypot(p.x-q.x,p.y-q.y,p.z-q.z)}))
+      .sort((a,b)=>a.d-b.d)
+      .slice(0,count)
+      .map(o=>o.i);
+  }
+
+  function generateSpatialModel(){
+    const complexity = pick(["easy","medium","medium","hard"]);
+    const nodeCount =
+      complexity==="easy" ? rand(7,10) :
+      complexity==="medium" ? rand(10,15) :
+      rand(15,22);
+
+    const points=[];
+    const edges=[];
+    const keys=new Set();
+
+    // Build a 3D "spine" first. It deliberately changes direction and height.
+    let x=-1.5, y=(Math.random()-.5)*.8, z=(Math.random()-.5)*.25;
+    points.push(v(x,y,z));
+
+    for(let i=1;i<nodeCount;i++){
+      const phase=i/(nodeCount-1);
+      const dx=0.28+Math.random()*.42;
+      x += dx;
+
+      y += (Math.random()-.5)*(complexity==="hard"?.95:.72);
+      z += (Math.random()-.5)*(complexity==="hard"?.9:.68);
+
+      // occasional strong depth jumps; prevents flat-looking models
+      if(Math.random()<.28){
+        z += (Math.random()<.5?-1:1)*(0.5+Math.random()*.75);
+      }
+
+      // occasional return/curl in x for open loops / tangled forms
+      if(Math.random()<.16){
+        x -= 0.45+Math.random()*.75;
+      }
+
+      points.push(v(
+        clamp(x,-2.0,2.0),
+        clamp(y,-1.65,1.65),
+        clamp(z,-1.55,1.8)
+      ));
+    }
+
+    // Normalize center
+    const mx=points.reduce((s,p)=>s+p.x,0)/points.length;
+    const my=points.reduce((s,p)=>s+p.y,0)/points.length;
+    const mz=points.reduce((s,p)=>s+p.z,0)/points.length;
+    points.forEach(p=>{p.x-=mx;p.y-=my;p.z-=mz;});
+
+    // Main chain: mix straight and curved pieces.
+    for(let i=0;i<points.length-1;i++){
+      if(Math.random() < (complexity==="easy"?.18:.30)){
+        addEdgeUnique(edges,{
+          type:"curve",a:i,b:i+1,
+          bend:.18+Math.random()*.34,
+          side:Math.random()<.5?-1:1
+        },keys);
+      }else{
+        addEdgeUnique(edges,[i,i+1],keys);
+      }
+    }
+
+    // Add cross-connections to create cages / triangles / prisms / crossings.
+    const extra =
+      complexity==="easy" ? rand(3,5) :
+      complexity==="medium" ? rand(6,10) :
+      rand(10,17);
+
+    for(let k=0;k<extra;k++){
+      const a=rand(0,points.length-1);
+      const candidates=nearestIndices(points,a,Math.min(6,points.length-1));
+      if(!candidates.length) continue;
+
+      let b=pick(candidates);
+      if(Math.abs(a-b)<=1 && Math.random()<.65){
+        b=rand(0,points.length-1);
+      }
+      if(a===b) continue;
+
+      const pa=points[a],pb=points[b];
+      const dist=Math.hypot(pa.x-pb.x,pa.y-pb.y,pa.z-pb.z);
+      if(dist>2.7) continue;
+
+      if(Math.random()<.27){
+        addEdgeUnique(edges,{
+          type:"curve",a,b,
+          bend:.16+Math.random()*.38,
+          side:Math.random()<.5?-1:1
+        },keys);
+      }else{
+        addEdgeUnique(edges,[a,b],keys);
+      }
+    }
+
+    // Add local triangular / cage motifs.
+    const motifs =
+      complexity==="easy" ? rand(0,1) :
+      complexity==="medium" ? rand(1,3) :
+      rand(2,5);
+
+    for(let m=0;m<motifs;m++){
+      const a=rand(0,points.length-3);
+      const b=Math.min(points.length-1,a+rand(1,2));
+      const c=Math.min(points.length-1,b+rand(1,2));
+      if(a!==b && b!==c && a!==c){
+        addEdgeUnique(edges,[a,b],keys);
+        addEdgeUnique(edges,[b,c],keys);
+        if(Math.random()<.78) addEdgeUnique(edges,[a,c],keys);
+      }
+    }
+
+    // Genuine ring elements, but not in every task.
+    const ringChance =
+      complexity==="easy" ? .12 :
+      complexity==="medium" ? .22 : .32;
+
+    const ringCount = Math.random()<ringChance ? rand(1, complexity==="hard"?3:2) : 0;
+    for(let r=0;r<ringCount;r++){
+      const center=rand(0,points.length-1);
+      addEdgeUnique(edges,{
+        type:"ring",
+        center,
+        radius:.38+Math.random()*.42,
+        tilt:rand(0,85)
+      },keys);
+    }
+
+    // Open C/U/S style curves: create long curved shortcuts without closing everything.
+    const openCurves =
+      complexity==="easy" ? rand(0,1) :
+      complexity==="medium" ? rand(1,3) :
+      rand(2,5);
+
+    for(let c=0;c<openCurves;c++){
+      const a=rand(0,points.length-3);
+      const b=rand(a+2,points.length-1);
+      addEdgeUnique(edges,{
+        type:"curve",a,b,
+        bend:.28+Math.random()*.40,
+        side:Math.random()<.5?-1:1
+      },keys);
+    }
+
+    // Reject obviously weak / too sparse topologies by ensuring adequate degree.
+    const degree=Array(points.length).fill(0);
+    edges.forEach(e=>{
+      if(Array.isArray(e)){
+        degree[e[0]]++; degree[e[1]]++;
+      }else if(e.type==="curve"){
+        degree[e.a]++; degree[e.b]++;
+      }else if(e.type==="ring"){
+        degree[e.center]+=2;
+      }
+    });
+
+    // Add connections to isolated/weak nodes.
+    for(let i=0;i<degree.length;i++){
+      if(degree[i]>=2) continue;
+      const near=nearestIndices(points,i,4).filter(j=>degree[j]>0);
+      if(!near.length) continue;
+      const j=pick(near);
+      addEdgeUnique(edges,[i,j],keys);
+      degree[i]++; degree[j]++;
+    }
 
     return {
-      name: base.name,
-      points: base.points.map(p => ({
-        x: p.x * mirrorX,
-        y: p.y * mirrorY,
-        z: p.z * stretchZ
-      })),
-      edges: base.edges
+      name:"generated-"+complexity+"-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),
+      points,
+      edges,
+      generated:true,
+      complexity
     };
   }
 
-  function chooseTask(){
-    model = transformedModel(pick(MODELS));
+  function modelQuality(m){
+    // Measures genuine 3D spread. High score means not flat.
+    const xs=m.points.map(p=>p.x), ys=m.points.map(p=>p.y), zs=m.points.map(p=>p.z);
+    const span=a=>Math.max(...a)-Math.min(...a);
+    const sx=span(xs), sy=span(ys), sz=span(zs);
 
-    // Startansicht leicht variieren, damit dasselbe Modell nicht
-    // immer exakt gleich aussieht.
-    const baseStart = pick([30,45,60]);
+    const dimensions=[sx,sy,sz].sort((a,b)=>a-b);
+    const dimensionality=dimensions[0]/Math.max(.01,dimensions[2]);
 
-    answerDir = pick(directions);
+    const edgeCount=m.edges.length;
+    const nodeCount=m.points.length;
+    const density=edgeCount/Math.max(1,nodeCount);
 
-    // Zielansicht ist immer dieselbe Figur aus einer der vier
-    // orthogonalen Blickrichtungen relativ zur Startansicht.
-    const offsets = {
-      up: 180,
-      right: 270,
-      down: 0,
-      left: 90
+    return dimensionality*90 + density*16 + nodeCount*.7;
+  }
+
+  function generateGoodSpatialModel(){
+    for(let i=0;i<80;i++){
+      const m=generateSpatialModel();
+      if(modelQuality(m) < 40) continue;
+      return m;
+    }
+
+    // Reserve only if generator somehow fails.
+    return transformedModel(pick(MODELS));
+  }
+
+  function transformedModel(base){
+    const mirrorX=Math.random()<.5?-1:1;
+    const mirrorY=Math.random()<.5?-1:1;
+    const stretchZ=.95+Math.random()*.48;
+
+    return {
+      name:base.name,
+      points:base.points.map(p=>({
+        x:p.x*mirrorX,
+        y:p.y*mirrorY,
+        z:p.z*stretchZ
+      })),
+      edges:base.edges
     };
+  }
 
-    const startYaw = baseStart;
-    const targetYaw = baseStart + offsets[answerDir];
+  function targetCameraFor(start,dir){
+    if(dir==="left"){
+      return {yaw:start.yaw-90,pitch:start.pitch,roll:start.roll};
+    }
+    if(dir==="right"){
+      return {yaw:start.yaw+90,pitch:start.pitch,roll:start.roll};
+    }
+    if(dir==="up"){
+      return {yaw:start.yaw,pitch:start.pitch+72,roll:start.roll};
+    }
+    return {yaw:start.yaw,pitch:start.pitch-72,roll:start.roll};
+  }
 
-    renderModel(startSvg,model,startYaw);
-    renderModel(targetSvg,model,targetYaw);
+  function chooseTask(){
+    for(let attempt=0;attempt<220;attempt++){
+      // New task = newly generated topology, not merely a rotated preset.
+      const candidate=generateGoodSpatialModel();
+
+      const startCamera={
+        yaw:rand(12,78),
+        pitch:rand(14,36),
+        roll:pick([-5,-3,0,0,0,3,5])
+      };
+
+      const dir=pick(directions);
+      const targetCamera=targetCameraFor(startCamera,dir);
+
+      // Reject views that are too similar.
+      const diff=viewDifference(candidate,startCamera,targetCamera);
+      if(diff<68) continue;
+
+      // Reject if two alternative directions are visually almost as plausible.
+      const targetGeom=projectedGeometry(candidate,targetCamera);
+      const alternatives=directions
+        .filter(d=>d!==dir)
+        .map(d=>({
+          d,
+          diff:viewDifference(candidate,targetCameraFor(startCamera,d),targetCamera)
+        }))
+        .sort((a,b)=>a.diff-b.diff);
+
+      // The mathematically correct view should be distinctly different from alternatives.
+      if(alternatives.length && alternatives[0].diff<26) continue;
+
+      model=candidate;
+      answerDir=dir;
+
+      renderModel(startSvg,model,startCamera);
+      renderModel(targetSvg,model,targetCamera);
+      return;
+    }
+
+    // Last-resort reserve.
+    model=transformedModel(
+      MODELS.find(m=>m.name==="asymmetric-cage") || MODELS[0]
+    );
+    const startCamera={yaw:37,pitch:25,roll:0};
+    answerDir="right";
+    renderModel(startSvg,model,startCamera);
+    renderModel(targetSvg,model,targetCameraFor(startCamera,answerDir));
   }
 
   function setSelected(dir){
