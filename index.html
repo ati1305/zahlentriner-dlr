@@ -10,7 +10,7 @@
 
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body,button{touch-action:manipulation}
+html,body,button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
 html,body{margin:0;min-height:100%;background:#f4f4f4;color:#111;font-family:Arial,Helvetica,sans-serif}
 body{min-height:100dvh;display:grid;place-items:center;padding:14px}
 .app{width:min(100%,680px)}
@@ -68,7 +68,6 @@ button:disabled{opacity:.45;cursor:not-allowed}
   background:#fff;
   font-size:24px;
   font-weight:400;
-  transition:background-color .12s ease
 }
 .keypad button.pressed{
   background:#bfe3f2 !important
@@ -230,9 +229,11 @@ function sleep(ms){
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function flashButton(button){
+function pressVisual(button){
   button.classList.add("pressed");
-  setTimeout(() => button.classList.remove("pressed"), 180);
+}
+function releaseVisual(button){
+  button.classList.remove("pressed");
 }
 
 function stopAnswerTimer(){
@@ -362,34 +363,44 @@ function nextRoundNow(){
 }
 
 document.querySelectorAll("[data-key]").forEach(button => {
-  button.addEventListener("click", () => {
+  button.addEventListener("pointerdown", event => {
+    event.preventDefault();
     if(!answerPhase) return;
 
-    flashButton(button);
+    pressVisual(button);
 
     const maxLength = Number($("length").value);
-
     if(entered.length >= maxLength) return;
 
     entered += button.dataset.key;
-
-    // Eingabe absichtlich NICHT anzeigen.
   });
+
+  const release = () => releaseVisual(button);
+  button.addEventListener("pointerup", release);
+  button.addEventListener("pointercancel", release);
+  button.addEventListener("pointerleave", release);
 });
 
-$("correction").addEventListener("click", () => {
+$("correction").addEventListener("pointerdown", event => {
+  event.preventDefault();
   if(!answerPhase) return;
 
-  flashButton($("correction"));
-
+  pressVisual($("correction"));
   entered = entered.slice(0, -1);
 });
+["pointerup","pointercancel","pointerleave"].forEach(evt => {
+  $("correction").addEventListener(evt, () => releaseVisual($("correction")));
+});
 
-$("next").addEventListener("click", () => {
+$("next").addEventListener("pointerdown", event => {
+  event.preventDefault();
   if(!answerPhase) return;
 
-  flashButton($("next"));
+  pressVisual($("next"));
   nextRoundNow();
+});
+["pointerup","pointercancel","pointerleave"].forEach(evt => {
+  $("next").addEventListener(evt, () => releaseVisual($("next")));
 });
 
 $("start").addEventListener("click", startRound);
