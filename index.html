@@ -5,63 +5,117 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>DLR Zahlentrainer</title>
 
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body,button,.keypad{touch-action:manipulation}
+html,body,button{touch-action:manipulation}
 html,body{margin:0;min-height:100%;background:#f4f4f4;color:#111;font-family:Arial,Helvetica,sans-serif}
 body{min-height:100dvh;display:grid;place-items:center;padding:14px}
 .app{width:min(100%,680px)}
 .panel{background:#fff;border:1px solid #ccc;border-radius:10px;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,.07)}
 h1{margin:0 0 14px;text-align:center;font-size:clamp(24px,6vw,34px)}
-.controls{display:grid;grid-template-columns:1fr;gap:12px}
 label{display:grid;gap:6px;font-size:14px;font-weight:700}
 select,button{width:100%;min-height:48px;border:1px solid #aaa;border-radius:6px;background:#fff;color:#111;font:inherit;padding:10px}
 button{background:#e8e8e8;font-weight:700;cursor:pointer}
 button:disabled{opacity:.45;cursor:not-allowed}
 
 .stage{
-  margin:16px 0;min-height:320px;display:grid;place-items:center;
-  background:#fff;border:1px solid #bbb;border-radius:4px
+  margin:16px 0;
+  min-height:320px;
+  display:grid;
+  place-items:center;
+  background:#fff;
+  border:1px solid #bbb;
+  border-radius:4px
 }
 .digit{
-  font-size:clamp(150px,45vw,300px);line-height:1;font-weight:700;color:#000;
-  font-variant-numeric:tabular-nums;user-select:none
+  font-size:clamp(150px,45vw,300px);
+  line-height:1;
+  font-weight:700;
+  color:#000;
+  font-variant-numeric:tabular-nums;
+  user-select:none
 }
 
 .answer-area{display:none;margin-top:12px}
 .answer-area.show{display:grid}
 
-.answer-display{
-  width:180px;margin:0 auto 8px;min-height:42px;border:1px solid #999;background:#fff;
-  display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:700;
-  letter-spacing:.08em;overflow:hidden
+.hidden-entry{
+  width:180px;
+  min-height:34px;
+  margin:0 auto 8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#666;
+  font-size:13px;
 }
 
-.keypad{width:180px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.keypad{
+  width:180px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:4px
+}
 .keypad button{
-  min-height:48px;padding:0;border-radius:0;border:1px solid #777;background:#e7e7e7;
-  font-size:24px;font-weight:400
+  min-height:48px;
+  padding:0;
+  border-radius:0;
+  border:1px solid #777;
+  background:#fff;
+  font-size:24px;
+  font-weight:400;
+  transition:background-color .12s ease
+}
+.keypad button.pressed{
+  background:#bfe3f2 !important
 }
 .keypad .correction{
-  grid-column:1/4;min-height:40px;margin-top:4px;background:#8fc7dc;font-size:15px;font-weight:700
+  grid-column:1/4;
+  min-height:40px;
+  margin-top:4px;
+  background:#8fc7dc;
+  font-size:15px;
+  font-weight:700
 }
-.keypad button.key-flash{background:#bfe3f2 !important}
-.next-button{width:180px;margin:10px auto 0;display:block;min-height:44px;border-radius:0;border:1px solid #777;background:#f2f2f2;font-size:16px;font-weight:700}
+.next-button{
+  width:180px;
+  margin:10px auto 0;
+  min-height:42px;
+  border-radius:0;
+  border:1px solid #777;
+  background:#efefef;
+  font-size:16px;
+  font-weight:700
+}
 
 .top-progress{
-  position:fixed;top:0;left:0;width:100%;height:10px;
-  background:#e5e5e5;z-index:9999;display:none
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:10px;
+  background:#e5e5e5;
+  z-index:9999;
+  display:none
 }
 .top-progress.show{display:block}
 .top-progress-bar{height:100%;width:0%;background:#444}
 
 .result{min-height:28px;margin-top:12px;text-align:center;font-size:18px;font-weight:700}
-.good{color:#187a36}.bad{color:#b42318}
+.good{color:#187a36}
+.bad{color:#b42318}
 .hint{margin-top:10px;text-align:center;color:#6b7280;font-size:13px}
 
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-top:14px
+}
 .stat{border:1px solid #d5d5d5;background:#fafafa;padding:8px;text-align:center}
 .stat b{display:block;font-size:19px}
 .stat span{font-size:11px;color:#6b7280}
@@ -80,19 +134,18 @@ button:disabled{opacity:.45;cursor:not-allowed}
 
 <main class="app">
 <section class="panel">
+
 <h1>DLR Zahlentrainer</h1>
 
-<div class="controls">
-  <label>
-    Anzahl Ziffern
-    <select id="length">
-      <option value="7">7 Ziffern</option>
-      <option value="8">8 Ziffern</option>
-      <option value="9">9 Ziffern</option>
-      <option value="10" selected>10 Ziffern</option>
-    </select>
-  </label>
-</div>
+<label>
+  Anzahl Ziffern
+  <select id="length">
+    <option value="7">7 Ziffern</option>
+    <option value="8">8 Ziffern</option>
+    <option value="9">9 Ziffern</option>
+    <option value="10" selected>10 Ziffern</option>
+  </select>
+</label>
 
 <div class="stage">
   <div id="digit" class="digit">–</div>
@@ -101,7 +154,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <button id="start">Start</button>
 
 <div id="answerArea" class="answer-area">
-  <div id="answerDisplay" class="answer-display">Eingabe läuft</div>
+  <div class="hidden-entry">Eingabe nicht sichtbar</div>
 
   <div class="keypad">
     <button data-key="1">1</button>
@@ -122,11 +175,15 @@ button:disabled{opacity:.45;cursor:not-allowed}
 
     <button id="correction" class="correction">Correction</button>
   </div>
+
   <button id="next" class="next-button">Next</button>
 </div>
 
 <div id="result" class="result"></div>
-<div class="hint">1,5 Sekunden pro Ziffer · 20 Sekunden Eingabezeit · Auswertung erst nach Ablauf</div>
+
+<div class="hint">
+  1,5 Sekunden pro Ziffer · 20 Sekunden Eingabezeit · Eingabe bleibt unsichtbar
+</div>
 
 <div class="stats">
   <div class="stat"><b id="correct">0</b><span>Richtig</span></div>
@@ -153,17 +210,20 @@ const GAP_MS = 200;
 const ANSWER_MS = 20000;
 
 const stats = JSON.parse(
-  localStorage.getItem("dlrStatsFinalV6") ||
+  localStorage.getItem("dlrStatsV8") ||
   '{"correct":0,"wrong":0,"streak":0,"best":0}'
 );
 
 function saveStats(){
-  localStorage.setItem("dlrStatsFinalV6", JSON.stringify(stats));
+  localStorage.setItem("dlrStatsV8", JSON.stringify(stats));
   $("correct").textContent = stats.correct;
   $("wrong").textContent = stats.wrong;
   $("best").textContent = stats.best;
+
   const total = stats.correct + stats.wrong;
-  $("rate").textContent = total ? Math.round(stats.correct / total * 100) + " %" : "0 %";
+  $("rate").textContent = total
+    ? Math.round(stats.correct / total * 100) + " %"
+    : "0 %";
 }
 
 function makeDigits(n){
@@ -176,7 +236,10 @@ function sleep(ms){
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function updateAnswer(){ $("answerDisplay").textContent = "Eingabe läuft"; }
+function flashButton(button){
+  button.classList.add("pressed");
+  setTimeout(() => button.classList.remove("pressed"), 180);
+}
 
 function stopAnswerTimer(){
   if(answerTimeout){
@@ -211,21 +274,16 @@ function startAnswerTimer(){
 
   progressRAF = requestAnimationFrame(animate);
 
-  // WICHTIG:
-  // Erst HIER – nach vollen 20 Sekunden – wird ausgewertet.
   answerTimeout = setTimeout(() => {
-    evaluateRound();
+    finishRound();
   }, ANSWER_MS);
 }
-
-function flashKey(button){button.classList.add("key-flash");setTimeout(()=>button.classList.remove("key-flash"),180)}
 
 async function startRound(){
   if(running || answerPhase) return;
 
   running = true;
   entered = "";
-  updateAnswer();
 
   $("start").disabled = true;
   $("answerArea").classList.remove("show");
@@ -244,8 +302,6 @@ async function startRound(){
     await sleep(GAP_MS);
   }
 
-  // Direkt nach der letzten Ziffer:
-  // Zahlenfeld + Correction erscheinen und bleiben exakt 20 Sekunden aktiv.
   $("digit").textContent = "";
   $("answerArea").classList.add("show");
 
@@ -255,68 +311,9 @@ async function startRound(){
   startAnswerTimer();
 }
 
-function evaluateRound(){
-  if(!answerPhase) return;
-
-  stopAnswerTimer();
-  answerPhase = false;
-
+function recordCurrentAnswer(){
   const ok = entered === target;
 
-  if(ok){
-    stats.correct++;
-    stats.streak++;
-    stats.best = Math.max(stats.best, stats.streak);
-    $("result").textContent = "Richtig";
-    $("result").className = "result good";
-  } else {
-    stats.wrong++;
-    stats.streak = 0;
-    $("result").textContent = `Falsch – richtig war ${target}`;
-    $("result").className = "result bad";
-  }
-
-  $("answerArea").classList.remove("show");
-  $("topProgress").classList.remove("show");
-  $("topProgressBar").style.width = "0%";
-  $("digit").textContent = "–";
-  $("start").disabled = false;
-
-  saveStats();
-}
-
-document.querySelectorAll("[data-key]").forEach(button => {
-  button.addEventListener("click", () => {
-    if(!answerPhase) return;
-    flashKey(button);
-
-    const maxLength = Number($("length").value);
-
-    // Selbst wenn alle Stellen voll sind, wird NICHT ausgewertet.
-    // Der Nutzer kann bis zum Ablauf der 20 Sekunden Correction benutzen.
-    if(entered.length >= maxLength) return;
-
-    entered += button.dataset.key;
-    updateAnswer();
-  });
-});
-
-$("correction").addEventListener("click", () => {
-  if(!answerPhase) return;
-  flashKey($("correction"));
-
-  // Correction entfernt genau die letzte Eingabe.
-  entered = entered.slice(0, -1);
-  updateAnswer();
-});
-
-
-function nextRoundNow(){
-  if(!answerPhase) return;
-  stopAnswerTimer();
-  answerPhase = false;
-
-  const ok = entered === target;
   if(ok){
     stats.correct++;
     stats.streak++;
@@ -325,7 +322,40 @@ function nextRoundNow(){
     stats.wrong++;
     stats.streak = 0;
   }
+
   saveStats();
+  return ok;
+}
+
+function finishRound(){
+  if(!answerPhase) return;
+
+  stopAnswerTimer();
+  answerPhase = false;
+
+  const ok = recordCurrentAnswer();
+
+  $("result").textContent = ok
+    ? "Richtig"
+    : `Falsch – richtig war ${target}`;
+  $("result").className = ok
+    ? "result good"
+    : "result bad";
+
+  $("answerArea").classList.remove("show");
+  $("topProgress").classList.remove("show");
+  $("topProgressBar").style.width = "0%";
+  $("digit").textContent = "–";
+  $("start").disabled = false;
+}
+
+function nextRoundNow(){
+  if(!answerPhase) return;
+
+  stopAnswerTimer();
+  answerPhase = false;
+
+  recordCurrentAnswer();
 
   $("answerArea").classList.remove("show");
   $("topProgress").classList.remove("show");
@@ -334,16 +364,45 @@ function nextRoundNow(){
   $("digit").textContent = "–";
   $("start").disabled = false;
 
-  setTimeout(() => startRound(), 120);
+  setTimeout(startRound, 100);
 }
 
+document.querySelectorAll("[data-key]").forEach(button => {
+  button.addEventListener("click", () => {
+    if(!answerPhase) return;
+
+    flashButton(button);
+
+    const maxLength = Number($("length").value);
+
+    if(entered.length >= maxLength) return;
+
+    entered += button.dataset.key;
+
+    // Eingabe absichtlich NICHT anzeigen.
+  });
+});
+
+$("correction").addEventListener("click", () => {
+  if(!answerPhase) return;
+
+  flashButton($("correction"));
+
+  entered = entered.slice(0, -1);
+});
+
+$("next").addEventListener("click", () => {
+  if(!answerPhase) return;
+
+  flashButton($("next"));
+  nextRoundNow();
+});
+
 $("start").addEventListener("click", startRound);
-$("next").addEventListener("click", nextRoundNow);
 
 saveStats();
 
-/* Alte Service-Worker/Cache-Versionen entfernen, damit GitHub Pages nicht
-   versehentlich eine ältere Variante mit automatischer Auswertung lädt. */
+/* Alte GitHub-Pages-Service-Worker/Cache-Versionen entfernen. */
 (async () => {
   try{
     if("serviceWorker" in navigator){
