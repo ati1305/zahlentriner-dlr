@@ -372,12 +372,17 @@
     }
 
     .solution-line{
-      min-height:24px;
-      margin-top:4px;
+      min-height:34px;
+      margin:0 auto 4px;
+      width:min(690px,100%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
       text-align:center;
-      font-size:14px;
+      font-size:clamp(13px,2vw,16px);
       font-weight:700;
-      color:#444;
+      color:#333;
+      padding:4px 8px;
     }
 
 </style>
@@ -394,7 +399,7 @@
 <div class="task-settings">
   <label>
     Zahlen:
-    <select id="numberCountSelect">
+    <select id="numberCountSelect" aria-label="Anzahl Zahlen für die nächste Aufgabe">
       <option value="3">3</option>
       <option value="4">4</option>
       <option value="5" selected>5</option>
@@ -425,6 +430,8 @@
       <div id="equation" class="equation"></div>
     </section>
 
+    <div id="solutionLine" class="solution-line"></div>
+
     <section class="controls">
       <button id="nextBtn" class="next" type="button">Next</button>
     </section>
@@ -438,7 +445,6 @@
   </div>
 
   <div id="feedback" class="feedback"></div>
-  <div id="solutionLine" class="solution-line"></div>
 </div>
 
 <script>
@@ -446,7 +452,7 @@
   "use strict";
 
   const ROUND_MS = 60000;
-  const FEEDBACK_MS = 650;
+  const FEEDBACK_MS = 2200;
   const MIN_NUMBERS = 3;
   const MAX_NUMBERS = 5;
   const MAX_ABS_RESULT = 999;
@@ -476,6 +482,8 @@
   let solutionOps = [];
 
   let roundActive = false;
+  let timeExpired = false;
+  let resultCounted = false;
   let roundStart = 0;
   let animationFrame = 0;
   let roundToken = 0;
@@ -883,42 +891,60 @@
     return Number.isFinite(value) && Math.abs(value-target)<1e-9;
   }
 
-  function endRound(reason="timeout"){
-    if(!roundActive) return;
-
-    roundActive=false;
-    numberCountSelect.disabled=false;
-    cancelAnimationFrame(animationFrame);
-    popup.classList.remove("show");
-    selectedGap=-1;
-
-    if(reason==="timeout"){
-      timerFill.style.width="100%";
-    }
-
+  function showCurrentEvaluation(){
     const isCorrect=checkAnswer();
 
-    if(isCorrect){
-      correct++;
-      currentStreak++;
-      bestStreak=Math.max(bestStreak,currentStreak);
-    }else{
-      wrong++;
-      currentStreak=0;
+    if(!resultCounted){
+      if(isCorrect){
+        correct++;
+        currentStreak++;
+        bestStreak=Math.max(bestStreak,currentStreak);
+      }else{
+        wrong++;
+        currentStreak=0;
+      }
+
+      resultCounted=true;
+      updateStats();
     }
 
-    updateStats();
-    renderEquation();
-    solutionLineEl.textContent = "Rechenweg: " + formatGeneratedPath();
+    const generatedPath=formatGeneratedPath();
+    solutionLineEl.textContent=generatedPath
+      ? "Rechenweg: " + generatedPath
+      : "";
+
     showFeedback(isCorrect);
+  }
 
-    const tokenAtEnd=roundToken;
+  function endRound(reason="timeout"){
+    if(reason==="timeout"){
+      if(timeExpired) return;
 
-    setTimeout(()=>{
-      if(tokenAtEnd===roundToken){
-        startRound();
-      }
-    },FEEDBACK_MS);
+      timeExpired=true;
+      roundActive=false;
+      cancelAnimationFrame(animationFrame);
+
+      timerFill.style.width="100%";
+      popup.classList.remove("show");
+      selectedGap=-1;
+
+      // Nach 60 Sekunden ist die Aufgabe vollständig eingefroren.
+      // Keine Rechenzeichen können mehr geändert werden.
+      showCurrentEvaluation();
+      renderEquation();
+      return;
+    }
+
+    // Next beendet eine noch laufende Aufgabe und wertet sie aus.
+    if(roundActive){
+      roundActive=false;
+      cancelAnimationFrame(animationFrame);
+      popup.classList.remove("show");
+      selectedGap=-1;
+
+      showCurrentEvaluation();
+      renderEquation();
+    }
   }
 
   function animateTimer(token){
@@ -958,8 +984,9 @@
     selectedGap=-1;
 
     timerFill.style.width="0%";
+    timeExpired=false;
+    resultCounted=false;
     roundActive=true;
-    numberCountSelect.disabled=true;
     roundStart=performance.now();
 
     renderEquation();
@@ -969,7 +996,14 @@
   nextBtn.addEventListener("pointerdown",(event)=>{
     event.preventDefault();
     flash(nextBtn);
-    endRound("next");
+
+    if(roundActive){
+      endRound("next");
+    }
+
+    // Egal ob vorzeitig beendet oder Zeit bereits abgelaufen:
+    // Eine neue Aufgabe entsteht nur durch diesen Next-Druck.
+    setTimeout(startRound,120);
   },{passive:false});
 
   document.addEventListener("dblclick",(event)=>{
