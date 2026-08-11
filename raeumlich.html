@@ -848,24 +848,18 @@ body{min-height:100dvh}
     const radius=modelRadius(m);
     const basis=cameraBasis(camera);
 
-    const cameraDistance=radius*4.5+2.4;
-    const cameraPos=mul(camera.position,cameraDistance);
-    const focal=cameraDistance*1.02;
-    const baseScale=96/Math.max(1,radius);
+    const baseScale=104/Math.max(1.0,radius);
 
     function projectWorldPoint(p){
-      const rel=sub(p,cameraPos);
-      const cx=dot(rel,basis.right);
-      const cy=dot(rel,basis.up);
-      const cz=dot(rel,basis.forward);
-
-      const depth=Math.max(.8,cz);
-      const perspective=focal/depth;
+      const cx=dot(p,basis.right);
+      const cy=dot(p,basis.up);
+      const cz=dot(p,basis.forward);
 
       return {
-        x:cx,y:cy,z:cz,perspective,
-        sx:210+cx*baseScale*perspective,
-        sy:170-cy*baseScale*perspective
+        x:cx,y:cy,z:cz,
+        perspective:1,
+        sx:210+cx*baseScale,
+        sy:170-cy*baseScale
       };
     }
 
@@ -880,7 +874,7 @@ body{min-height:100dvh}
           sourceType:"line",
           pathPts:[pa,pb],
           depth:(pa.z+pb.z)/2,
-          perspective:(pa.perspective+pb.perspective)/2
+          perspective:1
         };
       }
 
@@ -889,12 +883,12 @@ body{min-height:100dvh}
         const wb=m.points[edge.b];
         const control=stableCurveControl(
           wa,wb,
-          edge.bend ?? .35,
+          edge.bend ?? .22,
           edge.side ?? 1
         );
 
         const pathPts=[];
-        const samples=18;
+        const samples=16;
         for(let i=0;i<=samples;i++){
           const t=i/samples;
           pathPts.push(projectWorldPoint(pointOnQuadratic3D(wa,control,wb,t)));
@@ -905,17 +899,17 @@ body{min-height:100dvh}
           sourceType:"curve",
           pathPts,
           depth:pathPts.reduce((s,p)=>s+p.z,0)/pathPts.length,
-          perspective:pathPts.reduce((s,p)=>s+p.perspective,0)/pathPts.length
+          perspective:1
         };
       }
 
       if(edge.type==="ring"){
         const center=m.points[edge.center];
         const {u,v}=ringBasis(edge.tilt ?? 0,edge.center+edgeIndex);
-        const rr=edge.radius ?? .55;
+        const rr=edge.radius ?? .48;
 
         const pathPts=[];
-        const samples=30;
+        const samples=28;
         for(let i=0;i<=samples;i++){
           const a=(i/samples)*Math.PI*2;
           const world=add(
@@ -933,7 +927,7 @@ body{min-height:100dvh}
           sourceType:"ring",
           pathPts,
           depth:pathPts.reduce((s,p)=>s+p.z,0)/pathPts.length,
-          perspective:pathPts.reduce((s,p)=>s+p.perspective,0)/pathPts.length
+          perspective:1
         };
       }
 
@@ -1148,169 +1142,99 @@ body{min-height:100dvh}
   }
 
   function generateSpatialModel(){
-    const complexity = pick(["easy","medium","medium","hard"]);
+    const complexity=pick(["easy","easy","medium","medium","medium","hard"]);
+
     const nodeCount =
-      complexity==="easy" ? rand(7,10) :
-      complexity==="medium" ? rand(10,15) :
-      rand(15,22);
+      complexity==="easy" ? rand(6,8) :
+      complexity==="medium" ? rand(8,10) :
+      rand(10,12);
 
     const points=[];
     const edges=[];
     const keys=new Set();
 
-    // Build a 3D "spine" first. It deliberately changes direction and height.
-    let x=-1.5, y=(Math.random()-.5)*.8, z=(Math.random()-.5)*.25;
+    // A compact 3D chain, not a random tangle.
+    let x=-1.25,y=0,z=0;
     points.push(v(x,y,z));
 
     for(let i=1;i<nodeCount;i++){
-      const phase=i/(nodeCount-1);
-      const dx=0.28+Math.random()*.42;
-      x += dx;
+      x += .28+Math.random()*.34;
+      y += (Math.random()-.5)*.65;
+      z += (Math.random()-.5)*.65;
 
-      y += (Math.random()-.5)*(complexity==="hard"?.95:.72);
-      z += (Math.random()-.5)*(complexity==="hard"?.9:.68);
-
-      // occasional strong depth jumps; prevents flat-looking models
-      if(Math.random()<.28){
-        z += (Math.random()<.5?-1:1)*(0.5+Math.random()*.75);
-      }
-
-      // occasional return/curl in x for open loops / tangled forms
-      if(Math.random()<.16){
-        x -= 0.45+Math.random()*.75;
+      if(i%3===0){
+        z += (Math.random()<.5?-1:1)*(.35+Math.random()*.35);
       }
 
       points.push(v(
-        clamp(x,-2.0,2.0),
-        clamp(y,-1.65,1.65),
-        clamp(z,-1.55,1.8)
+        clamp(x,-1.7,1.7),
+        clamp(y,-1.15,1.15),
+        clamp(z,-1.15,1.35)
       ));
     }
 
-    // Normalize center
+    // Center object.
     const mx=points.reduce((s,p)=>s+p.x,0)/points.length;
     const my=points.reduce((s,p)=>s+p.y,0)/points.length;
     const mz=points.reduce((s,p)=>s+p.z,0)/points.length;
     points.forEach(p=>{p.x-=mx;p.y-=my;p.z-=mz;});
 
-    // Main chain: mix straight and curved pieces.
+    // Main chain.
     for(let i=0;i<points.length-1;i++){
-      if(Math.random() < (complexity==="easy"?.18:.30)){
-        addEdgeUnique(edges,{
-          type:"curve",a:i,b:i+1,
-          bend:.18+Math.random()*.34,
-          side:Math.random()<.5?-1:1
-        },keys);
-      }else{
-        addEdgeUnique(edges,[i,i+1],keys);
-      }
+      addEdgeUnique(edges,[i,i+1],keys);
     }
 
-    // Add cross-connections to create cages / triangles / prisms / crossings.
-    const extra =
-      complexity==="easy" ? rand(3,5) :
-      complexity==="medium" ? rand(6,10) :
-      rand(10,17);
+    // Only a few additional braces.
+    const braces =
+      complexity==="easy" ? rand(2,3) :
+      complexity==="medium" ? rand(3,5) :
+      rand(5,7);
 
-    for(let k=0;k<extra;k++){
-      const a=rand(0,points.length-1);
-      const candidates=nearestIndices(points,a,Math.min(6,points.length-1));
-      if(!candidates.length) continue;
-
-      let b=pick(candidates);
-      if(Math.abs(a-b)<=1 && Math.random()<.65){
-        b=rand(0,points.length-1);
-      }
-      if(a===b) continue;
-
-      const pa=points[a],pb=points[b];
-      const dist=Math.hypot(pa.x-pb.x,pa.y-pb.y,pa.z-pb.z);
-      if(dist>2.7) continue;
-
-      if(Math.random()<.27){
-        addEdgeUnique(edges,{
-          type:"curve",a,b,
-          bend:.16+Math.random()*.38,
-          side:Math.random()<.5?-1:1
-        },keys);
-      }else{
-        addEdgeUnique(edges,[a,b],keys);
-      }
-    }
-
-    // Add local triangular / cage motifs.
-    const motifs =
-      complexity==="easy" ? rand(0,1) :
-      complexity==="medium" ? rand(1,3) :
-      rand(2,5);
-
-    for(let m=0;m<motifs;m++){
+    for(let k=0;k<braces;k++){
       const a=rand(0,points.length-3);
-      const b=Math.min(points.length-1,a+rand(1,2));
-      const c=Math.min(points.length-1,b+rand(1,2));
-      if(a!==b && b!==c && a!==c){
-        addEdgeUnique(edges,[a,b],keys);
-        addEdgeUnique(edges,[b,c],keys);
-        if(Math.random()<.78) addEdgeUnique(edges,[a,c],keys);
-      }
+      const b=Math.min(points.length-1,a+rand(2,3));
+      addEdgeUnique(edges,[a,b],keys);
     }
 
-    // Genuine ring elements, but not in every task.
-    const ringChance =
-      complexity==="easy" ? .12 :
-      complexity==="medium" ? .22 : .32;
+    // Curves are occasional, not dominant.
+    const curveCount =
+      complexity==="easy" ? (Math.random()<.18?1:0) :
+      complexity==="medium" ? rand(0,1) :
+      rand(0,2);
 
-    const ringCount = Math.random()<ringChance ? rand(1, complexity==="hard"?3:2) : 0;
-    for(let r=0;r<ringCount;r++){
-      const center=rand(0,points.length-1);
-      addEdgeUnique(edges,{
-        type:"ring",
-        center,
-        radius:.38+Math.random()*.42,
-        tilt:rand(0,85)
-      },keys);
-    }
-
-    // Open C/U/S style curves: create long curved shortcuts without closing everything.
-    const openCurves =
-      complexity==="easy" ? rand(0,1) :
-      complexity==="medium" ? rand(1,3) :
-      rand(2,5);
-
-    for(let c=0;c<openCurves;c++){
+    for(let c=0;c<curveCount;c++){
       const a=rand(0,points.length-3);
-      const b=rand(a+2,points.length-1);
+      const b=Math.min(points.length-1,a+rand(2,4));
       addEdgeUnique(edges,{
-        type:"curve",a,b,
-        bend:.28+Math.random()*.40,
+        type:"curve",
+        a,b,
+        bend:.16+Math.random()*.16,
         side:Math.random()<.5?-1:1
       },keys);
     }
 
-    // Reject obviously weak / too sparse topologies by ensuring adequate degree.
-    const degree=Array(points.length).fill(0);
-    edges.forEach(e=>{
-      if(Array.isArray(e)){
-        degree[e[0]]++; degree[e[1]]++;
-      }else if(e.type==="curve"){
-        degree[e.a]++; degree[e.b]++;
-      }else if(e.type==="ring"){
-        degree[e.center]+=2;
-      }
-    });
+    // Rings/circles only sometimes, max one.
+    if(Math.random() < (complexity==="hard"?.25:.12)){
+      const center=rand(1,points.length-2);
+      addEdgeUnique(edges,{
+        type:"ring",
+        center,
+        radius:.34+Math.random()*.22,
+        tilt:rand(10,70)
+      },keys);
+    }
 
-    // Add connections to isolated/weak nodes.
-    for(let i=0;i<degree.length;i++){
-      if(degree[i]>=2) continue;
-      const near=nearestIndices(points,i,4).filter(j=>degree[j]>0);
-      if(!near.length) continue;
-      const j=pick(near);
-      addEdgeUnique(edges,[i,j],keys);
-      degree[i]++; degree[j]++;
+    // A small triangle/cage motif sometimes.
+    if(complexity!=="easy" && Math.random()<.55){
+      const a=rand(0,points.length-3);
+      const b=a+1;
+      const c=Math.min(points.length-1,a+2);
+      addEdgeUnique(edges,[a,c],keys);
+      if(Math.random()<.5) addEdgeUnique(edges,[b,c],keys);
     }
 
     return {
-      name:"generated-"+complexity+"-"+Date.now()+"-"+Math.random().toString(36).slice(2,7),
+      name:"generated-"+complexity+"-"+Math.random().toString(36).slice(2,7),
       points,
       edges,
       generated:true,
@@ -1319,25 +1243,24 @@ body{min-height:100dvh}
   }
 
   function modelQuality(m){
-    // Measures genuine 3D spread. High score means not flat.
-    const xs=m.points.map(p=>p.x), ys=m.points.map(p=>p.y), zs=m.points.map(p=>p.z);
+    const xs=m.points.map(p=>p.x),ys=m.points.map(p=>p.y),zs=m.points.map(p=>p.z);
     const span=a=>Math.max(...a)-Math.min(...a);
-    const sx=span(xs), sy=span(ys), sz=span(zs);
 
-    const dimensions=[sx,sy,sz].sort((a,b)=>a-b);
-    const dimensionality=dimensions[0]/Math.max(.01,dimensions[2]);
+    const sx=span(xs),sy=span(ys),sz=span(zs);
+    const minSpan=Math.min(sx,sy,sz);
+    const maxSpan=Math.max(sx,sy,sz);
 
-    const edgeCount=m.edges.length;
-    const nodeCount=m.points.length;
-    const density=edgeCount/Math.max(1,nodeCount);
+    const dimensionality=minSpan/Math.max(.01,maxSpan);
 
-    return dimensionality*90 + density*16 + nodeCount*.7;
+    // prefer readable 3D objects with moderate density
+    const density=m.edges.length/Math.max(1,m.points.length);
+    return dimensionality*100 + Math.min(density,1.8)*12;
   }
 
   function generateGoodSpatialModel(){
     for(let i=0;i<80;i++){
       const m=generateSpatialModel();
-      if(modelQuality(m) < 40) continue;
+      if(modelQuality(m) < 28) continue;
       return m;
     }
 
@@ -1363,35 +1286,17 @@ body{min-height:100dvh}
 
 
   function chooseTask(){
-    for(let attempt=0;attempt<220;attempt++){
-      // New task = newly generated topology, not merely a rotated preset.
+    for(let attempt=0;attempt<180;attempt++){
       const candidate=generateGoodSpatialModel();
 
-      const startCamera=makeCamera(
-        rand(12,78),
-        rand(16,34),
-        pick([-4,0,0,0,4])
-      );
+      // Fixed start view similar to the original test.
+      const startCamera=makeCamera(35,22,0);
 
       const dir=pick(directions);
       const targetCamera=targetCameraFor(startCamera,dir);
 
-      // Reject views that are too similar.
       const diff=viewDifference(candidate,startCamera,targetCamera);
-      if(diff<68) continue;
-
-      // Reject if two alternative directions are visually almost as plausible.
-      const targetGeom=projectedGeometry(candidate,targetCamera);
-      const alternatives=directions
-        .filter(d=>d!==dir)
-        .map(d=>({
-          d,
-          diff:viewDifference(candidate,targetCameraFor(startCamera,d),targetCamera)
-        }))
-        .sort((a,b)=>a.diff-b.diff);
-
-      // The mathematically correct view should be distinctly different from alternatives.
-      if(alternatives.length && alternatives[0].diff<26) continue;
+      if(diff<50) continue;
 
       model=candidate;
       answerDir=dir;
@@ -1401,11 +1306,10 @@ body{min-height:100dvh}
       return;
     }
 
-    // Last-resort reserve.
     model=transformedModel(
       MODELS.find(m=>m.name==="asymmetric-cage") || MODELS[0]
     );
-    const startCamera=makeCamera(37,25,0);
+    const startCamera=makeCamera(35,22,0);
     answerDir="right";
     renderModel(startSvg,model,startCamera);
     renderModel(targetSvg,model,targetCameraFor(startCamera,answerDir));
