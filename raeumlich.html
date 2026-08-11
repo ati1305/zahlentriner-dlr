@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>DLR Räumliches Vorstellungsvermögen</title>
+
+<style>
+:root{
+  --blue:#bfe3f2;
+  --blue2:#8fc7dc;
+  --ink:#0b6f8e;
+  --rod:#0b7898;
+  --node:#0d86aa;
+  --good:#4f9b2c;
+  --bad:#b42318;
+  --line:#d7d7d7;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body,button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+html,body{
+  margin:0;width:100%;height:100%;overflow:hidden;
+  background:#fff;color:#111;
+  font-family:Arial,Helvetica,sans-serif
+}
+body{min-height:100dvh}
+
+.timer-track{
+  position:fixed;top:0;left:0;width:100%;height:6px;
+  background:#e7e7e7;z-index:1000
+}
+.timer-fill{
+  height:100%;width:0;background:#8fc7dc;will-change:width
+}
+
+.site-nav{
+  height:40px;
+  padding:8px 8px 0;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:5px
+}
+.site-nav a{
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid #aaa;border-radius:5px;
+  background:#fff;color:#111;text-decoration:none;
+  font-size:10px;font-weight:700
+}
+.site-nav a.active{background:var(--blue);border-color:var(--blue2)}
+
+.app{
+  width:min(980px,100%);
+  height:calc(100dvh - 40px);
+  margin:0 auto;
+  padding:6px 10px 10px;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto auto;
+  gap:5px
+}
+
+.header{
+  min-height:24px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px
+}
+.title{font-size:15px;font-weight:700}
+.stats{
+  display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;
+  font-size:9px;font-variant-numeric:tabular-nums
+}
+.stats b{font-size:10px}
+
+.stage{
+  min-height:0;
+  display:grid;
+  grid-template-columns:1fr 1px 1fr;
+  gap:8px;
+  align-items:center
+}
+.separator{
+  width:1px;height:74%;background:#cdd8dc;justify-self:center
+}
+.panel{
+  min-width:0;min-height:0;
+  height:100%;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  align-items:center
+}
+.panel-title{
+  font-size:15px;
+  padding:2px 0 4px;
+  text-align:center
+}
+
+.start-wrap{
+  position:relative;
+  width:100%;
+  height:100%;
+  min-height:300px
+}
+.target-wrap{
+  width:100%;
+  height:100%;
+  min-height:300px
+}
+
+.view-svg{
+  width:100%;
+  height:100%;
+  display:block;
+  overflow:visible
+}
+
+.arrow{
+  position:absolute;
+  width:46px;height:46px;
+  border:0;background:transparent;
+  color:#111;font-size:38px;font-weight:900;
+  line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer
+}
+.arrow.selected{
+  color:#4f9fb9;
+  text-shadow:0 0 0 #4f9fb9
+}
+.arrow.up{left:50%;top:2%;transform:translateX(-50%)}
+.arrow.down{left:50%;bottom:2%;transform:translateX(-50%)}
+.arrow.left{left:3%;top:50%;transform:translateY(-50%)}
+.arrow.right{right:3%;top:50%;transform:translateY(-50%)}
+
+.result{
+  min-height:26px;
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;font-size:13px;font-weight:700
+}
+.result.good{color:var(--good)}
+.result.bad{color:var(--bad)}
+
+.next{
+  width:min(330px,100%);
+  margin:0 auto 8px;
+  height:36px;
+  border:1px solid #777;border-radius:5px;background:#efefef;
+  color:#111;font-size:13px;font-weight:700
+}
+.next.pressed{background:var(--blue)}
+
+@media(max-width:620px){
+  .site-nav{height:38px}
+  .app{height:calc(100dvh - 38px);padding:4px 6px 7px}
+  .title{font-size:12px}
+  .stats{font-size:8px;gap:5px}
+  .stage{gap:4px}
+  .panel-title{font-size:12px}
+  .start-wrap,.target-wrap{min-height:240px}
+  .arrow{width:38px;height:38px;font-size:31px}
+  .next{height:34px}
+}
+
+@media(max-height:700px){
+  .start-wrap,.target-wrap{min-height:205px}
+  .panel-title{font-size:11px}
+  .arrow{width:34px;height:34px;font-size:28px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="timer-track"><div id="timerFill" class="timer-fill"></div></div>
+
+<nav class="site-nav" aria-label="DLR Training Navigation">
+  <a href="index.html">Zahlen</a>
+  <a href="rechnen.html">Rechnen</a>
+  <a href="konzentration.html">Konzentration</a>
+  <a href="raeumlich.html" class="active">Räumlich</a>
+</nav>
+
+<main class="app">
+  <div class="header">
+    <div class="title">DLR Räumliches Vorstellungsvermögen</div>
+    <div class="stats">
+      <span>R <b id="correct">0</b></span>
+      <span>F <b id="wrong">0</b></span>
+      <span>Quote <b id="rate">0%</b></span>
+      <span>Serie <b id="best">0</b></span>
+    </div>
+  </div>
+
+  <section class="stage">
+    <div class="panel">
+      <div class="panel-title">Start view</div>
+      <div class="start-wrap">
+        <svg id="startSvg" class="view-svg" viewBox="0 0 420 340" aria-label="Startansicht"></svg>
+
+        <button class="arrow up" data-dir="up" type="button">↓</button>
+        <button class="arrow down" data-dir="down" type="button">↑</button>
+        <button class="arrow left" data-dir="left" type="button">→</button>
+        <button class="arrow right" data-dir="right" type="button">←</button>
+      </div>
+    </div>
+
+    <div class="separator"></div>
+
+    <div class="panel">
+      <div class="panel-title">Target view</div>
+      <div class="target-wrap">
+        <svg id="targetSvg" class="view-svg" viewBox="0 0 420 340" aria-label="Zielansicht"></svg>
+      </div>
+    </div>
+  </section>
+
+  <div id="result" class="result"></div>
+  <button id="next" class="next" type="button">Next</button>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  // 60 Sekunden pro Aufgabe.
+  const ROUND_MS = 60000;
+
+  const timerFill = document.getElementById("timerFill");
+  const startSvg = document.getElementById("startSvg");
+  const targetSvg = document.getElementById("targetSvg");
+  const result = document.getElementById("result");
+  const next = document.getElementById("next");
+
+  const correctEl = document.getElementById("correct");
+  const wrongEl = document.getElementById("wrong");
+  const rateEl = document.getElementById("rate");
+  const bestEl = document.getElementById("best");
+
+  const arrowButtons = [...document.querySelectorAll(".arrow")];
+
+  let model = null;
+  let answerDir = "left";
+  let selectedDir = null;
+  let evaluated = false;
+  let startedAt = 0;
+  let raf = 0;
+
+  let stats = {correct:0,wrong:0,streak:0,best:0};
+  try{
+    stats = JSON.parse(
+      localStorage.getItem("dlrSpatialStatsV1") ||
+      JSON.stringify(stats)
+    );
+  }catch(e){}
+
+  function saveStats(){
+    localStorage.setItem("dlrSpatialStatsV1", JSON.stringify(stats));
+    correctEl.textContent = stats.correct;
+    wrongEl.textContent = stats.wrong;
+    bestEl.textContent = stats.best;
+    const total = stats.correct + stats.wrong;
+    rateEl.textContent = total ? Math.round(stats.correct/total*100)+"%" : "0%";
+  }
+
+  function rand(min,max){
+    return Math.floor(Math.random()*(max-min+1))+min;
+  }
+  function pick(arr){
+    return arr[Math.floor(Math.random()*arr.length)];
+  }
+
+  function v(x,y,z){ return {x,y,z}; }
+
+  // Mehrere Grundmodelle mit unterschiedlichem Schwierigkeitsgrad.
+  const MODELS = [
+    {
+      name:"open-frame",
+      points:[
+        v(-1,-1,0),v(1,-1,0),v(-1,1,0),v(1,1,0),
+        v(-.6,-.6,1.2),v(.7,-.6,1),v(-.5,.7,1.1),v(.7,.7,1.35)
+      ],
+      edges:[
+        [0,1],[0,2],[1,3],[2,3],
+        [4,5],[4,6],[5,7],[6,7],
+        [0,4],[1,5],[2,6],[3,7],
+        [0,5],[3,6]
+      ]
+    },
+    {
+      name:"double-pyramid",
+      points:[
+        v(-1.4,0,0),v(-.5,-.8,0),v(-.5,.8,0),v(.3,0,.15),
+        v(.9,-.8,0),v(.9,.8,0),v(1.5,0,0),
+        v(-.5,0,1.25),v(.9,0,1.1)
+      ],
+      edges:[
+        [0,1],[0,2],[1,2],[1,3],[2,3],
+        [1,7],[2,7],[3,7],
+        [3,4],[3,5],[4,5],[4,6],[5,6],
+        [4,8],[5,8],[3,8]
+      ]
+    },
+    {
+      name:"branch",
+      points:[
+        v(-1.3,-.2,0),v(-.7,-.2,0),v(-.7,.6,0),
+        v(0,0,0),v(.5,-.6,.2),v(.9,.1,.4),v(1.4,.3,.2),
+        v(.3,.3,1.1),v(.7,.5,1.5),v(1,.2,1.0),
+        v(-.1,-.2,.9)
+      ],
+      edges:[
+        [0,1],[1,2],[1,3],[2,3],
+        [3,4],[4,5],[5,6],
+        [3,7],[7,8],[8,9],[9,5],
+        [3,10],[10,7],[10,5]
+      ]
+    },
+    {
+      name:"cage",
+      points:[
+        v(-1,-1,0),v(1,-1,0),v(-1,1,0),v(1,1,0),
+        v(-1,-1,1.2),v(1,-1,1.2),v(-1,1,1.2),v(1,1,1.2),
+        v(0,0,.6),v(0,-1,.6),v(0,1,.6)
+      ],
+      edges:[
+        [0,1],[0,2],[1,3],[2,3],
+        [4,5],[4,6],[5,7],[6,7],
+        [0,4],[1,5],[2,6],[3,7],
+        [0,8],[1,8],[2,8],[3,8],
+        [4,8],[5,8],[6,8],[7,8],
+        [9,8],[10,8]
+      ]
+    },
+    {
+      name:"zigzag",
+      points:[
+        v(-1.5,-.6,0),v(-.8,-.6,0),v(-.8,.3,.1),
+        v(-.1,.3,.1),v(-.1,-.5,.3),v(.6,-.5,.3),
+        v(.6,.4,.5),v(1.3,.4,.5),
+        v(-1.1,0,1),v(-.4,0,1.15),v(.3,0,1.0),v(1,0,1.25)
+      ],
+      edges:[
+        [0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],
+        [0,8],[8,9],[9,3],[3,10],[10,11],[11,7],
+        [1,8],[4,10],[6,11]
+      ]
+    }
+  ];
+
+  const directions = ["up","right","down","left"];
+  const azimuths = {
+    up: 225,
+    right: 315,
+    down: 45,
+    left: 135
+  };
+
+  function deg(d){ return d*Math.PI/180; }
+
+  function rotatePoint(p, yawDeg, pitchDeg=22){
+    const y=deg(yawDeg);
+    const c=Math.cos(y), s=Math.sin(y);
+
+    // yaw around vertical z axis
+    const x1=p.x*c - p.y*s;
+    const y1=p.x*s + p.y*c;
+    const z1=p.z;
+
+    // tilt/elevation
+    const pitch=deg(pitchDeg);
+    const cp=Math.cos(pitch), sp=Math.sin(pitch);
+
+    const y2=y1*cp - z1*sp;
+    const z2=y1*sp + z1*cp;
+
+    return {x:x1,y:y2,z:z2};
+  }
+
+  function projectedGeometry(m,yaw){
+    const pts=m.points.map((p,i)=>{
+      const r=rotatePoint(p,yaw);
+      return {i,x:r.x,y:r.y,z:r.z};
+    });
+
+    // fit to viewport
+    const xs=pts.map(p=>p.x), ys=pts.map(p=>p.y);
+    const minX=Math.min(...xs),maxX=Math.max(...xs);
+    const minY=Math.min(...ys),maxY=Math.max(...ys);
+    const w=Math.max(.01,maxX-minX),h=Math.max(.01,maxY-minY);
+    const scale=Math.min(245/w,220/h);
+
+    pts.forEach(p=>{
+      p.sx=210+(p.x-(minX+maxX)/2)*scale;
+      p.sy=170-(p.y-(minY+maxY)/2)*scale;
+    });
+
+    const edges=m.edges.map(([a,b])=>{
+      const pa=pts[a],pb=pts[b];
+      return {a,b,depth:(pa.z+pb.z)/2};
+    }).sort((a,b)=>a.depth-b.depth);
+
+    return {pts,edges};
+  }
+
+  function renderModel(svg,m,yaw){
+    svg.innerHTML="";
+    const g=projectedGeometry(m,yaw);
+
+    // rods first, depth sorted
+    g.edges.forEach(e=>{
+      const a=g.pts[e.a], b=g.pts[e.b];
+      const line=document.createElementNS("http://www.w3.org/2000/svg","line");
+      line.setAttribute("x1",a.sx);
+      line.setAttribute("y1",a.sy);
+      line.setAttribute("x2",b.sx);
+      line.setAttribute("y2",b.sy);
+      line.setAttribute("stroke","#0b7898");
+      line.setAttribute("stroke-width","7");
+      line.setAttribute("stroke-linecap","round");
+      svg.appendChild(line);
+    });
+
+    // nodes depth sorted so nearer nodes sit on top
+    [...g.pts].sort((a,b)=>a.z-b.z).forEach(p=>{
+      const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+      c.setAttribute("cx",p.sx);
+      c.setAttribute("cy",p.sy);
+      c.setAttribute("r","10");
+      c.setAttribute("fill","#0d86aa");
+      c.setAttribute("stroke","#075b77");
+      c.setAttribute("stroke-width","2");
+      svg.appendChild(c);
+    });
+  }
+
+  function chooseTask(){
+    model = pick(MODELS);
+
+    // Start view stays the same reference direction.
+    const startYaw=45;
+
+    // Target corresponds to one of four surrounding directions.
+    answerDir = pick(directions);
+    const targetYaw = azimuths[answerDir];
+
+    renderModel(startSvg,model,startYaw);
+    renderModel(targetSvg,model,targetYaw);
+  }
+
+  function setSelected(dir){
+    if(evaluated) return;
+    selectedDir=dir;
+    arrowButtons.forEach(b=>{
+      b.classList.toggle("selected",b.dataset.dir===dir);
+    });
+  }
+
+  function evaluate(fromTimeout=false){
+    if(evaluated) return;
+
+    cancelAnimationFrame(raf);
+    evaluated=true;
+    timerFill.style.width="100%";
+
+    const ok = selectedDir===answerDir;
+
+    if(ok){
+      stats.correct++;
+      stats.streak++;
+      stats.best=Math.max(stats.best,stats.streak);
+      result.textContent="Richtig";
+      result.className="result good";
+    }else{
+      stats.wrong++;
+      stats.streak=0;
+      const names={up:"oben",right:"rechts",down:"unten",left:"links"};
+      result.textContent = selectedDir
+        ? "Falsch · richtig wäre: " + names[answerDir]
+        : "Zeit abgelaufen · richtig wäre: " + names[answerDir];
+      result.className="result bad";
+    }
+
+    saveStats();
+    next.textContent="Nächste Aufgabe";
+  }
+
+  function animate(){
+    if(evaluated) return;
+
+    const elapsed=performance.now()-startedAt;
+    const pct=Math.min(elapsed/ROUND_MS,1);
+    timerFill.style.width=(pct*100)+"%";
+
+    if(pct>=1){
+      evaluate(true);
+      return;
+    }
+
+    raf=requestAnimationFrame(animate);
+  }
+
+  function startNew(){
+    cancelAnimationFrame(raf);
+    evaluated=false;
+    selectedDir=null;
+    result.textContent="";
+    result.className="result";
+    next.textContent="Next";
+    timerFill.style.width="0%";
+    arrowButtons.forEach(b=>b.classList.remove("selected"));
+
+    chooseTask();
+
+    startedAt=performance.now();
+    raf=requestAnimationFrame(animate);
+  }
+
+  arrowButtons.forEach(btn=>{
+    btn.addEventListener("pointerdown",ev=>{
+      ev.preventDefault();
+      setSelected(btn.dataset.dir);
+    },{passive:false});
+  });
+
+  next.addEventListener("pointerdown",ev=>{
+    ev.preventDefault();
+    next.classList.add("pressed");
+    setTimeout(()=>next.classList.remove("pressed"),80);
+
+    if(evaluated){
+      startNew();
+    }else{
+      evaluate(false);
+    }
+  },{passive:false});
+
+  document.addEventListener("dblclick",ev=>ev.preventDefault(),{passive:false});
+
+  saveStats();
+  startNew();
+})();
+</script>
+</body>
+</html>
