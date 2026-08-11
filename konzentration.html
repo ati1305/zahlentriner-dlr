@@ -5,22 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
 <title>DLR Konzentrationstrainer</title>
+
 <style>
 :root{
   --blue:#bfe3f2;
   --blue2:#8fc7dc;
-  --line:#9aa0a6;
-  --green:#76b947;
-  --red:#c13a2a;
+  --ink:#2f4054;
+  --good:#5b9b32;
+  --bad:#b42318;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body,button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fff;color:#111;font-family:Arial,Helvetica,sans-serif}
+html,body{
+  margin:0;width:100%;height:100%;overflow:hidden;background:#fff;color:#111;
+  font-family:Arial,Helvetica,sans-serif
+}
 body{min-height:100dvh}
+
+.timer-track{
+  position:fixed;top:0;left:0;width:100%;height:6px;background:#e7e7e7;z-index:1000
+}
+.timer-fill{
+  height:100%;width:0;background:#8fc7dc;will-change:width
+}
 
 .site-nav{
   height:40px;
-  padding:6px 8px 0;
+  padding:8px 8px 0;
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:5px;
@@ -36,115 +47,119 @@ body{min-height:100dvh}
   width:min(760px,100%);
   height:calc(100dvh - 40px);
   margin:0 auto;
-  padding:6px 10px 10px;
+  padding:5px 9px 9px;
   display:grid;
-  grid-template-rows:auto auto 1px minmax(0,1fr) auto auto;
-  gap:7px;
+  grid-template-rows:auto auto 2px minmax(0,1fr) auto auto;
+  gap:5px;
 }
 
 .header{
   display:flex;align-items:center;justify-content:space-between;gap:8px;
+  min-height:24px
 }
-.title{font-size:16px;font-weight:700}
-.stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;font-size:10px}
-.stats b{font-size:11px}
+.title{font-size:15px;font-weight:700}
+.stats{
+  display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap;
+  font-size:9px;font-variant-numeric:tabular-nums
+}
+.stats b{font-size:10px}
 
-.instruction{
+.rule-area{
   text-align:center;
-  font-size:14px;
-  line-height:1.25
+  font-size:13px;
+  line-height:1.15
+}
+.task-no{
+  color:#666;
+  font-size:11px;
+  margin-bottom:2px
 }
 .rule{
-  margin-top:4px;
-  font-size:17px;
-  line-height:1.5
+  display:inline-grid;
+  grid-template-columns:auto auto;
+  gap:2px 7px;
+  align-items:center;
+  justify-content:center;
+  margin-top:2px;
+  font-size:15px
 }
-.rule .tri{font-size:22px}
-.rule .dot{font-size:21px}
+.rule-symbol{
+  width:25px;height:25px;
+  display:inline-flex;align-items:center;justify-content:center
+}
+.rule-symbol svg{width:24px;height:24px;overflow:visible}
 
-.divider{background:#7faec0;width:100%}
+.divider{background:#77aabd;width:100%;height:2px}
 
 .grid-wrap{
   min-height:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:flex;align-items:center;justify-content:center
 }
 .figure-grid{
-  width:min(420px,92vw);
+  width:min(390px,91vw);
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:10px;
+  gap:6px
 }
 .figure{
   aspect-ratio:1/1;
   border:1px solid transparent;
   background:#fff;
-  padding:4px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
+  padding:3px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer
 }
 .figure.selected{
-  border-color:#9ab7c3;
-  background:#f7fbfd;
+  border-color:#91b5c4;
+  background:#f6fbfd
 }
-.figure.correct-choice{
-  outline:3px solid rgba(118,185,71,.5);
-}
-.figure.wrong-choice{
-  outline:3px solid rgba(193,58,42,.45);
-}
+.figure.correct-choice{outline:2px solid rgba(91,155,50,.55)}
+.figure.wrong-choice{outline:2px solid rgba(180,35,24,.45)}
+.figure.missed-choice{outline:2px dashed rgba(91,155,50,.55)}
 .figure svg{
-  width:100%;
-  height:100%;
-  overflow:visible;
+  width:100%;height:100%;overflow:visible
 }
 
 .result{
-  min-height:34px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:15px;
-  font-weight:700;
+  min-height:27px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700
 }
-.result.good{color:#397a1e}
-.result.bad{color:#b42318}
+.result.good{color:var(--good)}
+.result.bad{color:var(--bad)}
 
 .next{
-  width:min(360px,100%);
+  width:min(330px,100%);
   margin:0 auto;
-  height:40px;
-  border:1px solid #777;
-  border-radius:5px;
-  background:#efefef;
-  color:#111;
-  font-size:14px;
-  font-weight:700
+  height:36px;
+  border:1px solid #777;border-radius:5px;background:#efefef;
+  color:#111;font-size:13px;font-weight:700
 }
 .next.pressed{background:var(--blue)}
 
 @media(max-width:520px){
   .site-nav{height:38px}
-  .app{height:calc(100dvh - 38px);padding:4px 7px 8px;gap:5px}
-  .title{font-size:14px}
-  .stats{font-size:9px;gap:6px}
-  .instruction{font-size:12px}
-  .rule{font-size:15px}
-  .figure-grid{width:min(340px,88vw);gap:6px}
-  .result{min-height:28px;font-size:13px}
-  .next{height:36px}
+  .app{height:calc(100dvh - 38px);padding:4px 6px 7px;gap:4px}
+  .title{font-size:13px}
+  .stats{font-size:8px;gap:5px}
+  .rule-area{font-size:11px}
+  .rule{font-size:14px}
+  .figure-grid{width:min(330px,88vw);gap:4px}
+  .result{min-height:24px;font-size:12px}
+  .next{height:34px}
 }
 @media(max-height:700px){
-  .figure-grid{width:min(300px,80vw);gap:5px}
-  .instruction{font-size:11px}
-  .rule{font-size:14px;line-height:1.2}
+  .figure-grid{width:min(285px,76vw)}
+  .rule-area{font-size:10px}
+  .rule{font-size:13px}
+  .app{gap:3px}
 }
 </style>
 </head>
+
 <body>
+
+<div class="timer-track"><div id="timerFill" class="timer-fill"></div></div>
 
 <nav class="site-nav" aria-label="DLR Training Navigation">
   <a href="index.html">Zahlen</a>
@@ -163,12 +178,9 @@ body{min-height:100dvh}
     </div>
   </div>
 
-  <div class="instruction">
-    Markiere alle Figuren mit
-    <div class="rule">
-      <div><b>1×</b> <span class="tri">△</span></div>
-      <div><b>2×</b> <span class="dot">●</span></div>
-    </div>
+  <div class="rule-area">
+    <div id="taskNo" class="task-no">Aufgabe 1</div>
+    <div id="rule" class="rule"></div>
   </div>
 
   <div class="divider"></div>
@@ -185,7 +197,12 @@ body{min-height:100dvh}
 (() => {
   "use strict";
 
+  const ROUND_MS = 5000;
+
+  const timerFill = document.getElementById("timerFill");
   const grid = document.getElementById("grid");
+  const ruleEl = document.getElementById("rule");
+  const taskNoEl = document.getElementById("taskNo");
   const next = document.getElementById("next");
   const result = document.getElementById("result");
 
@@ -194,104 +211,203 @@ body{min-height:100dvh}
   const rateEl = document.getElementById("rate");
   const bestEl = document.getElementById("best");
 
+  const BASE_SHAPES = ["triangle","square","circle"];
+  const MARKER_TYPES = ["dot","triangle","square"];
+
   let figures = [];
+  let targetShape = "triangle";
+  let targetMarker = "dot";
+  let targetCount = 2;
+
   let evaluated = false;
+  let taskNumber = 0;
+  let startedAt = 0;
+  let raf = 0;
 
   let stats = {correct:0,wrong:0,streak:0,best:0};
   try{
-    stats = JSON.parse(localStorage.getItem("dlrConcentrationStatsV1") || JSON.stringify(stats));
+    stats = JSON.parse(
+      localStorage.getItem("dlrConcentrationStatsV2") ||
+      JSON.stringify(stats)
+    );
   }catch(e){}
 
   function saveStats(){
-    localStorage.setItem("dlrConcentrationStatsV1", JSON.stringify(stats));
+    localStorage.setItem("dlrConcentrationStatsV2", JSON.stringify(stats));
     correctEl.textContent = stats.correct;
     wrongEl.textContent = stats.wrong;
     bestEl.textContent = stats.best;
     const total = stats.correct + stats.wrong;
-    rateEl.textContent = total ? Math.round(stats.correct / total * 100) + "%" : "0%";
+    rateEl.textContent = total
+      ? Math.round(stats.correct / total * 100) + "%"
+      : "0%";
   }
 
   function rand(min,max){
     return Math.floor(Math.random()*(max-min+1))+min;
   }
+
   function pick(arr){
     return arr[Math.floor(Math.random()*arr.length)];
   }
 
-  const SHAPES = ["triangle","square","circle"];
-
-  function makeFigureData(forceTarget=false){
-    let shape = forceTarget ? "triangle" : pick(SHAPES);
-    let dots = forceTarget ? 2 : rand(0,3);
-
-    // A few decoys deliberately close to the target.
-    if(!forceTarget && Math.random()<0.45){
-      shape = Math.random()<0.55 ? "triangle" : pick(["square","circle"]);
-      dots = pick([1,2,3]);
-    }
-
-    const placements = [];
-    for(let i=0;i<dots;i++){
-      placements.push({
-        x: rand(22,78),
-        y: rand(20,80),
-        inside: Math.random()<0.55
-      });
-    }
-
-    return {
-      shape,
-      dots,
-      placements,
-      target: shape==="triangle" && dots===2,
-      selected:false
-    };
-  }
-
-  function generateFigures(){
-    // 9 figures, usually 2–4 correct ones.
-    const targetCount = rand(2,4);
-    const list = [];
-
-    for(let i=0;i<targetCount;i++){
-      list.push(makeFigureData(true));
-    }
-
-    while(list.length<9){
-      let f = makeFigureData(false);
-      if(f.target) continue;
-      list.push(f);
-    }
-
-    // Shuffle
-    for(let i=list.length-1;i>0;i--){
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
       const j=rand(0,i);
-      [list[i],list[j]]=[list[j],list[i]];
+      [arr[i],arr[j]]=[arr[j],arr[i]];
     }
-    return list;
+    return arr;
   }
 
-  function shapeSvg(shape){
+  function baseShapeSvg(shape){
     if(shape==="triangle"){
       return '<polygon points="50,18 20,78 80,78" fill="none" stroke="#2f4054" stroke-width="3"/>';
     }
     if(shape==="square"){
-      return '<rect x="23" y="22" width="54" height="56" fill="none" stroke="#2f4054" stroke-width="3"/>';
+      return '<rect x="22" y="22" width="56" height="56" fill="none" stroke="#2f4054" stroke-width="3"/>';
     }
     return '<circle cx="50" cy="50" r="29" fill="none" stroke="#2f4054" stroke-width="3"/>';
   }
 
-  function dotSvg(p){
-    let x=p.x, y=p.y;
-    if(!p.inside){
-      // Bias outer dots toward edges.
-      const side=rand(0,3);
-      if(side===0){ x=rand(18,82); y=14; }
-      if(side===1){ x=86; y=rand(18,82); }
-      if(side===2){ x=rand(18,82); y=86; }
-      if(side===3){ x=14; y=rand(18,82); }
+  function markerSvg(type,x,y,size=7){
+    if(type==="triangle"){
+      const h=size*1.5;
+      return `<polygon points="${x},${y-h} ${x-size},${y+h*.55} ${x+size},${y+h*.55}" fill="#2f4054"/>`;
     }
-    return `<circle cx="${x}" cy="${y}" r="6.5" fill="#2f4054"/>`;
+    if(type==="square"){
+      const s=size*1.55;
+      return `<rect x="${x-s/2}" y="${y-s/2}" width="${s}" height="${s}" fill="#2f4054"/>`;
+    }
+    return `<circle cx="${x}" cy="${y}" r="${size}" fill="#2f4054"/>`;
+  }
+
+  function ruleShapeSvg(shape){
+    return `<svg viewBox="0 0 100 100">${baseShapeSvg(shape)}</svg>`;
+  }
+
+  function ruleMarkerSvg(type){
+    return `<svg viewBox="0 0 100 100">${markerSvg(type,50,50,12)}</svg>`;
+  }
+
+  function makeStableMarkerPosition(index,total){
+    /*
+      IMPORTANT:
+      Positions are generated ONCE and saved in the figure data.
+      render() never calls random positioning, so nothing moves after selecting.
+    */
+    const presets = [
+      [50,50], [18,18], [82,18], [18,82], [82,82],
+      [50,15], [85,50], [50,85], [15,50],
+      [33,33], [67,33], [33,67], [67,67]
+    ];
+
+    // Mix positions but keep deterministic for this generation call.
+    return presets[(index + rand(0,presets.length-1)) % presets.length].slice();
+  }
+
+  function makeFigure(shape, markerType, markerCount, isTarget=false){
+    const positions = [];
+
+    // Produce a mixture of inside / edge / outside-like positions.
+    const used = new Set();
+    for(let i=0;i<markerCount;i++){
+      let pos;
+      let tries=0;
+      do{
+        pos = makeStableMarkerPosition(i,markerCount);
+        tries++;
+      }while(used.has(pos.join(",")) && tries<30);
+
+      used.add(pos.join(","));
+      positions.push({x:pos[0],y:pos[1]});
+    }
+
+    return {
+      shape,
+      markerType,
+      markerCount,
+      positions,
+      selected:false,
+      target:isTarget
+    };
+  }
+
+  function createDecoy(){
+    /*
+      Decoys are deliberately close to the target:
+      - correct shape, wrong count
+      - correct count, wrong shape
+      - correct shape/count, wrong marker type
+      - totally different
+    */
+    const mode = rand(0,3);
+
+    let shape = targetShape;
+    let markerType = targetMarker;
+    let markerCount = targetCount;
+
+    if(mode===0){
+      const options=[0,1,2,3,4].filter(n=>n!==targetCount);
+      markerCount=pick(options);
+    }else if(mode===1){
+      shape=pick(BASE_SHAPES.filter(s=>s!==targetShape));
+    }else if(mode===2){
+      markerType=pick(MARKER_TYPES.filter(m=>m!==targetMarker));
+    }else{
+      shape=pick(BASE_SHAPES);
+      markerType=pick(MARKER_TYPES);
+      markerCount=rand(0,4);
+    }
+
+    // Never accidentally create another target here.
+    if(
+      shape===targetShape &&
+      markerType===targetMarker &&
+      markerCount===targetCount
+    ){
+      markerCount=(targetCount+1)%5;
+    }
+
+    return makeFigure(shape,markerType,markerCount,false);
+  }
+
+  function generateTask(){
+    targetShape = pick(BASE_SHAPES);
+    targetMarker = pick(MARKER_TYPES);
+
+    // Examples show 1–4 markers; dots more often 1–3.
+    targetCount = targetMarker==="dot"
+      ? pick([1,1,2,2,2,3])
+      : pick([1,1,2,2,3,4]);
+
+    const correctCount = rand(2,4);
+    const list = [];
+
+    for(let i=0;i<correctCount;i++){
+      list.push(
+        makeFigure(
+          targetShape,
+          targetMarker,
+          targetCount,
+          true
+        )
+      );
+    }
+
+    while(list.length<9){
+      list.push(createDecoy());
+    }
+
+    return shuffle(list);
+  }
+
+  function renderRule(){
+    ruleEl.innerHTML = `
+      <span>${1}×</span>
+      <span class="rule-symbol">${ruleShapeSvg(targetShape)}</span>
+      <span>${targetCount}×</span>
+      <span class="rule-symbol">${ruleMarkerSvg(targetMarker)}</span>
+    `;
   }
 
   function render(){
@@ -301,23 +417,36 @@ body{min-height:100dvh}
       const btn=document.createElement("button");
       btn.type="button";
       btn.className="figure";
+
       if(f.selected) btn.classList.add("selected");
 
-      if(evaluated && f.selected){
-        btn.classList.add(f.target ? "correct-choice" : "wrong-choice");
+      if(evaluated){
+        if(f.selected && f.target) btn.classList.add("correct-choice");
+        if(f.selected && !f.target) btn.classList.add("wrong-choice");
+        if(!f.selected && f.target) btn.classList.add("missed-choice");
       }
+
+      const markers = f.positions
+        .map(p=>markerSvg(f.markerType,p.x,p.y,6.5))
+        .join("");
 
       btn.innerHTML = `
         <svg viewBox="0 0 100 100" aria-hidden="true">
-          ${shapeSvg(f.shape)}
-          ${f.placements.map(dotSvg).join("")}
+          ${baseShapeSvg(f.shape)}
+          ${markers}
         </svg>
       `;
 
       btn.addEventListener("pointerdown",ev=>{
         ev.preventDefault();
         if(evaluated) return;
-        figures[index].selected=!figures[index].selected;
+
+        figures[index].selected = !figures[index].selected;
+
+        /*
+          Only selection state changes.
+          Marker coordinates are already stored in figures[index].positions.
+        */
         render();
       },{passive:false});
 
@@ -326,12 +455,17 @@ body{min-height:100dvh}
   }
 
   function evaluate(){
-    const selected = figures.map((f,i)=>f.selected ? i : -1).filter(i=>i>=0);
-    const correctIndices = figures.map((f,i)=>f.target ? i : -1).filter(i=>i>=0);
+    if(evaluated) return;
+
+    cancelAnimationFrame(raf);
+    timerFill.style.width="100%";
+
+    const selected = figures.filter(f=>f.selected);
+    const correctTargets = figures.filter(f=>f.target);
 
     const ok =
-      selected.length===correctIndices.length &&
-      selected.every(i=>figures[i].target);
+      selected.length===correctTargets.length &&
+      selected.every(f=>f.target);
 
     if(ok){
       stats.correct++;
@@ -352,17 +486,46 @@ body{min-height:100dvh}
     render();
   }
 
+  function animate(){
+    if(evaluated) return;
+
+    const elapsed=performance.now()-startedAt;
+    const pct=Math.min(elapsed/ROUND_MS,1);
+
+    timerFill.style.width=(pct*100)+"%";
+
+    if(pct>=1){
+      evaluate();
+      return;
+    }
+
+    raf=requestAnimationFrame(animate);
+  }
+
   function startNew(){
-    figures=generateFigures();
+    cancelAnimationFrame(raf);
+
+    taskNumber++;
+    figures=generateTask();
     evaluated=false;
+
     result.textContent="";
     result.className="result";
     next.textContent="Next";
+    timerFill.style.width="0%";
+
+    taskNoEl.textContent="Aufgabe " + taskNumber;
+
+    renderRule();
     render();
+
+    startedAt=performance.now();
+    raf=requestAnimationFrame(animate);
   }
 
   next.addEventListener("pointerdown",ev=>{
     ev.preventDefault();
+
     next.classList.add("pressed");
     setTimeout(()=>next.classList.remove("pressed"),80);
 
@@ -373,8 +536,25 @@ body{min-height:100dvh}
     }
   },{passive:false});
 
+  document.addEventListener("dblclick",ev=>{
+    ev.preventDefault();
+  },{passive:false});
+
   saveStats();
   startNew();
+
+  (async()=>{
+    try{
+      if("serviceWorker" in navigator){
+        const regs=await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r=>r.unregister()));
+      }
+      if("caches" in window){
+        const keys=await caches.keys();
+        await Promise.all(keys.map(k=>caches.delete(k)));
+      }
+    }catch(e){}
+  })();
 })();
 </script>
 </body>
