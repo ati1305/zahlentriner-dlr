@@ -197,7 +197,7 @@ body{min-height:100dvh}
 (() => {
   "use strict";
 
-  const ROUND_MS = 5000;
+  const ROUND_MS = 6000;
 
   const timerFill = document.getElementById("timerFill");
   const grid = document.getElementById("grid");
@@ -380,7 +380,7 @@ body{min-height:100dvh}
       ? pick([1,1,2,2,2,3])
       : pick([1,1,2,2,3,4]);
 
-    const correctCount = rand(2,4);
+    const correctCount = rand(1,4);
     const list = [];
 
     for(let i=0;i<correctCount;i++){
