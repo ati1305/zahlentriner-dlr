@@ -372,17 +372,17 @@
     }
 
     .solution-line{
-      min-height:34px;
-      margin:0 auto 4px;
+      min-height:40px;
+      margin:0 auto 6px;
       width:min(690px,100%);
       display:flex;
       align-items:center;
       justify-content:center;
       text-align:center;
-      font-size:clamp(13px,2vw,16px);
+      font-size:clamp(14px,2vw,17px);
       font-weight:700;
       color:#333;
-      padding:4px 8px;
+      padding:5px 8px;
     }
 
 </style>
@@ -484,6 +484,7 @@
   let roundActive = false;
   let timeExpired = false;
   let resultCounted = false;
+  let awaitingNext = false;
   let roundStart = 0;
   let animationFrame = 0;
   let roundToken = 0;
@@ -805,7 +806,7 @@
 
         slot.addEventListener("pointerdown",(event)=>{
           event.preventDefault();
-          if(!roundActive) return;
+          if(!roundActive || awaitingNext) return;
           openPopupForGap(index,slot);
         },{passive:false});
 
@@ -855,7 +856,7 @@
   }
 
   function chooseOperator(op){
-    if(!roundActive || selectedGap<0) return;
+    if(!roundActive || awaitingNext || selectedGap<0) return;
 
     enteredOps[selectedGap]=op;
     closePopup();
@@ -936,42 +937,34 @@
     }
 
     const generatedPath=formatGeneratedPath();
+
     solutionLineEl.textContent=generatedPath
       ? "Rechenweg: " + generatedPath
-      : "";
+      : "Rechenweg nicht verfügbar";
 
     showFeedback(isCorrect);
   }
 
-  function endRound(reason="timeout"){
+  function finishCurrentTask(reason="manual"){
+    if(awaitingNext) return;
+
+    roundActive=false;
+    awaitingNext=true;
+
+    cancelAnimationFrame(animationFrame);
+    popup.classList.remove("show");
+    selectedGap=-1;
+
     if(reason==="timeout"){
-      if(timeExpired) return;
-
       timeExpired=true;
-      roundActive=false;
-      cancelAnimationFrame(animationFrame);
-
       timerFill.style.width="100%";
-      popup.classList.remove("show");
-      selectedGap=-1;
-
-      // Nach 60 Sekunden ist die Aufgabe vollständig eingefroren.
-      // Keine Rechenzeichen können mehr geändert werden.
-      showCurrentEvaluation();
-      renderEquation();
-      return;
     }
 
-    // Next beendet eine noch laufende Aufgabe und wertet sie aus.
-    if(roundActive){
-      roundActive=false;
-      cancelAnimationFrame(animationFrame);
-      popup.classList.remove("show");
-      selectedGap=-1;
+    showCurrentEvaluation();
+    renderEquation();
 
-      showCurrentEvaluation();
-      renderEquation();
-    }
+    // Der Rechenweg bleibt jetzt stehen, bis Next erneut gedrückt wird.
+    nextBtn.textContent="Nächste Aufgabe";
   }
 
   function animateTimer(token){
@@ -983,7 +976,7 @@
     timerFill.style.width=`${progress*100}%`;
 
     if(elapsed>=ROUND_MS){
-      endRound("timeout");
+      finishCurrentTask("timeout");
       return;
     }
 
@@ -1013,6 +1006,7 @@
     timerFill.style.width="0%";
     timeExpired=false;
     resultCounted=false;
+    awaitingNext=false;
     roundActive=true;
     roundStart=performance.now();
 
@@ -1024,13 +1018,14 @@
     event.preventDefault();
     flash(nextBtn);
 
-    if(roundActive){
-      endRound("next");
+    if(awaitingNext){
+      startRound();
+      return;
     }
 
-    // Egal ob vorzeitig beendet oder Zeit bereits abgelaufen:
-    // Eine neue Aufgabe entsteht nur durch diesen Next-Druck.
-    setTimeout(startRound,120);
+    if(roundActive){
+      finishCurrentTask("manual");
+    }
   },{passive:false});
 
   document.addEventListener("dblclick",(event)=>{
