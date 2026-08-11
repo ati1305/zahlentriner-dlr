@@ -1,511 +1,254 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#ffffff">
-  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  <title>DLR Rechentrainer</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>DLR Rechentrainer</title>
 
-  <style>
-    :root{
-      --vh:1vh;
-      --blue:#d9efff;
-      --blue2:#8ecbf4;
-      --slot:#ececec;
-      --line:#d5d5d5;
-      --good:#167a38;
-      --bad:#b3261e;
-    }
+<style>
+:root{
+  --blue:#bfe3f2;
+  --blue2:#8fc7dc;
+  --line:#bdbdbd;
+  --text:#111;
+  --muted:#666;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body,button,select{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fff;color:var(--text);font-family:Arial,Helvetica,sans-serif}
+body{min-height:100dvh}
 
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
-    }
+.top-progress{
+  position:fixed;top:0;left:0;width:100%;height:6px;background:#e8e8e8;z-index:100
+}
+.top-progress-bar{height:100%;width:0;background:#444}
 
-    html,body{
-      margin:0;
-      width:100%;
-      height:100%;
-      overflow:hidden;
-      background:#fff;
-      color:#111;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      touch-action:manipulation;
-      overscroll-behavior:none;
-    }
-
-    body{
-      min-height:calc(var(--vh) * 100);
-      display:block;
-      user-select:none;
-      -webkit-user-select:none;
-    }
-
-    button{font:inherit}
-
-    .app{
-      height:calc(var(--vh) * 100 - 46px);
-      display:grid;
-      grid-template-rows:8px auto minmax(0,1fr);
-      background:#fff;
-    }
-
-    .timer-track{
-      width:100%;
-      height:8px;
-      background:#eee;
-      overflow:hidden;
-    }
-
-    .timer-fill{
-      height:100%;
-      width:0%;
-      background:#111;
-      will-change:width;
-    }
-
-    .top{
-      padding:clamp(8px,1.4vh,14px) clamp(10px,3vw,24px) 0;
-    }
-
-    .header-row{
-      min-height:30px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-    }
-
-    .title{
-      font-size:clamp(14px,2vw,19px);
-      font-weight:700;
-      white-space:nowrap;
-    }
-
-    .stats{
-      display:flex;
-      justify-content:flex-end;
-      gap:clamp(7px,1.8vw,16px);
-      flex-wrap:wrap;
-      font-size:clamp(10px,1.6vw,14px);
-      font-variant-numeric:tabular-nums;
-    }
-
-    .stats b{font-weight:800}
-
-    .main{
-      min-height:0;
-      display:grid;
-      grid-template-rows:minmax(120px,1fr) auto;
-      gap:10px;
-      padding:6px clamp(8px,2.5vw,22px) clamp(10px,1.6vh,16px);
-    }
-
-    .task-area{
-      min-height:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-      padding:6px;
-    }
-
-    .equation{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:clamp(5px,1vw,12px);
-      white-space:nowrap;
-      max-width:100%;
-      font-size:clamp(31px,min(6vw,8vh),70px);
-      line-height:1;
-      font-weight:500;
-      font-variant-numeric:tabular-nums;
-    }
-
-    .number-token{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .slot{
-      width:1.05em;
-      height:1.08em;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      background:var(--slot);
-      border:0;
-      border-bottom:2px solid #bdbdbd;
-      color:#111;
-      font-size:1em;
-      font-weight:500;
-      line-height:1;
-      padding:0;
-      cursor:pointer;
-      touch-action:manipulation;
-      flex:0 0 auto;
-    }
-
-    .slot.selected{
-      background:var(--blue);
-      border-bottom-color:var(--blue2);
-    }
-
-    .slot.filled{
-      background:var(--blue);
-      border-bottom-color:transparent;
-    }
-
-    .controls{
-      width:min(690px,100%);
-      margin:0 auto;
-      align-self:end;
-    }
-
-    .next{
-      width:100%;
-      appearance:none;
-      -webkit-appearance:none;
-      border:2px solid #111;
-      border-radius:10px;
-      background:#fff;
-      color:#111;
-      height:clamp(48px,7vh,60px);
-      font-size:clamp(16px,2.5vh,20px);
-      font-weight:800;
-      cursor:pointer;
-      touch-action:manipulation;
-      transition:background-color 70ms linear,transform 45ms linear;
-    }
-
-    .next.pressed{
-      background:var(--blue);
-      transform:scale(.99);
-    }
-
-    .popup{
-      position:fixed;
-      z-index:20;
-      display:none;
-      grid-template-columns:1fr;
-      gap:6px;
-      width:72px;
-      padding:8px;
-      background:#fff;
-      border:1px solid #aaa;
-      border-radius:12px;
-      box-shadow:0 8px 28px rgba(0,0,0,.18);
-    }
-
-    .popup.show{
-      display:grid;
-    }
-
-    .popup-btn{
-      appearance:none;
-      -webkit-appearance:none;
-      border:1.5px solid #111;
-      border-radius:9px;
-      background:#fff;
-      color:#111;
-      height:58px;
-      font-size:30px;
-      font-weight:800;
-      cursor:pointer;
-      touch-action:manipulation;
-      transition:background-color 70ms linear,transform 45ms linear;
-    }
-
-    .popup-btn.pressed{
-      background:var(--blue);
-      transform:scale(.97);
-    }
-
-    .feedback{
-      position:fixed;
-      z-index:30;
-      left:50%;
-      top:clamp(62px,10vh,92px);
-      transform:translateX(-50%);
-      padding:7px 12px;
-      border-radius:999px;
-      background:#fff;
-      border:1px solid var(--line);
-      font-size:clamp(13px,2vw,16px);
-      font-weight:800;
-      opacity:0;
-      pointer-events:none;
-      transition:opacity 120ms ease;
-      white-space:nowrap;
-    }
-
-    .feedback.show{opacity:1}
-    .feedback.good{color:var(--good)}
-    .feedback.bad{color:var(--bad)}
-
-    @media(max-width:520px){
-      .top{
-        padding-left:8px;
-        padding-right:8px;
-      }
-
-      .header-row{
-        align-items:flex-start;
-      }
-
-      .title{font-size:14px}
-
-      .stats{
-        max-width:72%;
-        gap:6px 8px;
-        font-size:10px;
-      }
-
-      .main{
-        padding-left:7px;
-        padding-right:7px;
-      }
-
-      .equation{
-        gap:4px;
-        font-size:clamp(29px,8vw,43px);
-      }
-
-      .popup{
-        width:68px;
-      }
-
-      .popup-btn{
-        height:56px;
-        font-size:29px;
-      }
-    }
-
-    @media(max-height:680px){
-      .app{
-        grid-template-rows:6px auto minmax(0,1fr);
-      }
-
-      .timer-track{height:6px}
-
-      .top{padding-top:5px}
-
-      .main{
-        grid-template-rows:minmax(80px,.8fr) auto;
-        gap:5px;
-        padding-top:3px;
-        padding-bottom:6px;
-      }
-
-      .equation{
-        font-size:clamp(26px,7vh,48px);
-      }
-
-      .next{
-        height:44px;
-      }
-    }
-  
-/* Gemeinsame Navigation */
 .site-nav{
-  width:min(100%,690px);
-  margin:0 auto 6px;
+  height:34px;
+  margin-top:6px;
+  padding:3px 8px 0;
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:6px;
+  gap:5px;
 }
 .site-nav a{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:34px;
-  padding:6px 10px;
-  border:1px solid #aaa;
-  border-radius:6px;
-  background:#fff;
-  color:#111;
-  text-decoration:none;
-  font-size:14px;
-  font-weight:700;
-  touch-action:manipulation;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid #aaa;border-radius:5px;background:#fff;color:#111;
+  text-decoration:none;font-size:12px;font-weight:700
 }
-.site-nav a.active{
-  background:#bfe3f2;
-  border-color:#7fbfd7;
+.site-nav a.active{background:var(--blue);border-color:var(--blue2)}
+
+.settings{
+  height:34px;
+  display:flex;align-items:center;justify-content:center;
+  gap:6px;font-size:12px;font-weight:700
 }
-@media (min-width:700px) and (max-height:800px){
-  .site-nav{margin-bottom:4px}
-  .site-nav a{min-height:30px;padding:4px 8px;font-size:13px}
+.settings select{
+  height:28px;min-width:52px;padding:2px 5px;
+  border:1px solid #aaa;border-radius:5px;background:#fff;color:#111;font:inherit
 }
 
+.app{
+  height:calc(100dvh - 74px);
+  padding:4px 8px 8px;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) 32px 40px;
+  gap:4px;
+}
 
-    .task-settings{
-      width:min(690px,100%);
-      margin:4px auto 0;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:8px;
-      font-size:13px;
-      font-weight:700;
-    }
+.header{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  min-height:24px
+}
+.title{font-size:15px;font-weight:700;white-space:nowrap}
+.stats{
+  display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap;
+  font-size:9px;font-variant-numeric:tabular-nums
+}
+.stats b{font-size:10px}
 
-    .task-settings label{
-      display:flex;
-      align-items:center;
-      gap:6px;
-    }
+.task-area{
+  min-height:0;
+  display:flex;align-items:center;justify-content:center;
+  overflow:visible
+}
+.equation{
+  display:flex;align-items:center;justify-content:center;
+  gap:4px;white-space:nowrap;
+  font-size:clamp(26px,7.2vw,48px);
+  line-height:1;font-weight:500;font-variant-numeric:tabular-nums
+}
+.slot{
+  width:1.03em;height:1.08em;padding:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  border:0;border-bottom:2px solid var(--line);
+  background:#ededed;color:#111;font-size:1em;font-weight:500;
+  border-radius:0;cursor:pointer
+}
+.slot.filled{background:var(--blue);border-bottom-color:transparent}
+.slot.selected{outline:2px solid var(--blue2)}
 
-    .task-settings select{
-      min-height:32px;
-      border:1px solid #aaa;
-      border-radius:6px;
-      background:#fff;
-      color:#111;
-      padding:4px 8px;
-      font:inherit;
-    }
+.solution{
+  min-height:32px;
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;
+  padding:2px 4px;
+  color:#333;font-size:12px;font-weight:700;
+  overflow:hidden
+}
 
-    .solution-line{
-      min-height:40px;
-      margin:0 auto 6px;
-      width:min(690px,100%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      font-size:clamp(14px,2vw,17px);
-      font-weight:700;
-      color:#333;
-      padding:5px 8px;
-    }
+.next{
+  width:min(360px,100%);
+  margin:0 auto;
+  height:40px;min-height:40px;padding:0 10px;
+  border:1px solid #777;border-radius:5px;background:#efefef;
+  color:#111;font-size:14px;font-weight:700
+}
+.next.pressed{background:var(--blue)}
 
+.popup{
+  position:fixed;z-index:200;
+  display:none;
+  width:52px;
+  padding:4px;
+  grid-template-columns:1fr;
+  gap:3px;
+  background:#fff;border:1px solid #999;border-radius:7px;
+  box-shadow:0 6px 18px rgba(0,0,0,.18)
+}
+.popup.show{display:grid}
+.popup button{
+  width:42px;height:42px;min-height:42px;padding:0;
+  border:1px solid #777;border-radius:4px;background:#fff;
+  color:#111;font-size:23px;font-weight:500
+}
+.popup button.pressed{background:var(--blue)}
+
+.feedback{
+  position:fixed;z-index:300;left:50%;top:82px;transform:translateX(-50%);
+  display:none;padding:5px 9px;border:1px solid #bbb;border-radius:12px;
+  background:#fff;font-size:12px;font-weight:700
+}
+.feedback.show{display:block}
+.feedback.good{color:#187a36}
+.feedback.bad{color:#b42318}
+
+@media(min-width:700px){
+  .site-nav{width:min(680px,100%);margin-left:auto;margin-right:auto}
+  .app{width:min(760px,100%);margin:0 auto}
+  .equation{gap:8px}
+  .stats{font-size:11px;gap:12px}
+  .stats b{font-size:12px}
+  .solution{font-size:14px}
+  .next{height:42px}
+}
+
+@media(max-height:700px){
+  .site-nav{height:30px}
+  .settings{height:30px}
+  .app{height:calc(100dvh - 66px);grid-template-rows:auto minmax(0,1fr) 28px 36px}
+  .next{height:36px;min-height:36px}
+  .solution{min-height:28px;font-size:11px}
+}
 </style>
 </head>
 
 <body>
+<div class="top-progress"><div id="timerFill" class="top-progress-bar"></div></div>
 
 <nav class="site-nav" aria-label="DLR Training Navigation">
   <a href="index.html">Zahlentrainer</a>
   <a href="rechnen.html" class="active">Rechentrainer</a>
 </nav>
 
-
-<div class="task-settings">
-  <label>
-    Zahlen:
-    <select id="numberCountSelect" aria-label="Anzahl Zahlen für die nächste Aufgabe">
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5" selected>5</option>
-    </select>
-  </label>
+<div class="settings">
+  <label for="numberCount">Zahlen</label>
+  <select id="numberCount">
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5" selected>5</option>
+  </select>
 </div>
 
-<div class="app">
-  <div class="timer-track">
-    <div id="timerFill" class="timer-fill"></div>
-  </div>
-
-  <div class="top">
-    <div class="header-row">
-      <div class="title">DLR Rechentrainer</div>
-
-      <div class="stats">
-        <span>Richtig <b id="correctCount">0</b></span>
-        <span>Falsch <b id="wrongCount">0</b></span>
-        <span>Quote <b id="accuracy">0%</b></span>
-        <span>Serie <b id="bestStreak">0</b></span>
-      </div>
+<main class="app">
+  <div class="header">
+    <div class="title">DLR Rechentrainer</div>
+    <div class="stats">
+      <span>R <b id="correct">0</b></span>
+      <span>F <b id="wrong">0</b></span>
+      <span>Quote <b id="rate">0%</b></span>
+      <span>Serie <b id="best">0</b></span>
     </div>
   </div>
 
-  <main class="main">
-    <section class="task-area">
-      <div id="equation" class="equation"></div>
-    </section>
+  <section class="task-area">
+    <div id="equation" class="equation"></div>
+  </section>
 
-    <div id="solutionLine" class="solution-line"></div>
+  <div id="solution" class="solution"></div>
 
-    <section class="controls">
-      <button id="nextBtn" class="next" type="button">Next</button>
-    </section>
-  </main>
+  <button id="next" class="next" type="button">Next</button>
+</main>
 
-  <div id="operatorPopup" class="popup">
-    <button class="popup-btn" data-op="+" type="button">+</button>
-    <button class="popup-btn" data-op="-" type="button">−</button>
-    <button class="popup-btn" data-op="*" type="button">×</button>
-    <button class="popup-btn" data-op="/" type="button">÷</button>
-  </div>
-
-  <div id="feedback" class="feedback"></div>
+<div id="popup" class="popup">
+  <button data-op="+">+</button>
+  <button data-op="-">−</button>
+  <button data-op="*">×</button>
+  <button data-op="/">÷</button>
 </div>
+
+<div id="feedback" class="feedback"></div>
 
 <script>
 (() => {
   "use strict";
 
   const ROUND_MS = 60000;
-  const FEEDBACK_MS = 2200;
-  const MIN_NUMBERS = 3;
-  const MAX_NUMBERS = 5;
-  const MAX_ABS_RESULT = 999;
 
-  const equationEl = document.getElementById("equation");
   const timerFill = document.getElementById("timerFill");
-  const nextBtn = document.getElementById("nextBtn");
-  const popup = document.getElementById("operatorPopup");
-  const feedbackEl = document.getElementById("feedback");
-  const solutionLineEl = document.getElementById("solutionLine");
-  const numberCountSelect = document.getElementById("numberCountSelect");
+  const numberCount = document.getElementById("numberCount");
+  const equation = document.getElementById("equation");
+  const solution = document.getElementById("solution");
+  const next = document.getElementById("next");
+  const popup = document.getElementById("popup");
+  const feedback = document.getElementById("feedback");
 
-  const correctCountEl = document.getElementById("correctCount");
-  const wrongCountEl = document.getElementById("wrongCount");
-  const accuracyEl = document.getElementById("accuracy");
-  const bestStreakEl = document.getElementById("bestStreak");
+  const correctEl = document.getElementById("correct");
+  const wrongEl = document.getElementById("wrong");
+  const rateEl = document.getElementById("rate");
+  const bestEl = document.getElementById("best");
 
-  let numbers = [];
+  let nums = [];
   let target = 0;
   let enteredOps = [];
-  let selectedGap = -1;
-
-  // Hidden mathematical grouping used by the task generator.
-  // Never rendered and never entered by the user.
-  let hiddenGroupStart = null;
-  let hiddenGroupEnd = null;
   let solutionOps = [];
+  let groupStart = null;
+  let groupEnd = null;
 
+  let selectedGap = -1;
   let roundActive = false;
-  let timeExpired = false;
-  let resultCounted = false;
   let awaitingNext = false;
-  let roundStart = 0;
-  let animationFrame = 0;
-  let roundToken = 0;
+  let counted = false;
+  let startedAt = 0;
+  let raf = 0;
 
-  let correct = 0;
-  let wrong = 0;
-  let currentStreak = 0;
-  let bestStreak = 0;
+  let stats = {correct:0,wrong:0,streak:0,best:0};
 
-  function setViewportHeight(){
-    document.documentElement.style.setProperty("--vh", `${window.innerHeight * .01}px`);
+  try{
+    stats = JSON.parse(localStorage.getItem("dlrMathStatsV2") || JSON.stringify(stats));
+  }catch(e){}
+
+  function saveStats(){
+    localStorage.setItem("dlrMathStatsV2", JSON.stringify(stats));
+    correctEl.textContent = stats.correct;
+    wrongEl.textContent = stats.wrong;
+    bestEl.textContent = stats.best;
+    const total = stats.correct + stats.wrong;
+    rateEl.textContent = total ? Math.round(stats.correct / total * 100) + "%" : "0%";
   }
 
-  setViewportHeight();
-
-  window.addEventListener("resize", setViewportHeight, {passive:true});
-  window.addEventListener("orientationchange", () => {
-    setTimeout(setViewportHeight, 60);
-  }, {passive:true});
-
-  function randInt(min,max){
+  function rand(min,max){
     return Math.floor(Math.random()*(max-min+1))+min;
   }
 
@@ -524,7 +267,7 @@
     return (op==="*" || op==="/") ? 2 : 1;
   }
 
-  function applyOp(a,b,op){
+  function calc(a,b,op){
     if(op==="+") return a+b;
     if(op==="-") return a-b;
     if(op==="*") return a*b;
@@ -532,520 +275,326 @@
     return NaN;
   }
 
-  function evaluateExpression(nums,ops){
-    if(ops.length !== nums.length-1) return NaN;
+  function evalNormal(numbers, ops){
+    if(ops.length !== numbers.length-1) return NaN;
 
-    const values=[nums[0]];
+    const values=[numbers[0]];
     const operators=[];
 
     function reduce(){
       const op=operators.pop();
       const b=values.pop();
       const a=values.pop();
-      values.push(applyOp(a,b,op));
+      values.push(calc(a,b,op));
     }
 
     for(let i=0;i<ops.length;i++){
-      const op=ops[i];
-
-      while(
-        operators.length &&
-        precedence(operators[operators.length-1]) >= precedence(op)
-      ){
+      while(operators.length && precedence(operators[operators.length-1]) >= precedence(ops[i])){
         reduce();
       }
-
-      operators.push(op);
-      values.push(nums[i+1]);
+      operators.push(ops[i]);
+      values.push(numbers[i+1]);
     }
 
     while(operators.length) reduce();
-
-    return values.length===1 ? values[0] : NaN;
+    return values[0];
   }
 
-  function evaluateWithHiddenGroup(nums,ops,start,end){
-    if(start===null || end===null){
-      return evaluateExpression(nums,ops);
-    }
+  function evalTask(numbers, ops, gs, ge){
+    if(gs===null || ge===null) return evalNormal(numbers,ops);
 
-    const groupedNums=nums.slice(start,end+1);
-    const groupedOps=ops.slice(start,end);
-    const groupedValue=evaluateExpression(groupedNums,groupedOps);
+    const inner = evalNormal(
+      numbers.slice(gs,ge+1),
+      ops.slice(gs,ge)
+    );
 
-    if(!Number.isFinite(groupedValue)) return NaN;
+    if(!Number.isFinite(inner)) return NaN;
 
     const reducedNums=[
-      ...nums.slice(0,start),
-      groupedValue,
-      ...nums.slice(end+1)
+      ...numbers.slice(0,gs),
+      inner,
+      ...numbers.slice(ge+1)
     ];
 
     const reducedOps=[
-      ...ops.slice(0,start),
-      ...ops.slice(end)
+      ...ops.slice(0,gs),
+      ...ops.slice(ge)
     ];
 
-    return evaluateExpression(reducedNums,reducedOps);
+    return evalNormal(reducedNums,reducedOps);
   }
 
-  function allOperatorCombinations(slotCount){
-    const result=[];
-    const ops=["+","-","*","/"];
+  function createTask(){
+    const count = Number(numberCount.value);
 
-    function walk(current){
-      if(current.length===slotCount){
-        result.push(current.slice());
-        return;
-      }
+    for(let attempt=0; attempt<800; attempt++){
+      const n = Array.from({length:count},()=>rand(2,12));
 
-      for(const op of ops){
-        current.push(op);
-        walk(current);
-        current.pop();
-      }
-    }
-
-    walk([]);
-    return result;
-  }
-
-  function possibleGroups(numberCount){
-    const groups=[{start:null,end:null}];
-
-    for(let start=0;start<numberCount-1;start++){
-      for(let end=start+1;end<numberCount;end++){
-        const length=end-start+1;
-
-        if(length>=2 && length<=Math.min(4,numberCount)){
-          groups.push({start,end});
-        }
-      }
-    }
-
-    return groups;
-  }
-
-  function countValidInterpretations(nums,wantedTarget){
-    const allOps=allOperatorCombinations(nums.length-1);
-    const groups=possibleGroups(nums.length);
-    let count=0;
-
-    for(const ops of allOps){
-      for(const group of groups){
-        const value=evaluateWithHiddenGroup(
-          nums,
-          ops,
-          group.start,
-          group.end
-        );
-
-        if(
-          Number.isFinite(value) &&
-          Number.isInteger(value) &&
-          Math.abs(value-wantedTarget)<1e-9
-        ){
-          count++;
-
-          if(count>1) return count;
-        }
-      }
-    }
-
-    return count;
-  }
-
-
-  function createHiddenOps(numberCount){
-    const slotCount=numberCount-1;
-
-    // Leichtere DLR-artige Mischung:
-    // höchstens zwei Multiplikationen/Divisionen insgesamt.
-    for(let attempt=0;attempt<200;attempt++){
-      const ops=Array.from(
-        {length:slotCount},
-        () => pick(["+","-","+","-","*","/"])
+      const ops = Array.from(
+        {length:count-1},
+        ()=>pick(["+","+","-","-","*","/"])
       );
 
-      const highCount=ops.filter(op=>op==="*" || op==="/").length;
+      const highCount = ops.filter(op=>op==="*" || op==="/").length;
+      if(highCount > 2) continue;
 
-      if(highCount<=2){
-        return ops;
+      let gs=null, ge=null;
+
+      // Ca. 30 % der Aufgaben verwenden intern eine kleine Klammer,
+      // immer nur über zwei benachbarte Zahlen.
+      if(count>=3 && Math.random()<0.30){
+        gs=rand(0,count-2);
+        ge=gs+1;
       }
-    }
 
-    return Array.from({length:slotCount},()=>pick(["+","-"]));
-  }
-
-  function chooseHiddenGroup(numberCount){
-    // Klammern nur gelegentlich und immer nur um GENAU zwei
-    // benachbarte Zahlen. Dadurch bleiben die Aufgaben schnell lösbar.
-    if(numberCount<3 || Math.random()<0.65){
-      return {start:null,end:null};
-    }
-
-    const start=randInt(0,numberCount-2);
-    return {start:start,end:start+1};
-  }
-
-  function intendedPathIsReasonable(nums,ops,group){
-    // Keine großen oder krummen Zwischenrechnungen.
-    if(group.start!==null){
-      const innerNums=nums.slice(group.start,group.end+1);
-      const innerOps=ops.slice(group.start,group.end);
-      const innerValue=evaluateExpression(innerNums,innerOps);
-
-      if(!Number.isFinite(innerValue)) return false;
-      if(!Number.isInteger(innerValue)) return false;
-      if(innerValue<0 || innerValue>60) return false;
-    }
-
-    // Divisionen sollen in der vorgesehenen Aufgabe möglichst "glatt" sein.
-    for(let i=0;i<ops.length;i++){
-      if(ops[i]==="/"){
-        const a=nums[i];
-        const b=nums[i+1];
-        if(b===0) return false;
-
-        // Bei einer sichtbaren lokalen Division bevorzugen wir ganzzahlige Ergebnisse.
-        if(a % b !== 0 && !(group.start===i && group.end===i+1)){
-          return false;
+      // Glatte lokale Divisionen bevorzugen.
+      let badDivision=false;
+      for(let i=0;i<ops.length;i++){
+        if(ops[i]==="/" && !(gs===i && ge===i+1)){
+          if(n[i] % n[i+1] !== 0){
+            badDivision=true;
+            break;
+          }
         }
       }
+      if(badDivision) continue;
+
+      if(gs!==null){
+        const inner=evalNormal(n.slice(gs,ge+1),ops.slice(gs,ge));
+        if(!Number.isFinite(inner) || !Number.isInteger(inner) || inner<0 || inner>50) continue;
+      }
+
+      const result = evalTask(n,ops,gs,ge);
+      if(!Number.isFinite(result) || !Number.isInteger(result)) continue;
+      if(result<0 || result>300) continue;
+
+      return {nums:n,target:result,ops,gs,ge};
     }
 
-    const highCount=ops.filter(op=>op==="*" || op==="/").length;
-    if(highCount>2) return false;
-
-    return true;
-  }
-
-  function generateTask(){
-    for(let attempt=0;attempt<6000;attempt++){
-      const numberCount=Number(numberCountSelect.value);
-
-      // Kleinere Zahlen, damit Kopfrechnen in 60 Sekunden realistisch bleibt.
-      const nums=Array.from(
-        {length:numberCount},
-        () => randInt(2,12)
-      );
-
-      const hiddenOps=createHiddenOps(numberCount);
-      const group=chooseHiddenGroup(numberCount);
-
-      if(!intendedPathIsReasonable(nums,hiddenOps,group)) continue;
-
-      const result=evaluateWithHiddenGroup(
-        nums,
-        hiddenOps,
-        group.start,
-        group.end
-      );
-
-      if(!Number.isFinite(result)) continue;
-      if(!Number.isInteger(result)) continue;
-
-      // Kein negatives Ergebnis.
-      if(result<0) continue;
-
-      // Technisch weiterhin maximal dreistellig,
-      // praktisch aber bevorzugt deutlich kleinere Ergebnisse.
-      if(result>300) continue;
-
-      // Extrem triviale Nullaufgaben selten zulassen.
-      if(result===0 && Math.random()<0.85) continue;
-
-      // Nur Aufgaben mit einer eindeutigen Interpretation akzeptieren.
-      if(countValidInterpretations(nums,result)!==1) continue;
-
-      return {
-        numbers:nums,
-        target:result,
-        groupStart:group.start,
-        groupEnd:group.end,
-        solutionOps:hiddenOps
-      };
-    }
-
-    // Einfacher Fallback:
-    // (7 + 2) × 3 = 27
     return {
-      numbers:[7,2,3],
+      nums:[7,2,3],
       target:27,
-      groupStart:0,
-      groupEnd:1,
-      solutionOps:["+","*"]
+      ops:["+","*"],
+      gs:0,
+      ge:1
     };
   }
 
-  function renderEquation(){
-    equationEl.innerHTML="";
+  function formatSolution(){
+    const parts=[];
 
-    numbers.forEach((num,index)=>{
+    for(let i=0;i<nums.length;i++){
+      if(groupStart===i) parts.push("(");
+      parts.push(String(nums[i]));
+      if(groupEnd===i) parts.push(")");
+      if(i<solutionOps.length) parts.push(symbol(solutionOps[i]));
+    }
+
+    parts.push("=");
+    parts.push(String(target));
+    return parts.join(" ");
+  }
+
+  function render(){
+    equation.innerHTML="";
+
+    nums.forEach((num,i)=>{
       const n=document.createElement("span");
-      n.className="number-token";
       n.textContent=String(num);
-      equationEl.appendChild(n);
+      equation.appendChild(n);
 
-      if(index<numbers.length-1){
+      if(i<nums.length-1){
         const slot=document.createElement("button");
         slot.type="button";
         slot.className="slot";
-        slot.dataset.gap=String(index);
+        slot.textContent=enteredOps[i] ? symbol(enteredOps[i]) : "?";
 
-        if(enteredOps[index]){
-          slot.textContent=symbol(enteredOps[index]);
-          slot.classList.add("filled");
-        }else{
-          slot.textContent="?";
-        }
+        if(enteredOps[i]) slot.classList.add("filled");
+        if(i===selectedGap && popup.classList.contains("show")) slot.classList.add("selected");
 
-        if(index===selectedGap && popup.classList.contains("show")){
-          slot.classList.add("selected");
-        }
-
-        slot.addEventListener("pointerdown",(event)=>{
-          event.preventDefault();
-          if(!roundActive || awaitingNext) return;
-          openPopupForGap(index,slot);
+        slot.addEventListener("pointerdown",ev=>{
+          ev.preventDefault();
+          if(!roundActive) return;
+          openPopup(i,slot);
         },{passive:false});
 
-        equationEl.appendChild(slot);
+        equation.appendChild(slot);
       }
     });
 
-    const equal=document.createElement("span");
-    equal.textContent="=";
-    equationEl.appendChild(equal);
+    const eq=document.createElement("span");
+    eq.textContent="=";
+    equation.appendChild(eq);
 
-    const result=document.createElement("span");
-    result.textContent=String(target);
-    equationEl.appendChild(result);
+    const res=document.createElement("span");
+    res.textContent=String(target);
+    equation.appendChild(res);
   }
 
-  function openPopupForGap(index,slot){
+  function openPopup(index,slot){
     selectedGap=index;
     popup.classList.add("show");
 
-    const rect=slot.getBoundingClientRect();
-    const popupWidth=window.innerWidth<=520 ? 68 : 72;
-    const popupHeight=(58*4)+(6*3)+16;
+    const r=slot.getBoundingClientRect();
+    const width=52;
+    const height=4*42 + 3*3 + 8;
 
-    // Popup opens as a vertical column directly below the selected field.
-    let left=rect.left + rect.width/2 - popupWidth/2;
-    left=Math.max(8,Math.min(left,window.innerWidth-popupWidth-8));
+    let left=r.left + r.width/2 - width/2;
+    left=Math.max(4,Math.min(left,window.innerWidth-width-4));
 
-    let top=rect.bottom+8;
-
-    // Keep it on-screen while preserving the downward vertical layout.
-    if(top+popupHeight>window.innerHeight-8){
-      top=Math.max(8,window.innerHeight-popupHeight-8);
+    let top=r.bottom+4;
+    if(top+height > window.innerHeight-4){
+      top=Math.max(4,window.innerHeight-height-4);
     }
 
-    popup.style.width=`${popupWidth}px`;
-    popup.style.left=`${left}px`;
-    popup.style.top=`${top}px`;
-
-    renderEquation();
+    popup.style.left=left+"px";
+    popup.style.top=top+"px";
+    render();
   }
 
   function closePopup(){
     popup.classList.remove("show");
     selectedGap=-1;
-    renderEquation();
+    render();
   }
 
-  function chooseOperator(op){
-    if(!roundActive || awaitingNext || selectedGap<0) return;
+  document.querySelectorAll("[data-op]").forEach(btn=>{
+    btn.addEventListener("pointerdown",ev=>{
+      ev.preventDefault();
+      ev.stopPropagation();
 
-    enteredOps[selectedGap]=op;
-    closePopup();
-  }
+      if(!roundActive || selectedGap<0) return;
 
-  function flash(button){
-    button.classList.add("pressed");
-    setTimeout(()=>button.classList.remove("pressed"),90);
-  }
+      btn.classList.add("pressed");
+      setTimeout(()=>btn.classList.remove("pressed"),80);
 
-  document.querySelectorAll(".popup-btn").forEach(button=>{
-    button.addEventListener("pointerdown",(event)=>{
-      event.preventDefault();
-      event.stopPropagation();
-      flash(button);
-      chooseOperator(button.dataset.op);
+      enteredOps[selectedGap]=btn.dataset.op;
+      closePopup();
     },{passive:false});
   });
 
-  document.addEventListener("pointerdown",(event)=>{
+  document.addEventListener("pointerdown",ev=>{
     if(
       popup.classList.contains("show") &&
-      !popup.contains(event.target) &&
-      !event.target.classList.contains("slot")
+      !popup.contains(ev.target) &&
+      !ev.target.classList.contains("slot")
     ){
       closePopup();
     }
   },{passive:true});
 
-  function updateStats(){
-    const total=correct+wrong;
-    const accuracy=total ? Math.round(correct/total*100) : 0;
-
-    correctCountEl.textContent=String(correct);
-    wrongCountEl.textContent=String(wrong);
-    accuracyEl.textContent=`${accuracy}%`;
-    bestStreakEl.textContent=String(bestStreak);
-  }
-
-  function showFeedback(isCorrect){
-    feedbackEl.className="feedback";
-    feedbackEl.textContent=isCorrect ? "Richtig" : "Falsch";
-    feedbackEl.classList.add(isCorrect ? "good" : "bad","show");
-
-    setTimeout(()=>{
-      feedbackEl.classList.remove("show");
-    },FEEDBACK_MS);
-  }
-
   function checkAnswer(){
     if(enteredOps.some(op=>!op)) return false;
-
-    const value=evaluateWithHiddenGroup(
-      numbers,
-      enteredOps,
-      hiddenGroupStart,
-      hiddenGroupEnd
-    );
-
+    const value=evalTask(nums,enteredOps,groupStart,groupEnd);
     return Number.isFinite(value) && Math.abs(value-target)<1e-9;
   }
 
-  function showCurrentEvaluation(){
-    const isCorrect=checkAnswer();
-
-    if(!resultCounted){
-      if(isCorrect){
-        correct++;
-        currentStreak++;
-        bestStreak=Math.max(bestStreak,currentStreak);
-      }else{
-        wrong++;
-        currentStreak=0;
-      }
-
-      resultCounted=true;
-      updateStats();
-    }
-
-    const generatedPath=formatGeneratedPath();
-
-    solutionLineEl.textContent=generatedPath
-      ? "Rechenweg: " + generatedPath
-      : "Rechenweg nicht verfügbar";
-
-    showFeedback(isCorrect);
-  }
-
-  function finishCurrentTask(reason="manual"){
+  function finishTask(fromTimeout){
     if(awaitingNext) return;
 
     roundActive=false;
     awaitingNext=true;
+    cancelAnimationFrame(raf);
+    closePopup();
 
-    cancelAnimationFrame(animationFrame);
-    popup.classList.remove("show");
-    selectedGap=-1;
+    if(fromTimeout) timerFill.style.width="100%";
 
-    if(reason==="timeout"){
-      timeExpired=true;
-      timerFill.style.width="100%";
+    const ok=checkAnswer();
+
+    if(!counted){
+      if(ok){
+        stats.correct++;
+        stats.streak++;
+        stats.best=Math.max(stats.best,stats.streak);
+      }else{
+        stats.wrong++;
+        stats.streak=0;
+      }
+      counted=true;
+      saveStats();
     }
 
-    showCurrentEvaluation();
-    renderEquation();
+    feedback.className="feedback show " + (ok ? "good" : "bad");
+    feedback.textContent=ok ? "Richtig" : "Falsch";
 
-    // Der Rechenweg bleibt jetzt stehen, bis Next erneut gedrückt wird.
-    nextBtn.textContent="Nächste Aufgabe";
+    solution.textContent="Rechenweg: " + formatSolution();
+    next.textContent="Nächste Aufgabe";
+
+    render();
   }
 
-  function animateTimer(token){
-    if(!roundActive || token!==roundToken) return;
+  function animate(){
+    if(!roundActive) return;
 
-    const elapsed=performance.now()-roundStart;
-    const progress=Math.min(1,elapsed/ROUND_MS);
+    const elapsed=performance.now()-startedAt;
+    const pct=Math.min(elapsed/ROUND_MS,1);
+    timerFill.style.width=(pct*100)+"%";
 
-    timerFill.style.width=`${progress*100}%`;
-
-    if(elapsed>=ROUND_MS){
-      finishCurrentTask("timeout");
+    if(pct>=1){
+      finishTask(true);
       return;
     }
 
-    animationFrame=requestAnimationFrame(()=>animateTimer(token));
+    raf=requestAnimationFrame(animate);
   }
 
-  function startRound(){
-    roundToken++;
-    const token=roundToken;
-
-    cancelAnimationFrame(animationFrame);
+  function startTask(){
+    cancelAnimationFrame(raf);
     popup.classList.remove("show");
-    feedbackEl.classList.remove("show");
+    feedback.className="feedback";
 
-    const task=generateTask();
+    const t=createTask();
+    nums=t.nums;
+    target=t.target;
+    solutionOps=t.ops;
+    groupStart=t.gs;
+    groupEnd=t.ge;
 
-    numbers=task.numbers;
-    target=task.target;
-    hiddenGroupStart=task.groupStart;
-    hiddenGroupEnd=task.groupEnd;
-    solutionOps=task.solutionOps || [];
-
-    enteredOps=Array(numbers.length-1).fill(null);
-    solutionLineEl.textContent="";
+    enteredOps=Array(nums.length-1).fill(null);
     selectedGap=-1;
-
-    timerFill.style.width="0%";
-    timeExpired=false;
-    resultCounted=false;
+    counted=false;
     awaitingNext=false;
     roundActive=true;
-    roundStart=performance.now();
 
-    renderEquation();
-    animationFrame=requestAnimationFrame(()=>animateTimer(token));
+    solution.textContent="";
+    next.textContent="Next";
+    timerFill.style.width="0%";
+
+    render();
+
+    startedAt=performance.now();
+    raf=requestAnimationFrame(animate);
   }
 
-  nextBtn.addEventListener("pointerdown",(event)=>{
-    event.preventDefault();
-    flash(nextBtn);
+  next.addEventListener("pointerdown",ev=>{
+    ev.preventDefault();
+    next.classList.add("pressed");
+    setTimeout(()=>next.classList.remove("pressed"),80);
 
     if(awaitingNext){
-      startRound();
-      return;
-    }
-
-    if(roundActive){
-      finishCurrentTask("manual");
+      startTask();
+    }else if(roundActive){
+      finishTask(false);
     }
   },{passive:false});
 
-  document.addEventListener("dblclick",(event)=>{
-    event.preventDefault();
-  },{passive:false});
+  document.addEventListener("dblclick",ev=>ev.preventDefault(),{passive:false});
 
-  let lastTouchEnd=0;
+  saveStats();
+  startTask();
 
-  document.addEventListener("touchend",(event)=>{
-    const now=Date.now();
-
-    if(now-lastTouchEnd<=300){
-      event.preventDefault();
-    }
-
-    lastTouchEnd=now;
-  },{passive:false});
-
-  updateStats();
-  startRound();
+  (async()=>{
+    try{
+      if("serviceWorker" in navigator){
+        const regs=await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r=>r.unregister()));
+      }
+      if("caches" in window){
+        const keys=await caches.keys();
+        await Promise.all(keys.map(k=>caches.delete(k)));
+      }
+    }catch(e){}
+  })();
 })();
 </script>
 </body>
