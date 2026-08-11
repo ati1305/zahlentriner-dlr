@@ -2,174 +2,225 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
-<title>DLR Räumliches Vorstellungsvermögen</title>
-<!-- procedural-generator-v1 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>DLR Räumliches Vorstellungsvermögen V2</title>
 
 <style>
 :root{
   --blue:#bfe3f2;
   --blue2:#8fc7dc;
-  --ink:#0b6f8e;
-  --rod:#0b7898;
-  --node:#0d86aa;
+  --cyan:#0b7898;
+  --cyan-dark:#07546c;
   --good:#4f9b2c;
   --bad:#b42318;
-  --line:#d7d7d7;
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body,button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+html,body,button{
+  touch-action:manipulation;
+  -webkit-user-select:none;
+  user-select:none;
+}
 html,body{
-  margin:0;width:100%;height:100%;overflow:hidden;
-  background:#fff;color:#111;
-  font-family:Arial,Helvetica,sans-serif
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#fff;
+  color:#111;
+  font-family:Arial,Helvetica,sans-serif;
 }
 body{min-height:100dvh}
 
 .timer-track{
-  position:fixed;top:0;left:0;width:100%;height:6px;
-  background:#e7e7e7;z-index:1000
+  position:fixed;
+  top:0;left:0;
+  width:100%;
+  height:6px;
+  background:#e7e7e7;
+  z-index:1000;
 }
 .timer-fill{
-  height:100%;width:0;background:#8fc7dc;will-change:width
+  width:0;
+  height:100%;
+  background:#8fc7dc;
+  will-change:width;
 }
 
 .site-nav{
-  height:40px;
-  padding:8px 8px 0;
+  height:42px;
+  padding:9px 8px 0;
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:5px
+  gap:5px;
 }
 .site-nav a{
-  display:flex;align-items:center;justify-content:center;
-  border:1px solid #aaa;border-radius:5px;
-  background:#fff;color:#111;text-decoration:none;
-  font-size:10px;font-weight:700
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #aaa;
+  border-radius:5px;
+  color:#111;
+  background:#fff;
+  text-decoration:none;
+  font-size:11px;
+  font-weight:700;
 }
-.site-nav a.active{background:var(--blue);border-color:var(--blue2)}
+.site-nav a.active{
+  background:var(--blue);
+  border-color:var(--blue2);
+}
 
 .app{
-  width:min(980px,100%);
-  height:calc(100dvh - 40px);
+  width:min(1050px,100%);
+  height:calc(100dvh - 42px);
   margin:0 auto;
-  padding:6px 10px 10px;
+  padding:7px 12px 10px;
   display:grid;
   grid-template-rows:auto minmax(0,1fr) auto auto;
-  gap:5px
+  gap:4px;
 }
-
 .header{
-  min-height:24px;
-  display:flex;align-items:center;justify-content:space-between;gap:8px
+  min-height:26px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
 }
-.title{font-size:15px;font-weight:700}
+.title{
+  font-size:16px;
+  font-weight:700;
+}
 .stats{
-  display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;
-  font-size:9px;font-variant-numeric:tabular-nums
+  display:flex;
+  gap:9px;
+  font-size:10px;
+  white-space:nowrap;
 }
-.stats b{font-size:10px}
+.stats b{font-size:11px}
 
 .stage{
   min-height:0;
   display:grid;
   grid-template-columns:1fr 1px 1fr;
-  gap:8px;
-  align-items:center
+  align-items:stretch;
+  gap:10px;
 }
 .separator{
-  width:1px;height:74%;background:#cdd8dc;justify-self:center
+  width:1px;
+  height:76%;
+  align-self:center;
+  background:#cdd8dc;
 }
 .panel{
-  min-width:0;min-height:0;
-  height:100%;
+  min-width:0;
+  min-height:0;
   display:grid;
   grid-template-rows:auto minmax(0,1fr);
-  align-items:center
 }
 .panel-title{
-  font-size:15px;
-  padding:2px 0 4px;
-  text-align:center
+  padding:3px 0 0;
+  text-align:center;
+  font-size:17px;
 }
-
-.start-wrap{
+.view-wrap{
   position:relative;
+  min-height:0;
   width:100%;
   height:100%;
-  min-height:300px
 }
-.target-wrap{
-  width:100%;
-  height:100%;
-  min-height:300px
-}
-
 .view-svg{
   width:100%;
   height:100%;
   display:block;
-  overflow:visible
+  overflow:visible;
 }
 
 .arrow{
   position:absolute;
-  width:46px;height:46px;
-  border:0;background:transparent;
-  color:#111;font-size:38px;font-weight:900;
+  width:54px;
+  height:54px;
+  border:0;
+  background:transparent;
+  color:#111;
+  font-size:44px;
+  font-weight:900;
   line-height:1;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  padding:0;
 }
-.arrow.selected{
-  color:#4f9fb9;
-  text-shadow:0 0 0 #4f9fb9
-}
-.arrow.up{left:50%;top:2%;transform:translateX(-50%)}
-.arrow.down{left:50%;bottom:2%;transform:translateX(-50%)}
-.arrow.left{left:3%;top:50%;transform:translateY(-50%)}
-.arrow.right{right:3%;top:50%;transform:translateY(-50%)}
+.arrow.selected{color:#5aa5bf}
+.arrow.top{left:50%;top:2%;transform:translateX(-50%)}
+.arrow.bottom{left:50%;bottom:2%;transform:translateX(-50%)}
+.arrow.left{left:2%;top:50%;transform:translateY(-50%)}
+.arrow.right{right:2%;top:50%;transform:translateY(-50%)}
 
 .result{
-  min-height:26px;
-  display:flex;align-items:center;justify-content:center;
-  text-align:center;font-size:13px;font-weight:700
+  min-height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-size:14px;
+  font-weight:700;
 }
 .result.good{color:var(--good)}
 .result.bad{color:var(--bad)}
 
 .next{
-  width:min(330px,100%);
+  width:min(360px,100%);
+  height:38px;
   margin:0 auto 8px;
-  height:36px;
-  border:1px solid #777;border-radius:5px;background:#efefef;
-  color:#111;font-size:13px;font-weight:700
+  border:1px solid #777;
+  border-radius:5px;
+  background:#efefef;
+  color:#111;
+  font-size:14px;
+  font-weight:700;
 }
 .next.pressed{background:var(--blue)}
 
 @media(max-width:620px){
-  .site-nav{height:38px}
-  .app{height:calc(100dvh - 38px);padding:4px 6px 7px}
+  .site-nav{height:40px;padding-top:8px}
+  .site-nav a{font-size:10px}
+  .app{
+    height:calc(100dvh - 40px);
+    padding:5px 5px 7px;
+  }
   .title{font-size:12px}
-  .stats{font-size:8px;gap:5px}
+  .stats{gap:5px;font-size:8px}
+  .stats b{font-size:9px}
   .stage{gap:4px}
   .panel-title{font-size:12px}
-  .start-wrap,.target-wrap{min-height:240px}
-  .arrow{width:38px;height:38px;font-size:31px}
-  .next{height:34px}
+  .arrow{
+    width:40px;height:40px;
+    font-size:33px;
+  }
+  .arrow.left{left:0}
+  .arrow.right{right:0}
+  .next{height:35px;margin-bottom:4px}
 }
-
-@media(max-height:700px){
-  .start-wrap,.target-wrap{min-height:205px}
+@media(max-height:690px){
+  .header{min-height:21px}
+  .title{font-size:11px}
   .panel-title{font-size:11px}
-  .arrow{width:34px;height:34px;font-size:28px}
+  .arrow{width:36px;height:36px;font-size:30px}
+  .result{min-height:22px;font-size:12px}
+  .next{height:33px}
 }
 </style>
 </head>
 
 <body>
-
 <div class="timer-track"><div id="timerFill" class="timer-fill"></div></div>
 
 <nav class="site-nav" aria-label="DLR Training Navigation">
@@ -193,13 +244,14 @@ body{min-height:100dvh}
   <section class="stage">
     <div class="panel">
       <div class="panel-title">Start view</div>
-      <div class="start-wrap">
-        <svg id="startSvg" class="view-svg" viewBox="0 0 420 340" aria-label="Startansicht"></svg>
+      <div class="view-wrap">
+        <svg id="startSvg" class="view-svg" viewBox="0 0 440 360" aria-label="Startansicht"></svg>
 
-        <button class="arrow up" data-dir="up" type="button">↓</button>
-        <button class="arrow down" data-dir="down" type="button">↑</button>
-        <button class="arrow left" data-dir="left" type="button">→</button>
-        <button class="arrow right" data-dir="right" type="button">←</button>
+        <!-- Pfeil zeigt wie im Referenztest AUF die Figur -->
+        <button class="arrow top" data-dir="top" type="button" aria-label="von oben">↓</button>
+        <button class="arrow bottom" data-dir="bottom" type="button" aria-label="von unten">↑</button>
+        <button class="arrow left" data-dir="left" type="button" aria-label="von links">→</button>
+        <button class="arrow right" data-dir="right" type="button" aria-label="von rechts">←</button>
       </div>
     </div>
 
@@ -207,8 +259,8 @@ body{min-height:100dvh}
 
     <div class="panel">
       <div class="panel-title">Target view</div>
-      <div class="target-wrap">
-        <svg id="targetSvg" class="view-svg" viewBox="0 0 420 340" aria-label="Zielansicht"></svg>
+      <div class="view-wrap">
+        <svg id="targetSvg" class="view-svg" viewBox="0 0 440 360" aria-label="Zielansicht"></svg>
       </div>
     </div>
   </section>
@@ -221,39 +273,36 @@ body{min-height:100dvh}
 (() => {
   "use strict";
 
-  // 60 Sekunden pro Aufgabe.
   const ROUND_MS = 60000;
 
+  const NS = "http://www.w3.org/2000/svg";
   const timerFill = document.getElementById("timerFill");
   const startSvg = document.getElementById("startSvg");
   const targetSvg = document.getElementById("targetSvg");
   const result = document.getElementById("result");
   const next = document.getElementById("next");
+  const arrows = [...document.querySelectorAll(".arrow")];
 
   const correctEl = document.getElementById("correct");
   const wrongEl = document.getElementById("wrong");
   const rateEl = document.getElementById("rate");
   const bestEl = document.getElementById("best");
 
-  const arrowButtons = [...document.querySelectorAll(".arrow")];
+  let stats = {correct:0,wrong:0,streak:0,best:0};
+  try{
+    const saved = JSON.parse(localStorage.getItem("dlrSpatialStatsV2") || "null");
+    if(saved) stats = {...stats,...saved};
+  }catch(e){}
 
-  let model = null;
-  let answerDir = "left";
+  let currentModel = null;
+  let answerDir = null;
   let selectedDir = null;
   let evaluated = false;
   let startedAt = 0;
   let raf = 0;
 
-  let stats = {correct:0,wrong:0,streak:0,best:0};
-  try{
-    stats = JSON.parse(
-      localStorage.getItem("dlrSpatialStatsV1") ||
-      JSON.stringify(stats)
-    );
-  }catch(e){}
-
   function saveStats(){
-    localStorage.setItem("dlrSpatialStatsV1", JSON.stringify(stats));
+    localStorage.setItem("dlrSpatialStatsV2",JSON.stringify(stats));
     correctEl.textContent = stats.correct;
     wrongEl.textContent = stats.wrong;
     bestEl.textContent = stats.best;
@@ -261,467 +310,14 @@ body{min-height:100dvh}
     rateEl.textContent = total ? Math.round(stats.correct/total*100)+"%" : "0%";
   }
 
-  function rand(min,max){
-    return Math.floor(Math.random()*(max-min+1))+min;
-  }
-  function pick(arr){
-    return arr[Math.floor(Math.random()*arr.length)];
-  }
-
-  function v(x,y,z){ return {x,y,z}; }
-
-  // Mehrere Grundmodelle mit unterschiedlichem Schwierigkeitsgrad.
-  const MODELS = [
-    {
-      name:"open-frame",
-      points:[
-        v(-1,-1,0),v(1,-1,0),v(-1,1,0),v(1,1,0),
-        v(-.6,-.6,1.2),v(.7,-.6,1),v(-.5,.7,1.1),v(.7,.7,1.35)
-      ],
-      edges:[
-        [0,1],[0,2],[1,3],[2,3],
-        [4,5],[4,6],[5,7],[6,7],
-        [0,4],[1,5],[2,6],[3,7],
-        [0,5],[3,6]
-      ]
-    },
-    {
-      name:"double-pyramid",
-      points:[
-        v(-1.4,0,0),v(-.5,-.8,0),v(-.5,.8,0),v(.3,0,.15),
-        v(.9,-.8,0),v(.9,.8,0),v(1.5,0,0),
-        v(-.5,0,1.25),v(.9,0,1.1)
-      ],
-      edges:[
-        [0,1],[0,2],[1,2],[1,3],[2,3],
-        [1,7],[2,7],[3,7],
-        [3,4],[3,5],[4,5],[4,6],[5,6],
-        [4,8],[5,8],[3,8]
-      ]
-    },
-    {
-      name:"branch",
-      points:[
-        v(-1.3,-.2,0),v(-.7,-.2,0),v(-.7,.6,0),
-        v(0,0,0),v(.5,-.6,.2),v(.9,.1,.4),v(1.4,.3,.2),
-        v(.3,.3,1.1),v(.7,.5,1.5),v(1,.2,1.0),
-        v(-.1,-.2,.9)
-      ],
-      edges:[
-        [0,1],[1,2],[1,3],[2,3],
-        [3,4],[4,5],[5,6],
-        [3,7],[7,8],[8,9],[9,5],
-        [3,10],[10,7],[10,5]
-      ]
-    },
-    {
-      name:"cage",
-      points:[
-        v(-1,-1,0),v(1,-1,0),v(-1,1,0),v(1,1,0),
-        v(-1,-1,1.2),v(1,-1,1.2),v(-1,1,1.2),v(1,1,1.2),
-        v(0,0,.6),v(0,-1,.6),v(0,1,.6)
-      ],
-      edges:[
-        [0,1],[0,2],[1,3],[2,3],
-        [4,5],[4,6],[5,7],[6,7],
-        [0,4],[1,5],[2,6],[3,7],
-        [0,8],[1,8],[2,8],[3,8],
-        [4,8],[5,8],[6,8],[7,8],
-        [9,8],[10,8]
-      ]
-    },
-    {
-      name:"zigzag",
-      points:[
-        v(-1.5,-.6,0),v(-.8,-.6,0),v(-.8,.3,.1),
-        v(-.1,.3,.1),v(-.1,-.5,.3),v(.6,-.5,.3),
-        v(.6,.4,.5),v(1.3,.4,.5),
-        v(-1.1,0,1),v(-.4,0,1.15),v(.3,0,1.0),v(1,0,1.25)
-      ],
-      edges:[
-        [0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],
-        [0,8],[8,9],[9,3],[3,10],[10,11],[11,7],
-        [1,8],[4,10],[6,11]
-      ]
-    },
-
-    /* zusätzliche Modelle, inspiriert von den übrigen Beispielaufgaben */
-
-    {
-      name:"flat-rectangle",
-      points:[
-        v(-1.5,-.8,0),v(1.5,-.8,0),v(-1.5,.8,0),v(1.5,.8,0),
-        v(-.6,-.2,.25),v(.6,.2,.25)
-      ],
-      edges:[
-        [0,1],[0,2],[1,3],[2,3],
-        [0,4],[2,4],[4,5],[5,1],[5,3]
-      ]
-    },
-    {
-      name:"long-ladder",
-      points:[
-        v(-1.7,-.5,0),v(-1.1,-.5,0),v(-.5,-.5,0),v(.1,-.5,0),v(.7,-.5,0),v(1.3,-.5,0),
-        v(-1.7,.5,.25),v(-1.1,.5,.4),v(-.5,.5,.55),v(.1,.5,.35),v(.7,.5,.65),v(1.3,.5,.5)
-      ],
-      edges:[
-        [0,1],[1,2],[2,3],[3,4],[4,5],
-        [6,7],[7,8],[8,9],[9,10],[10,11],
-        [0,6],[1,7],[2,8],[3,9],[4,10],[5,11],
-        [1,8],[3,10]
-      ]
-    },
-    {
-      name:"forked-tree",
-      points:[
-        v(-1.4,0,0),v(-.8,0,.15),v(-.2,0,.25),v(.4,0,.35),v(1.0,0,.45),
-        v(-.5,.7,.7),v(-.5,-.7,.85),
-        v(.2,.7,1.0),v(.2,-.7,.9),
-        v(.9,.55,1.25),v(.9,-.55,1.15)
-      ],
-      edges:[
-        [0,1],[1,2],[2,3],[3,4],
-        [1,5],[1,6],
-        [2,7],[2,8],
-        [4,9],[4,10],
-        [5,7],[6,8]
-      ]
-    },
-    {
-      name:"twisted-cube",
-      points:[
-        v(-1,-1,0),v(1,-1,.2),v(-1,1,.3),v(1,1,0),
-        v(-.8,-.8,1.2),v(.9,-.7,1.4),v(-.9,.9,1.1),v(.8,.8,1.3),
-        v(0,0,.65)
-      ],
-      edges:[
-        [0,1],[0,2],[1,3],[2,3],
-        [4,5],[4,6],[5,7],[6,7],
-        [0,4],[1,5],[2,6],[3,7],
-        [0,8],[3,8],[4,8],[7,8],
-        [1,6],[2,5]
-      ]
-    },
-    {
-      name:"diamond-chain",
-      points:[
-        v(-1.5,0,0),v(-1,.7,.35),v(-1,-.7,.25),v(-.4,0,.55),
-        v(.2,.7,.8),v(.2,-.7,.65),v(.8,0,.95),
-        v(1.3,.6,1.15),v(1.3,-.6,1.05)
-      ],
-      edges:[
-        [0,1],[0,2],[1,3],[2,3],
-        [3,4],[3,5],[4,6],[5,6],
-        [6,7],[6,8],[7,8]
-      ]
-    },
-    {
-      name:"offset-box",
-      points:[
-        v(-1.3,-.8,0),v(-.2,-.8,.1),v(-1.3,.4,.2),v(-.2,.4,.4),
-        v(.3,-.4,.6),v(1.4,-.4,.5),v(.3,.8,.9),v(1.4,.8,.8),
-        v(0,0,1.45)
-      ],
-      edges:[
-        [0,1],[0,2],[1,3],[2,3],
-        [4,5],[4,6],[5,7],[6,7],
-        [1,4],[3,6],
-        [3,8],[4,8],[6,8]
-      ]
-    },
-    {
-      name:"triangular-prism",
-      points:[
-        v(-1.2,-.8,0),v(-.2,-.8,0),v(-.7,.3,.7),
-        v(.3,-.8,.3),v(1.3,-.8,.3),v(.8,.3,1.0),
-        v(.05,.7,.4),v(.8,.9,.65)
-      ],
-      edges:[
-        [0,1],[1,2],[2,0],
-        [3,4],[4,5],[5,3],
-        [0,3],[1,4],[2,5],
-        [2,6],[6,7],[7,5]
-      ]
-    },
-    {
-      name:"crossed-bridge",
-      points:[
-        v(-1.5,-.5,0),v(-.8,.5,.2),v(-.1,-.5,.4),v(.6,.5,.6),v(1.3,-.5,.8),
-        v(-.8,-.6,1.0),v(-.1,.6,1.2),v(.6,-.6,1.1)
-      ],
-      edges:[
-        [0,1],[1,2],[2,3],[3,4],
-        [0,5],[5,6],[6,7],[7,4],
-        [1,5],[2,6],[3,7],
-        [1,6],[2,7]
-      ]
-    },
-    {
-      name:"staircase",
-      points:[
-        v(-1.4,-.7,0),v(-.7,-.7,0),v(-.7,0,.35),v(0,0,.35),
-        v(0,.7,.7),v(.7,.7,.7),v(.7,0,1.05),v(1.4,0,1.05),
-        v(-.7,.7,.9),v(.7,-.7,1.25)
-      ],
-      edges:[
-        [0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],
-        [2,8],[8,4],
-        [3,9],[9,6]
-      ]
-    },
-    {
-      name:"arched-loop",
-      points:[
-        v(-1.3,-.5,0),v(-.7,-.8,.2),v(0,-.9,.4),v(.7,-.8,.6),v(1.3,-.5,.8),
-        v(1,.2,1.15),v(.4,.7,1.35),v(-.4,.7,1.15),v(-1,.2,.75),
-        v(0,0,.75)
-      ],
-      edges:[
-        [0,1],[1,2],[2,3],[3,4],
-        [4,5],[5,6],[6,7],[7,8],[8,0],
-        [1,9],[3,9],[6,9],[8,9]
-      ]
-    },
-    {
-      name:"asymmetric-cage",
-      points:[
-        v(-1.2,-1,0),v(.2,-1,.1),v(1.2,-.5,.25),
-        v(-1.2,.7,.2),v(.1,.9,.35),v(1.2,.6,.5),
-        v(-.8,-.5,1.2),v(.4,-.4,1.45),v(-.6,.6,1.15),v(.7,.5,1.3),
-        v(0,0,.7)
-      ],
-      edges:[
-        [0,1],[1,2],[0,3],[3,4],[4,5],[2,5],
-        [6,7],[6,8],[7,9],[8,9],
-        [0,6],[1,7],[3,8],[5,9],
-        [0,10],[2,10],[4,10],[7,10],[8,10]
-      ]
-    },
-    {
-      name:"sparse-kite",
-      points:[
-        v(-1.3,0,0),v(-.5,-.7,.25),v(-.5,.7,.35),v(.3,0,.7),
-        v(1.1,-.6,.95),v(1.1,.6,1.1),v(1.5,0,.55)
-      ],
-      edges:[
-        [0,1],[0,2],[1,3],[2,3],
-        [3,4],[3,5],[4,6],[5,6]
-      ]
-    },
-    {
-      name:"central-star",
-      points:[
-        v(0,0,.7),
-        v(-1.2,-.8,0),v(-1.2,.8,.2),v(1.2,-.8,.35),v(1.2,.8,.55),
-        v(-.5,0,1.45),v(.6,0,1.55),
-        v(0,-1.15,.8),v(0,1.15,1.0)
-      ],
-      edges:[
-        [0,1],[0,2],[0,3],[0,4],
-        [0,5],[0,6],[0,7],[0,8],
-        [1,3],[2,4],[5,6],[7,8]
-      ]
-    }
-,
-    {
-      name:"open-c",
-      points:[
-        v(-1.1,-.7,0),v(-1.4,0,.25),v(-1.1,.7,.45),
-        v(.3,.8,.7),v(1.1,.45,.9),v(1.15,-.35,.75),v(.35,-.8,.55)
-      ],
-      edges:[
-        {type:"curve",a:0,b:1,bend:.22,side:-1},
-        {type:"curve",a:1,b:2,bend:.22,side:-1},
-        {type:"curve",a:2,b:3,bend:.24,side:-1},
-        {type:"curve",a:3,b:4,bend:.22,side:-1},
-        {type:"curve",a:4,b:5,bend:.24,side:-1},
-        {type:"curve",a:5,b:6,bend:.22,side:-1}
-      ]
-    },
-    {
-      name:"u-frame",
-      points:[
-        v(-1,-.8,0),v(-1,.5,.35),v(-.55,1,.55),
-        v(.55,1,.75),v(1,.5,.55),v(1,-.8,.25),
-        v(-.25,.15,1.15),v(.45,.15,1.05)
-      ],
-      edges:[
-        {type:"curve",a:0,b:1,bend:.18,side:1},
-        {type:"curve",a:1,b:2,bend:.18,side:1},
-        {type:"curve",a:2,b:3,bend:.16,side:1},
-        {type:"curve",a:3,b:4,bend:.18,side:1},
-        {type:"curve",a:4,b:5,bend:.18,side:1},
-        [1,6],[6,7],[7,4]
-      ]
-    },
-    {
-      name:"loop-tail",
-      points:[
-        v(-.7,0,.5),v(0,.7,.7),v(.7,0,.9),v(0,-.7,.65),
-        v(1.2,-.4,.45),v(1.6,.1,.25),v(-1.2,.2,.2)
-      ],
-      edges:[
-        {type:"curve",a:0,b:1,bend:.28,side:-1},
-        {type:"curve",a:1,b:2,bend:.28,side:-1},
-        {type:"curve",a:2,b:3,bend:.28,side:-1},
-        {type:"curve",a:3,b:0,bend:.28,side:-1},
-        {type:"curve",a:2,b:4,bend:.25,side:1},
-        [4,5],[0,6]
-      ]
-    },
-    {
-      name:"ring-bridge",
-      points:[
-        v(-.9,0,.5),v(.9,0,.6),v(-1.5,-.5,0),v(1.5,.5,.2),
-        v(0,-.8,1.1),v(0,.8,1.2)
-      ],
-      edges:[
-        {type:"ring",center:0,radius:.62,tilt:15},
-        {type:"ring",center:1,radius:.62,tilt:70},
-        [0,1],[0,2],[1,3],[0,4],[1,5],[4,5]
-      ]
-    },
-    {
-      name:"double-ring-open",
-      points:[
-        v(-.8,-.1,.35),v(.75,.1,.55),v(-1.45,.55,.2),v(1.35,-.55,.3),
-        v(0,0,1.35)
-      ],
-      edges:[
-        {type:"ring",center:0,radius:.55,tilt:30},
-        {type:"ring",center:1,radius:.5,tilt:75},
-        {type:"curve",a:0,b:4,bend:.3,side:1},
-        {type:"curve",a:4,b:1,bend:.3,side:-1},
-        [0,2],[1,3]
-      ]
-    },
-    {
-      name:"s-hook",
-      points:[
-        v(-1.3,.55,.2),v(-.7,.9,.45),v(-.1,.55,.7),
-        v(.2,0,.85),v(.7,-.55,.65),v(1.3,-.8,.4),
-        v(-.1,-.65,.2),v(.7,.55,1.2)
-      ],
-      edges:[
-        {type:"curve",a:0,b:1,bend:.25,side:1},
-        {type:"curve",a:1,b:2,bend:.25,side:-1},
-        {type:"curve",a:2,b:3,bend:.22,side:-1},
-        {type:"curve",a:3,b:4,bend:.22,side:1},
-        {type:"curve",a:4,b:5,bend:.25,side:1},
-        [3,6],[3,7]
-      ]
-    },
-    {
-      name:"open-spiral",
-      points:[
-        v(-1.1,.2,.25),v(-.7,.75,.45),v(0,.9,.65),
-        v(.7,.55,.8),v(.8,-.15,.9),v(.25,-.65,.75),
-        v(-.35,-.45,.55),v(-.25,.1,.65),v(.2,.15,1.2)
-      ],
-      edges:[
-        {type:"curve",a:0,b:1,bend:.2,side:1},
-        {type:"curve",a:1,b:2,bend:.2,side:1},
-        {type:"curve",a:2,b:3,bend:.2,side:1},
-        {type:"curve",a:3,b:4,bend:.2,side:1},
-        {type:"curve",a:4,b:5,bend:.2,side:1},
-        {type:"curve",a:5,b:6,bend:.2,side:1},
-        {type:"curve",a:6,b:7,bend:.2,side:1},
-        [7,8]
-      ]
-    },
-    {
-      name:"arched-cage",
-      points:[
-        v(-1.1,-.8,0),v(1.1,-.8,.1),v(-1.1,.7,.2),v(1.1,.7,.3),
-        v(-.7,-.45,1.2),v(.7,-.45,1.3),v(-.7,.45,1.15),v(.7,.45,1.35)
-      ],
-      edges:[
-        [0,1],[0,2],[1,3],[2,3],
-        {type:"curve",a:4,b:5,bend:.22,side:-1},
-        {type:"curve",a:4,b:6,bend:.22,side:1},
-        {type:"curve",a:5,b:7,bend:.22,side:-1},
-        {type:"curve",a:6,b:7,bend:.22,side:1},
-        [0,4],[1,5],[2,6],[3,7]
-      ]
-    },
-    {
-      name:"circle-spokes",
-      points:[
-        v(0,0,.65),v(-1.2,0,.2),v(1.2,0,.3),v(0,-1,.15),v(0,1,.4),
-        v(-.65,.65,1.25),v(.65,-.65,1.15)
-      ],
-      edges:[
-        {type:"ring",center:0,radius:.9,tilt:45},
-        [0,1],[0,2],[0,3],[0,4],[0,5],[0,6]
-      ]
-    },
-    {
-      name:"broken-ring",
-      points:[
-        v(-1,.2,.2),v(-.6,.8,.45),v(.1,1,.65),v(.8,.65,.8),
-        v(1,.05,.75),v(.6,-.65,.55),v(-.05,-.8,.35),v(-.75,-.4,.15),
-        v(.15,.15,1.25)
-      ],
-      edges:[
-        {type:"curve",a:0,b:1,bend:.18,side:1},
-        {type:"curve",a:1,b:2,bend:.18,side:1},
-        {type:"curve",a:2,b:3,bend:.18,side:1},
-        {type:"curve",a:3,b:4,bend:.18,side:1},
-        {type:"curve",a:4,b:5,bend:.18,side:1},
-        {type:"curve",a:5,b:6,bend:.18,side:1},
-        {type:"curve",a:6,b:7,bend:.18,side:1},
-        [2,8],[6,8]
-      ]
-    },
-    {
-      name:"wave-frame",
-      points:[
-        v(-1.5,-.6,0),v(-.9,.4,.25),v(-.2,-.3,.5),v(.5,.5,.7),v(1.2,-.2,.9),
-        v(-1.2,.8,1.2),v(-.3,.9,1.35),v(.6,.85,1.15),v(1.4,.7,1.3)
-      ],
-      edges:[
-        {type:"curve",a:0,b:1,bend:.24,side:1},
-        {type:"curve",a:1,b:2,bend:.24,side:-1},
-        {type:"curve",a:2,b:3,bend:.24,side:1},
-        {type:"curve",a:3,b:4,bend:.24,side:-1},
-        {type:"curve",a:5,b:6,bend:.2,side:-1},
-        {type:"curve",a:6,b:7,bend:.2,side:1},
-        {type:"curve",a:7,b:8,bend:.2,side:-1},
-        [1,5],[2,6],[3,7],[4,8]
-      ]
-    },
-    {
-      name:"ring-and-fork",
-      points:[
-        v(-.5,0,.55),v(.7,0,.65),v(1.35,.55,.9),v(1.35,-.55,.4),
-        v(-1.2,.45,.2),v(-1.2,-.45,.15),v(.1,0,1.4)
-      ],
-      edges:[
-        {type:"ring",center:0,radius:.62,tilt:55},
-        [0,1],[1,2],[1,3],[0,4],[0,5],
-        {type:"curve",a:0,b:6,bend:.3,side:1}
-      ]
-    }
-  ];
-
-
-  const directions = ["up","right","down","left"];
-  const azimuths = {
-    up: 225,
-    right: 315,
-    down: 45,
-    left: 135
-  };
-
-  function deg(d){ return d*Math.PI/180; }
-
-  function vec(x,y,z){ return {x,y,z}; }
-  function add(a,b){ return vec(a.x+b.x,a.y+b.y,a.z+b.z); }
-  function sub(a,b){ return vec(a.x-b.x,a.y-b.y,a.z-b.z); }
-  function mul(a,s){ return vec(a.x*s,a.y*s,a.z*s); }
-  function dot(a,b){ return a.x*b.x+a.y*b.y+a.z*b.z; }
+  function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+  function v(x,y,z){return {x,y,z}}
+  function add(a,b){return v(a.x+b.x,a.y+b.y,a.z+b.z)}
+  function sub(a,b){return v(a.x-b.x,a.y-b.y,a.z-b.z)}
+  function mul(a,s){return v(a.x*s,a.y*s,a.z*s)}
+  function dot(a,b){return a.x*b.x+a.y*b.y+a.z*b.z}
   function cross(a,b){
-    return vec(
+    return v(
       a.y*b.z-a.z*b.y,
       a.z*b.x-a.x*b.z,
       a.x*b.y-a.y*b.x
@@ -729,608 +325,490 @@ body{min-height:100dvh}
   }
   function norm(a){
     const l=Math.hypot(a.x,a.y,a.z)||1;
-    return vec(a.x/l,a.y/l,a.z/l);
+    return v(a.x/l,a.y/l,a.z/l);
   }
 
-  function rotateAroundAxis(v,axis,angleDeg){
-    const a=norm(axis);
-    const t=deg(angleDeg);
-    const c=Math.cos(t), s=Math.sin(t);
-    return add(
-      add(mul(v,c),mul(cross(a,v),s)),
-      mul(a,dot(a,v)*(1-c))
-    );
-  }
-
-  function makeCamera(yawDeg,pitchDeg,rollDeg=0){
-    const yaw=deg(yawDeg);
-    const pitch=deg(pitchDeg);
-
-    const position=norm(vec(
-      Math.cos(pitch)*Math.cos(yaw),
-      Math.cos(pitch)*Math.sin(yaw),
-      Math.sin(pitch)
-    ));
-
-    const forward=norm(mul(position,-1));
-    let right=norm(cross(forward,vec(0,0,1)));
-    if(Math.hypot(right.x,right.y,right.z)<.01) right=vec(1,0,0);
-    let up=norm(cross(right,forward));
-
-    if(rollDeg){
-      right=rotateAroundAxis(right,forward,rollDeg);
-      up=rotateAroundAxis(up,forward,rollDeg);
+  /*
+    Kontrollierte Formenbibliothek.
+    Alle Figuren sind bewusst auf ca. 7–10 Knoten begrenzt:
+    genug Tiefe, aber keine Zufalls-Knäuel.
+  */
+  const MODELS = [
+    {
+      name:"reference-frame",
+      p:[
+        v(-1.25,-.58,-.30), // 0
+        v(-.72,.62,-.22),   // 1
+        v(.62,.70,-.10),    // 2
+        v(1.18,-.45,-.35),  // 3
+        v(-.72,-.36,.82),   // 4
+        v(.58,-.28,.95),    // 5
+        v(.02,.34,.42)      // 6
+      ],
+      e:[
+        [0,1],[1,2],[2,3],[3,0],
+        [0,4],[1,4],
+        [2,5],[3,5],
+        [4,5],[4,6],[5,6],
+        [1,6],[2,6]
+      ]
+    },
+    {
+      name:"offset-prism",
+      p:[
+        v(-1.20,-.70,-.35),v(.15,-.72,-.22),v(-1.16,.45,-.18),v(.18,.50,-.08),
+        v(-.55,-.40,.82),v(.82,-.34,.92),v(-.52,.65,.70),v(.80,.68,.86)
+      ],
+      e:[
+        [0,1],[0,2],[1,3],[2,3],
+        [4,5],[4,6],[5,7],[6,7],
+        [0,4],[1,5],[2,6],[3,7],
+        [1,6]
+      ]
+    },
+    {
+      name:"double-tetra",
+      p:[
+        v(-1.25,-.35,-.25),v(-.42,-.75,-.32),v(-.52,.48,-.12),v(-.42,-.10,.88),
+        v(.38,-.55,-.28),v(1.18,-.12,-.22),v(.72,.60,-.05),v(.62,.02,.92)
+      ],
+      e:[
+        [0,1],[0,2],[1,2],[0,3],[1,3],[2,3],
+        [4,5],[4,6],[5,6],[4,7],[5,7],[6,7],
+        [2,4],[3,7]
+      ]
+    },
+    {
+      name:"bridge",
+      p:[
+        v(-1.28,-.60,-.32),v(-.72,.48,-.22),v(-.08,-.58,-.16),v(.52,.48,-.02),v(1.22,-.54,-.20),
+        v(-.68,-.16,.82),v(.02,.25,.98),v(.70,-.12,.78)
+      ],
+      e:[
+        [0,1],[1,2],[2,3],[3,4],
+        [0,5],[1,5],[2,5],
+        [2,6],[3,6],
+        [3,7],[4,7],[6,7]
+      ]
+    },
+    {
+      name:"stepped-cage",
+      p:[
+        v(-1.20,-.70,-.30),v(-.30,-.70,-.20),v(-1.18,.20,-.10),v(-.28,.22,.02),
+        v(.25,-.20,.20),v(1.15,-.18,.26),v(.30,.72,.45),v(1.16,.70,.55),
+        v(.12,.16,1.02)
+      ],
+      e:[
+        [0,1],[0,2],[1,3],[2,3],
+        [3,4],[4,5],[4,6],[5,7],[6,7],
+        [3,8],[4,8],[6,8]
+      ]
+    },
+    {
+      name:"asym-pyramid",
+      p:[
+        v(-1.25,-.55,-.35),v(-.20,-.78,-.25),v(.78,-.42,-.20),v(1.12,.42,-.05),v(-.52,.58,-.10),
+        v(-.55,-.02,.88),v(.52,.12,1.02)
+      ],
+      e:[
+        [0,1],[1,2],[2,3],[3,4],[4,0],
+        [0,5],[1,5],[4,5],
+        [1,6],[2,6],[3,6],
+        [5,6]
+      ]
+    },
+    {
+      name:"fork",
+      p:[
+        v(-1.20,-.55,-.30),v(-.52,-.12,-.16),v(.20,-.45,-.12),v(.92,-.12,-.02),
+        v(-.46,.62,.18),v(.22,.55,.34),v(1.08,.58,.20),v(.05,.05,.98)
+      ],
+      e:[
+        [0,1],[1,2],[2,3],
+        [1,4],[4,5],[5,6],[3,6],
+        [1,7],[2,7],[5,7]
+      ]
+    },
+    {
+      name:"low-frame",
+      p:[
+        v(-1.28,-.65,-.25),v(-.40,-.74,-.22),v(.48,-.62,-.18),v(1.18,-.28,-.18),
+        v(-.95,.40,-.05),v(-.10,.55,.05),v(.75,.42,.10),
+        v(-.20,-.02,.88),v(.65,.02,.72)
+      ],
+      e:[
+        [0,1],[1,2],[2,3],
+        [0,4],[4,5],[5,6],[6,3],
+        [1,7],[5,7],
+        [2,8],[6,8],[7,8]
+      ]
+    },
+    {
+      name:"twisted-frame",
+      p:[
+        v(-1.15,-.62,-.38),v(.10,-.72,-.18),v(1.12,-.45,-.12),v(-1.06,.48,-.08),v(.05,.58,.02),v(1.08,.55,.14),
+        v(-.48,-.12,.92),v(.62,.10,.78)
+      ],
+      e:[
+        [0,1],[1,2],[0,3],[3,4],[4,5],[2,5],
+        [0,6],[3,6],[4,6],
+        [1,7],[2,7],[5,7],
+        [6,7]
+      ]
+    },
+    {
+      name:"tri-bridge",
+      p:[
+        v(-1.25,-.52,-.28),v(-.45,-.70,-.22),v(.32,-.55,-.15),v(1.16,-.20,-.10),
+        v(-.88,.46,-.08),v(.00,.60,.06),v(.86,.48,.16),
+        v(-.38,.00,.90),v(.50,.08,.96)
+      ],
+      e:[
+        [0,1],[1,2],[2,3],
+        [0,4],[4,5],[5,6],[6,3],
+        [1,7],[4,7],[5,7],
+        [2,8],[5,8],[6,8],
+        [7,8]
+      ]
+    },
+    {
+      name:"open-cage",
+      p:[
+        v(-1.20,-.64,-.30),v(-.20,-.70,-.20),v(.78,-.56,-.15),
+        v(-1.08,.36,-.08),v(-.06,.50,.04),v(.94,.38,.10),
+        v(-.58,-.06,.88),v(.42,.06,.98)
+      ],
+      e:[
+        [0,1],[1,2],[0,3],[3,4],[4,5],
+        [0,6],[1,6],[3,6],[4,6],
+        [1,7],[2,7],[4,7],[5,7],
+        [6,7]
+      ]
+    },
+    {
+      name:"split-tower",
+      p:[
+        v(-1.10,-.62,-.28),v(-.25,-.65,-.20),v(.68,-.55,-.15),v(1.15,.10,-.04),
+        v(-.90,.34,-.02),v(-.08,.52,.12),v(.72,.48,.22),
+        v(-.45,-.05,.92),v(.42,.10,1.12)
+      ],
+      e:[
+        [0,1],[1,2],[2,3],
+        [0,4],[4,5],[5,6],[6,3],
+        [1,7],[4,7],[5,7],
+        [2,8],[5,8],[6,8],
+        [7,8]
+      ]
     }
+  ];
 
-    return {position,up};
+  function rotateZ(p,quarterTurns){
+    const q=((quarterTurns%4)+4)%4;
+    if(q===0) return v(p.x,p.y,p.z);
+    if(q===1) return v(-p.y,p.x,p.z);
+    if(q===2) return v(-p.x,-p.y,p.z);
+    return v(p.y,-p.x,p.z);
   }
 
-  function cameraBasis(camera){
-    const forward=norm(mul(camera.position,-1));
-    const right=norm(cross(forward,camera.up));
+  function variant(base){
+    const q=Math.floor(Math.random()*4);
+    const mirror=Math.random()<0.5 ? -1 : 1;
+    return {
+      name:base.name,
+      p:base.p.map(pt=>{
+        const r=rotateZ(pt,q);
+        return v(r.x*mirror,r.y,r.z);
+      }),
+      e:base.e
+    };
+  }
+
+  /*
+    Camera:
+    pos = Richtung vom Objekt zum Betrachter.
+    up  = "oben" auf dem Bildschirm.
+  */
+  function camera(pos,up){
+    pos=norm(pos);
+    let forward=mul(pos,-1);
+    let right=norm(cross(forward,up));
+    let trueUp=norm(cross(right,forward));
+    return {pos,up:trueUp};
+  }
+
+  const START_CAMERA = camera(v(1.35,-1.55,1.05),v(0,0,1));
+
+  function basis(cam){
+    const forward=mul(cam.pos,-1);
+    const right=norm(cross(forward,cam.up));
     const up=norm(cross(right,forward));
     return {forward,right,up};
   }
 
-  function orbitCamera(camera,axis,angleDeg){
+  /*
+    Exakte vier Seiten relativ zur STARTANSICHT.
+
+    Beispiel bei einer Frontkamera:
+      left   = Kamera steht links vom Objekt
+      right  = Kamera steht rechts
+      top    = Kamera steht oberhalb
+      bottom = Kamera steht unterhalb
+
+    Für top/bottom wird die Bildschirm-"oben"-Richtung so gesetzt,
+    wie bei klassischen orthogonalen 3D-Seitenansichten.
+  */
+  function targetCamera(dir){
+    const b=basis(START_CAMERA);
+
+    if(dir==="left"){
+      return camera(mul(b.right,-1),b.up);
+    }
+    if(dir==="right"){
+      return camera(b.right,b.up);
+    }
+    if(dir==="top"){
+      return camera(b.up,mul(START_CAMERA.pos,-1));
+    }
+    return camera(mul(b.up,-1),START_CAMERA.pos);
+  }
+
+  function rawProject(model,cam){
+    const b=basis(cam);
+    return model.p.map((pt,i)=>({
+      i,
+      x:dot(pt,b.right),
+      y:dot(pt,b.up),
+      depth:dot(pt,b.forward)
+    }));
+  }
+
+  function bbox(points){
     return {
-      position:norm(rotateAroundAxis(camera.position,axis,angleDeg)),
-      up:norm(rotateAroundAxis(camera.up,axis,angleDeg))
+      minX:Math.min(...points.map(p=>p.x)),
+      maxX:Math.max(...points.map(p=>p.x)),
+      minY:Math.min(...points.map(p=>p.y)),
+      maxY:Math.max(...points.map(p=>p.y))
     };
   }
 
-  function targetCameraFor(start,dir){
-    /*
-      Die vier Pfeile beziehen sich auf die sichtbare Startansicht:
-      links/rechts drehen um die sichtbare Hochachse,
-      oben/unten drehen um die sichtbare Querachse.
-    */
-    const basis=cameraBasis(start);
+  function commonScale(model,startCam,targetCam){
+    const a=bbox(rawProject(model,startCam));
+    const b=bbox(rawProject(model,targetCam));
+    const maxW=Math.max(a.maxX-a.minX,b.maxX-b.minX,.2);
+    const maxH=Math.max(a.maxY-a.minY,b.maxY-b.minY,.2);
 
-    if(dir==="left")  return orbitCamera(start,basis.up,-90);
-    if(dir==="right") return orbitCamera(start,basis.up, 90);
-    if(dir==="up")    return orbitCamera(start,basis.right,-90);
-    return orbitCamera(start,basis.right,90);
+    // gleiche Größe für Start + Target
+    return Math.min(245/maxW,205/maxH);
   }
 
-  function modelRadius(m){
-    let r=.1;
-    m.points.forEach(p=>{
-      r=Math.max(r,Math.hypot(p.x,p.y,p.z));
-    });
-    return r;
+  function project(model,cam,scale){
+    const raw=rawProject(model,cam);
+    const bb=bbox(raw);
+    const cx=(bb.minX+bb.maxX)/2;
+    const cy=(bb.minY+bb.maxY)/2;
+
+    return raw.map(p=>({
+      ...p,
+      sx:220+(p.x-cx)*scale,
+      sy:185-(p.y-cy)*scale
+    }));
   }
 
-  function pointOnQuadratic3D(a,c,b,t){
-    const u=1-t;
-    return {
-      x:u*u*a.x+2*u*t*c.x+t*t*b.x,
-      y:u*u*a.y+2*u*t*c.y+t*t*b.y,
-      z:u*u*a.z+2*u*t*c.z+t*t*b.z
-    };
-  }
+  function addDefs(svg){
+    const defs=document.createElementNS(NS,"defs");
 
-  function stableCurveControl(a,b,bend=0.3,side=1){
-    const mid={
-      x:(a.x+b.x)/2,
-      y:(a.y+b.y)/2,
-      z:(a.z+b.z)/2
-    };
-
-    const d=norm(sub(b,a));
-
-    // Choose a stable 3D perpendicular, not a screen-space bend.
-    let ref=Math.abs(dot(d,vec(0,0,1)))>.82 ? vec(0,1,0) : vec(0,0,1);
-    let perp=norm(cross(d,ref));
-
-    const length=Math.hypot(b.x-a.x,b.y-a.y,b.z-a.z);
-    return add(mid,mul(perp,length*bend*side));
-  }
-
-  function ringBasis(tiltDeg,seed=0){
-    // Deterministic 3D plane for a ring.
-    const tilt=deg(tiltDeg);
-    const spin=deg((seed*71)%360);
-
-    const normal=norm(vec(
-      Math.sin(tilt)*Math.cos(spin),
-      Math.sin(tilt)*Math.sin(spin),
-      Math.cos(tilt)
-    ));
-
-    let ref=Math.abs(normal.z)>.88 ? vec(1,0,0) : vec(0,0,1);
-    const u=norm(cross(normal,ref));
-    const v=norm(cross(normal,u));
-    return {u,v,normal};
-  }
-
-  function projectedGeometry(m,camera){
-    const radius=modelRadius(m);
-    const basis=cameraBasis(camera);
-
-    const baseScale=104/Math.max(1.0,radius);
-
-    function projectWorldPoint(p){
-      const cx=dot(p,basis.right);
-      const cy=dot(p,basis.up);
-      const cz=dot(p,basis.forward);
-
-      return {
-        x:cx,y:cy,z:cz,
-        perspective:1,
-        sx:210+cx*baseScale,
-        sy:170-cy*baseScale
-      };
-    }
-
-    const pts=m.points.map((p,i)=>({i,...projectWorldPoint(p)}));
-
-    const edges=m.edges.map((edge,edgeIndex)=>{
-      if(Array.isArray(edge)){
-        const [a,b]=edge;
-        const pa=pts[a],pb=pts[b];
-        return {
-          type:"path",
-          sourceType:"line",
-          pathPts:[pa,pb],
-          depth:(pa.z+pb.z)/2,
-          perspective:1
-        };
-      }
-
-      if(edge.type==="curve"){
-        const wa=m.points[edge.a];
-        const wb=m.points[edge.b];
-        const control=stableCurveControl(
-          wa,wb,
-          edge.bend ?? .22,
-          edge.side ?? 1
-        );
-
-        const pathPts=[];
-        const samples=16;
-        for(let i=0;i<=samples;i++){
-          const t=i/samples;
-          pathPts.push(projectWorldPoint(pointOnQuadratic3D(wa,control,wb,t)));
-        }
-
-        return {
-          type:"path",
-          sourceType:"curve",
-          pathPts,
-          depth:pathPts.reduce((s,p)=>s+p.z,0)/pathPts.length,
-          perspective:1
-        };
-      }
-
-      if(edge.type==="ring"){
-        const center=m.points[edge.center];
-        const {u,v}=ringBasis(edge.tilt ?? 0,edge.center+edgeIndex);
-        const rr=edge.radius ?? .48;
-
-        const pathPts=[];
-        const samples=28;
-        for(let i=0;i<=samples;i++){
-          const a=(i/samples)*Math.PI*2;
-          const world=add(
-            center,
-            add(
-              mul(u,Math.cos(a)*rr),
-              mul(v,Math.sin(a)*rr)
-            )
-          );
-          pathPts.push(projectWorldPoint(world));
-        }
-
-        return {
-          type:"path",
-          sourceType:"ring",
-          pathPts,
-          depth:pathPts.reduce((s,p)=>s+p.z,0)/pathPts.length,
-          perspective:1
-        };
-      }
-
-      return null;
-    }).filter(Boolean).sort((a,b)=>b.depth-a.depth);
-
-    return {pts,edges,radius};
-  }
-
-  function viewDifference(m,c1,c2){
-    const g1=projectedGeometry(m,c1);
-    const g2=projectedGeometry(m,c2);
-
-    const nodeMean=arr=>({
-      x:arr.reduce((s,p)=>s+p.sx,0)/arr.length,
-      y:arr.reduce((s,p)=>s+p.sy,0)/arr.length
-    });
-
-    const m1=nodeMean(g1.pts);
-    const m2=nodeMean(g2.pts);
-
-    let nodeSum=0;
-    for(let i=0;i<g1.pts.length;i++){
-      const dx=(g1.pts[i].sx-m1.x)-(g2.pts[i].sx-m2.x);
-      const dy=(g1.pts[i].sy-m1.y)-(g2.pts[i].sy-m2.y);
-      nodeSum+=dx*dx+dy*dy;
-    }
-    const nodeDiff=Math.sqrt(nodeSum/g1.pts.length);
-
-    // Also compare sampled edge geometry so curves/rings count.
-    const sampleEdges=g=>g.edges.flatMap(e=>{
-      if(!e.pathPts) return [];
-      const step=Math.max(1,Math.floor(e.pathPts.length/5));
-      return e.pathPts.filter((_,i)=>i%step===0).slice(0,6);
-    });
-
-    const e1=sampleEdges(g1);
-    const e2=sampleEdges(g2);
-    const n=Math.min(e1.length,e2.length);
-
-    let edgeDiff=0;
-    if(n){
-      let s=0;
-      for(let i=0;i<n;i++){
-        const dx=e1[i].sx-e2[i].sx;
-        const dy=e1[i].sy-e2[i].sy;
-        s+=dx*dx+dy*dy;
-      }
-      edgeDiff=Math.sqrt(s/n);
-    }
-
-    return nodeDiff*.68+edgeDiff*.32;
-  }
-
-  function renderModel(svg,m,camera){
-    svg.innerHTML="";
-    const g=projectedGeometry(m,camera);
-    const ns="http://www.w3.org/2000/svg";
-
-    const defs=document.createElementNS(ns,"defs");
-
-    const nodeGrad=document.createElementNS(ns,"radialGradient");
-    nodeGrad.setAttribute("id","nodeGrad");
+    const nodeGrad=document.createElementNS(NS,"radialGradient");
+    nodeGrad.id="nodeGrad";
     nodeGrad.setAttribute("cx","30%");
     nodeGrad.setAttribute("cy","25%");
-    nodeGrad.setAttribute("r","74%");
+    nodeGrad.setAttribute("r","75%");
     [
-      ["0%","#d7f5fb"],
-      ["16%","#84d5e8"],
-      ["42%","#2496b5"],
-      ["72%","#0b6e8d"],
-      ["100%","#05465e"]
-    ].forEach(([offset,color])=>{
-      const s=document.createElementNS(ns,"stop");
-      s.setAttribute("offset",offset);
-      s.setAttribute("stop-color",color);
+      ["0%","#dff8fd"],
+      ["18%","#82d1e3"],
+      ["47%","#238ead"],
+      ["78%","#0a6683"],
+      ["100%","#06495f"]
+    ].forEach(([o,c])=>{
+      const s=document.createElementNS(NS,"stop");
+      s.setAttribute("offset",o);
+      s.setAttribute("stop-color",c);
       nodeGrad.appendChild(s);
     });
 
-    const rodGrad=document.createElementNS(ns,"linearGradient");
-    rodGrad.setAttribute("id","rodGrad");
-    rodGrad.setAttribute("x1","0%");
-    rodGrad.setAttribute("y1","0%");
-    rodGrad.setAttribute("x2","0%");
-    rodGrad.setAttribute("y2","100%");
+    const rodGrad=document.createElementNS(NS,"linearGradient");
+    rodGrad.id="rodGrad";
+    rodGrad.setAttribute("x1","0");
+    rodGrad.setAttribute("y1","0");
+    rodGrad.setAttribute("x2","0");
+    rodGrad.setAttribute("y2","1");
     [
-      ["0%","#8fd8e8"],
-      ["28%","#2b9ab8"],
-      ["68%","#0c6d8c"],
-      ["100%","#054b64"]
-    ].forEach(([offset,color])=>{
-      const s=document.createElementNS(ns,"stop");
-      s.setAttribute("offset",offset);
-      s.setAttribute("stop-color",color);
+      ["0%","#82cee0"],
+      ["35%","#238ead"],
+      ["72%","#0a6683"],
+      ["100%","#06495f"]
+    ].forEach(([o,c])=>{
+      const s=document.createElementNS(NS,"stop");
+      s.setAttribute("offset",o);
+      s.setAttribute("stop-color",c);
       rodGrad.appendChild(s);
     });
 
-    const shadow=document.createElementNS(ns,"filter");
-    shadow.setAttribute("id","softShadow");
-    shadow.setAttribute("x","-35%");
-    shadow.setAttribute("y","-35%");
-    shadow.setAttribute("width","170%");
-    shadow.setAttribute("height","170%");
-    shadow.innerHTML=`
-      <feDropShadow dx="1.8" dy="2.4" stdDeviation="1.8"
-                    flood-color="#000" flood-opacity=".24"/>
-    `;
+    const shadow=document.createElementNS(NS,"filter");
+    shadow.id="shadow";
+    shadow.setAttribute("x","-30%");
+    shadow.setAttribute("y","-30%");
+    shadow.setAttribute("width","160%");
+    shadow.setAttribute("height","160%");
+    shadow.innerHTML='<feDropShadow dx="1.5" dy="2" stdDeviation="1.5" flood-color="#000" flood-opacity=".22"/>';
 
     defs.appendChild(nodeGrad);
     defs.appendChild(rodGrad);
     defs.appendChild(shadow);
     svg.appendChild(defs);
+  }
 
-    function widthFor(persp,base){
-      return base*Math.max(.72,Math.min(1.38,persp||1));
-    }
+  function render(svg,model,cam,scale){
+    svg.innerHTML="";
+    addDefs(svg);
 
-    function addPath(d,perspective=1){
-      const outer=document.createElementNS(ns,"path");
-      outer.setAttribute("d",d);
-      outer.setAttribute("fill","none");
-      outer.setAttribute("stroke","#05485f");
-      outer.setAttribute("stroke-width",widthFor(perspective,9.2));
+    const pts=project(model,cam,scale);
+
+    // Kanten nach mittlerer Tiefe sortieren: hinten zuerst
+    const edges=model.e.map(([a,b])=>({
+      a,b,
+      depth:(pts[a].depth+pts[b].depth)/2
+    })).sort((x,y)=>x.depth-y.depth);
+
+    edges.forEach(({a,b})=>{
+      const A=pts[a],B=pts[b];
+
+      const outer=document.createElementNS(NS,"line");
+      outer.setAttribute("x1",A.sx);
+      outer.setAttribute("y1",A.sy);
+      outer.setAttribute("x2",B.sx);
+      outer.setAttribute("y2",B.sy);
+      outer.setAttribute("stroke","#05495f");
+      outer.setAttribute("stroke-width","9.5");
       outer.setAttribute("stroke-linecap","round");
-      outer.setAttribute("stroke-linejoin","round");
-      outer.setAttribute("filter","url(#softShadow)");
+      outer.setAttribute("filter","url(#shadow)");
       svg.appendChild(outer);
 
-      const inner=document.createElementNS(ns,"path");
-      inner.setAttribute("d",d);
-      inner.setAttribute("fill","none");
+      const inner=document.createElementNS(NS,"line");
+      inner.setAttribute("x1",A.sx);
+      inner.setAttribute("y1",A.sy);
+      inner.setAttribute("x2",B.sx);
+      inner.setAttribute("y2",B.sy);
       inner.setAttribute("stroke","url(#rodGrad)");
-      inner.setAttribute("stroke-width",widthFor(perspective,5.8));
+      inner.setAttribute("stroke-width","6");
       inner.setAttribute("stroke-linecap","round");
-      inner.setAttribute("stroke-linejoin","round");
       svg.appendChild(inner);
 
-      const shine=document.createElementNS(ns,"path");
-      shine.setAttribute("d",d);
-      shine.setAttribute("fill","none");
-      shine.setAttribute("stroke","#c4eef6");
-      shine.setAttribute("stroke-opacity",".30");
-      shine.setAttribute("stroke-width",widthFor(perspective,1.1));
+      const shine=document.createElementNS(NS,"line");
+      shine.setAttribute("x1",A.sx);
+      shine.setAttribute("y1",A.sy-1.3);
+      shine.setAttribute("x2",B.sx);
+      shine.setAttribute("y2",B.sy-1.3);
+      shine.setAttribute("stroke","#bcecf4");
+      shine.setAttribute("stroke-opacity",".32");
+      shine.setAttribute("stroke-width","1.2");
       shine.setAttribute("stroke-linecap","round");
       svg.appendChild(shine);
-    }
-
-    // Back-to-front rendering of true 3D lines, curves and rings.
-    g.edges.forEach(e=>{
-      if(e.type!=="path" || !e.pathPts || e.pathPts.length<2) return;
-
-      let d=`M ${e.pathPts[0].sx} ${e.pathPts[0].sy}`;
-      for(let i=1;i<e.pathPts.length;i++){
-        d+=` L ${e.pathPts[i].sx} ${e.pathPts[i].sy}`;
-      }
-
-      addPath(d,e.perspective);
     });
 
-    [...g.pts].sort((a,b)=>a.z-b.z).forEach(p=>{
-      const r=widthFor(p.perspective,11.1);
-
-      const c=document.createElementNS(ns,"circle");
-      c.setAttribute("cx",p.sx);
-      c.setAttribute("cy",p.sy);
-      c.setAttribute("r",r);
+    // Kugeln hinten -> vorne
+    [...pts].sort((a,b)=>a.depth-b.depth).forEach(P=>{
+      const c=document.createElementNS(NS,"circle");
+      c.setAttribute("cx",P.sx);
+      c.setAttribute("cy",P.sy);
+      c.setAttribute("r","12.5");
       c.setAttribute("fill","url(#nodeGrad)");
-      c.setAttribute("stroke","#05485f");
-      c.setAttribute("stroke-width",widthFor(p.perspective,1.8));
-      c.setAttribute("filter","url(#softShadow)");
+      c.setAttribute("stroke","#05495f");
+      c.setAttribute("stroke-width","1.8");
+      c.setAttribute("filter","url(#shadow)");
       svg.appendChild(c);
 
-      const hi=document.createElementNS(ns,"circle");
-      hi.setAttribute("cx",p.sx-r*.28);
-      hi.setAttribute("cy",p.sy-r*.32);
-      hi.setAttribute("r",r*.22);
-      hi.setAttribute("fill","#e5f9fd");
-      hi.setAttribute("fill-opacity",".76");
+      const hi=document.createElementNS(NS,"circle");
+      hi.setAttribute("cx",P.sx-3.6);
+      hi.setAttribute("cy",P.sy-4.2);
+      hi.setAttribute("r","3");
+      hi.setAttribute("fill","#e7f9fd");
+      hi.setAttribute("fill-opacity",".75");
       svg.appendChild(hi);
     });
   }
 
-
-  function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
-
-  function addEdgeUnique(edges,edge,keySet){
-    let key;
-    if(Array.isArray(edge)){
-      const a=Math.min(edge[0],edge[1]), b=Math.max(edge[0],edge[1]);
-      key="L:"+a+":"+b;
-    }else if(edge.type==="curve"){
-      const a=Math.min(edge.a,edge.b), b=Math.max(edge.a,edge.b);
-      key="C:"+a+":"+b+":"+Math.round((edge.bend||.3)*100)+":"+(edge.side||1);
-    }else if(edge.type==="ring"){
-      key="R:"+edge.center+":"+Math.round((edge.radius||.5)*100)+":"+Math.round(edge.tilt||0);
-    }else{
-      return;
-    }
-    if(!keySet.has(key)){
-      keySet.add(key);
-      edges.push(edge);
-    }
+  function normalizedShape(model,cam){
+    const pts=rawProject(model,cam);
+    const bb=bbox(pts);
+    const cx=(bb.minX+bb.maxX)/2;
+    const cy=(bb.minY+bb.maxY)/2;
+    const size=Math.max(bb.maxX-bb.minX,bb.maxY-bb.minY,.001);
+    return pts.map(p=>({x:(p.x-cx)/size,y:(p.y-cy)/size}));
   }
 
-  function nearestIndices(points,index,count=3){
-    const p=points[index];
-    return points
-      .map((q,i)=>({i,d:i===index?Infinity:Math.hypot(p.x-q.x,p.y-q.y,p.z-q.z)}))
-      .sort((a,b)=>a.d-b.d)
-      .slice(0,count)
-      .map(o=>o.i);
+  function shapeDifference(model,a,b){
+    const A=normalizedShape(model,a);
+    const B=normalizedShape(model,b);
+    let sum=0;
+    for(let i=0;i<A.length;i++){
+      const dx=A[i].x-B[i].x;
+      const dy=A[i].y-B[i].y;
+      sum+=dx*dx+dy*dy;
+    }
+    return Math.sqrt(sum/A.length);
   }
-
-  function generateSpatialModel(){
-    const complexity=pick(["easy","easy","medium","medium","medium","hard"]);
-
-    const nodeCount =
-      complexity==="easy" ? rand(6,8) :
-      complexity==="medium" ? rand(8,10) :
-      rand(10,12);
-
-    const points=[];
-    const edges=[];
-    const keys=new Set();
-
-    // A compact 3D chain, not a random tangle.
-    let x=-1.25,y=0,z=0;
-    points.push(v(x,y,z));
-
-    for(let i=1;i<nodeCount;i++){
-      x += .28+Math.random()*.34;
-      y += (Math.random()-.5)*.65;
-      z += (Math.random()-.5)*.65;
-
-      if(i%3===0){
-        z += (Math.random()<.5?-1:1)*(.35+Math.random()*.35);
-      }
-
-      points.push(v(
-        clamp(x,-1.7,1.7),
-        clamp(y,-1.15,1.15),
-        clamp(z,-1.15,1.35)
-      ));
-    }
-
-    // Center object.
-    const mx=points.reduce((s,p)=>s+p.x,0)/points.length;
-    const my=points.reduce((s,p)=>s+p.y,0)/points.length;
-    const mz=points.reduce((s,p)=>s+p.z,0)/points.length;
-    points.forEach(p=>{p.x-=mx;p.y-=my;p.z-=mz;});
-
-    // Main chain.
-    for(let i=0;i<points.length-1;i++){
-      addEdgeUnique(edges,[i,i+1],keys);
-    }
-
-    // Only a few additional braces.
-    const braces =
-      complexity==="easy" ? rand(2,3) :
-      complexity==="medium" ? rand(3,5) :
-      rand(5,7);
-
-    for(let k=0;k<braces;k++){
-      const a=rand(0,points.length-3);
-      const b=Math.min(points.length-1,a+rand(2,3));
-      addEdgeUnique(edges,[a,b],keys);
-    }
-
-    // Curves are occasional, not dominant.
-    const curveCount =
-      complexity==="easy" ? (Math.random()<.18?1:0) :
-      complexity==="medium" ? rand(0,1) :
-      rand(0,2);
-
-    for(let c=0;c<curveCount;c++){
-      const a=rand(0,points.length-3);
-      const b=Math.min(points.length-1,a+rand(2,4));
-      addEdgeUnique(edges,{
-        type:"curve",
-        a,b,
-        bend:.16+Math.random()*.16,
-        side:Math.random()<.5?-1:1
-      },keys);
-    }
-
-    // Rings/circles only sometimes, max one.
-    if(Math.random() < (complexity==="hard"?.25:.12)){
-      const center=rand(1,points.length-2);
-      addEdgeUnique(edges,{
-        type:"ring",
-        center,
-        radius:.34+Math.random()*.22,
-        tilt:rand(10,70)
-      },keys);
-    }
-
-    // A small triangle/cage motif sometimes.
-    if(complexity!=="easy" && Math.random()<.55){
-      const a=rand(0,points.length-3);
-      const b=a+1;
-      const c=Math.min(points.length-1,a+2);
-      addEdgeUnique(edges,[a,c],keys);
-      if(Math.random()<.5) addEdgeUnique(edges,[b,c],keys);
-    }
-
-    return {
-      name:"generated-"+complexity+"-"+Math.random().toString(36).slice(2,7),
-      points,
-      edges,
-      generated:true,
-      complexity
-    };
-  }
-
-  function modelQuality(m){
-    const xs=m.points.map(p=>p.x),ys=m.points.map(p=>p.y),zs=m.points.map(p=>p.z);
-    const span=a=>Math.max(...a)-Math.min(...a);
-
-    const sx=span(xs),sy=span(ys),sz=span(zs);
-    const minSpan=Math.min(sx,sy,sz);
-    const maxSpan=Math.max(sx,sy,sz);
-
-    const dimensionality=minSpan/Math.max(.01,maxSpan);
-
-    // prefer readable 3D objects with moderate density
-    const density=m.edges.length/Math.max(1,m.points.length);
-    return dimensionality*100 + Math.min(density,1.8)*12;
-  }
-
-  function generateGoodSpatialModel(){
-    for(let i=0;i<80;i++){
-      const m=generateSpatialModel();
-      if(modelQuality(m) < 28) continue;
-      return m;
-    }
-
-    // Reserve only if generator somehow fails.
-    return transformedModel(pick(MODELS));
-  }
-
-  function transformedModel(base){
-    const mirrorX=Math.random()<.5?-1:1;
-    const mirrorY=Math.random()<.5?-1:1;
-    const stretchZ=.95+Math.random()*.48;
-
-    return {
-      name:base.name,
-      points:base.points.map(p=>({
-        x:p.x*mirrorX,
-        y:p.y*mirrorY,
-        z:p.z*stretchZ
-      })),
-      edges:base.edges
-    };
-  }
-
 
   function chooseTask(){
-    for(let attempt=0;attempt<180;attempt++){
-      const candidate=generateGoodSpatialModel();
+    const dirs=["top","right","bottom","left"];
 
-      // Fixed start view similar to the original test.
-      const startCamera=makeCamera(35,22,0);
+    // Verhindert symmetrische / praktisch identische Ansichten.
+    for(let attempt=0;attempt<100;attempt++){
+      const model=variant(pick(MODELS));
+      const dir=pick(dirs);
+      const target=targetCamera(dir);
 
-      const dir=pick(directions);
-      const targetCamera=targetCameraFor(startCamera,dir);
+      const correctDiff=shapeDifference(model,START_CAMERA,target);
+      if(correctDiff<0.17) continue;
 
-      const diff=viewDifference(candidate,startCamera,targetCamera);
-      if(diff<50) continue;
+      // Andere Seiten müssen klar anders aussehen als die richtige Zielansicht.
+      const alternatives=dirs
+        .filter(d=>d!==dir)
+        .map(d=>shapeDifference(model,targetCamera(d),target));
 
-      model=candidate;
+      if(Math.min(...alternatives)<0.10) continue;
+
+      currentModel=model;
       answerDir=dir;
 
-      renderModel(startSvg,model,startCamera);
-      renderModel(targetSvg,model,targetCamera);
+      const scale=commonScale(model,START_CAMERA,target);
+      render(startSvg,model,START_CAMERA,scale);
+      render(targetSvg,model,target,scale);
       return;
     }
 
-    model=transformedModel(
-      MODELS.find(m=>m.name==="asymmetric-cage") || MODELS[0]
-    );
-    const startCamera=makeCamera(35,22,0);
-    answerDir="right";
-    renderModel(startSvg,model,startCamera);
-    renderModel(targetSvg,model,targetCameraFor(startCamera,answerDir));
+    // kontrollierter Fallback
+    currentModel=variant(MODELS[0]);
+    answerDir="left";
+    const target=targetCamera(answerDir);
+    const scale=commonScale(currentModel,START_CAMERA,target);
+    render(startSvg,currentModel,START_CAMERA,scale);
+    render(targetSvg,currentModel,target,scale);
   }
 
   function setSelected(dir){
     if(evaluated) return;
     selectedDir=dir;
-    arrowButtons.forEach(b=>{
-      b.classList.toggle("selected",b.dataset.dir===dir);
-    });
+    arrows.forEach(b=>b.classList.toggle("selected",b.dataset.dir===dir));
   }
 
-  function evaluate(fromTimeout=false){
+  function evaluate(timeout=false){
     if(evaluated) return;
-
-    cancelAnimationFrame(raf);
     evaluated=true;
+    cancelAnimationFrame(raf);
     timerFill.style.width="100%";
 
-    const ok = selectedDir===answerDir;
+    const ok=selectedDir===answerDir;
+    const names={top:"oben",right:"rechts",bottom:"unten",left:"links"};
 
     if(ok){
       stats.correct++;
@@ -1341,10 +819,9 @@ body{min-height:100dvh}
     }else{
       stats.wrong++;
       stats.streak=0;
-      const names={up:"oben",right:"rechts",down:"unten",left:"links"};
-      result.textContent = selectedDir
-        ? "Falsch · richtig wäre: " + names[answerDir]
-        : "Zeit abgelaufen · richtig wäre: " + names[answerDir];
+      result.textContent=selectedDir
+        ? "Falsch · richtig wäre: "+names[answerDir]
+        : "Zeit abgelaufen · richtig wäre: "+names[answerDir];
       result.className="result bad";
     }
 
@@ -1352,60 +829,56 @@ body{min-height:100dvh}
     next.textContent="Nächste Aufgabe";
   }
 
-  function animate(){
+  function tick(){
     if(evaluated) return;
-
     const elapsed=performance.now()-startedAt;
-    const pct=Math.min(elapsed/ROUND_MS,1);
-    timerFill.style.width=(pct*100)+"%";
+    const p=Math.min(elapsed/ROUND_MS,1);
+    timerFill.style.width=(p*100)+"%";
 
-    if(pct>=1){
+    if(p>=1){
       evaluate(true);
       return;
     }
-
-    raf=requestAnimationFrame(animate);
+    raf=requestAnimationFrame(tick);
   }
 
-  function startNew(){
+  function newTask(){
     cancelAnimationFrame(raf);
     evaluated=false;
     selectedDir=null;
+    answerDir=null;
     result.textContent="";
     result.className="result";
     next.textContent="Next";
     timerFill.style.width="0%";
-    arrowButtons.forEach(b=>b.classList.remove("selected"));
+    arrows.forEach(b=>b.classList.remove("selected"));
 
     chooseTask();
 
     startedAt=performance.now();
-    raf=requestAnimationFrame(animate);
+    raf=requestAnimationFrame(tick);
   }
 
-  arrowButtons.forEach(btn=>{
-    btn.addEventListener("pointerdown",ev=>{
-      ev.preventDefault();
+  arrows.forEach(btn=>{
+    btn.addEventListener("pointerdown",e=>{
+      e.preventDefault();
       setSelected(btn.dataset.dir);
     },{passive:false});
   });
 
-  next.addEventListener("pointerdown",ev=>{
-    ev.preventDefault();
+  next.addEventListener("pointerdown",e=>{
+    e.preventDefault();
     next.classList.add("pressed");
     setTimeout(()=>next.classList.remove("pressed"),80);
 
-    if(evaluated){
-      startNew();
-    }else{
-      evaluate(false);
-    }
+    if(evaluated) newTask();
+    else evaluate(false);
   },{passive:false});
 
-  document.addEventListener("dblclick",ev=>ev.preventDefault(),{passive:false});
+  document.addEventListener("dblclick",e=>e.preventDefault(),{passive:false});
 
   saveStats();
-  startNew();
+  newTask();
 })();
 </script>
 </body>
