@@ -385,7 +385,7 @@ body{min-height:100dvh}
     const minX=Math.min(...xs),maxX=Math.max(...xs);
     const minY=Math.min(...ys),maxY=Math.max(...ys);
     const w=Math.max(.01,maxX-minX),h=Math.max(.01,maxY-minY);
-    const scale=Math.min(245/w,220/h);
+    const scale=Math.min(255/w,228/h);
 
     pts.forEach(p=>{
       p.sx=210+(p.x-(minX+maxX)/2)*scale;
@@ -404,30 +404,149 @@ body{min-height:100dvh}
     svg.innerHTML="";
     const g=projectedGeometry(m,yaw);
 
-    // rods first, depth sorted
-    g.edges.forEach(e=>{
-      const a=g.pts[e.a], b=g.pts[e.b];
-      const line=document.createElementNS("http://www.w3.org/2000/svg","line");
-      line.setAttribute("x1",a.sx);
-      line.setAttribute("y1",a.sy);
-      line.setAttribute("x2",b.sx);
-      line.setAttribute("y2",b.sy);
-      line.setAttribute("stroke","#0b7898");
-      line.setAttribute("stroke-width","7");
-      line.setAttribute("stroke-linecap","round");
-      svg.appendChild(line);
+    const ns="http://www.w3.org/2000/svg";
+
+    const defs=document.createElementNS(ns,"defs");
+
+    const nodeGrad=document.createElementNS(ns,"radialGradient");
+    nodeGrad.setAttribute("id","nodeGrad");
+    nodeGrad.setAttribute("cx","32%");
+    nodeGrad.setAttribute("cy","28%");
+    nodeGrad.setAttribute("r","72%");
+
+    [
+      ["0%","#8edcf0"],
+      ["28%","#2aa3c2"],
+      ["68%","#0d7898"],
+      ["100%","#064e68"]
+    ].forEach(([offset,color])=>{
+      const stop=document.createElementNS(ns,"stop");
+      stop.setAttribute("offset",offset);
+      stop.setAttribute("stop-color",color);
+      nodeGrad.appendChild(stop);
     });
 
-    // nodes depth sorted so nearer nodes sit on top
+    const rodGrad=document.createElementNS(ns,"linearGradient");
+    rodGrad.setAttribute("id","rodGrad");
+    rodGrad.setAttribute("x1","0%");
+    rodGrad.setAttribute("y1","0%");
+    rodGrad.setAttribute("x2","0%");
+    rodGrad.setAttribute("y2","100%");
+
+    [
+      ["0%","#72c6dc"],
+      ["38%","#1785a4"],
+      ["72%","#0a6684"],
+      ["100%","#064b63"]
+    ].forEach(([offset,color])=>{
+      const stop=document.createElementNS(ns,"stop");
+      stop.setAttribute("offset",offset);
+      stop.setAttribute("stop-color",color);
+      rodGrad.appendChild(stop);
+    });
+
+    const shadow=document.createElementNS(ns,"filter");
+    shadow.setAttribute("id","softShadow");
+    shadow.setAttribute("x","-30%");
+    shadow.setAttribute("y","-30%");
+    shadow.setAttribute("width","160%");
+    shadow.setAttribute("height","160%");
+
+    const blur=document.createElementNS(ns,"feGaussianBlur");
+    blur.setAttribute("in","SourceAlpha");
+    blur.setAttribute("stdDeviation","2.2");
+    blur.setAttribute("result","blur");
+    shadow.appendChild(blur);
+
+    const off=document.createElementNS(ns,"feOffset");
+    off.setAttribute("dx","1.7");
+    off.setAttribute("dy","2.4");
+    off.setAttribute("result","off");
+    shadow.appendChild(off);
+
+    const flood=document.createElementNS(ns,"feFlood");
+    flood.setAttribute("flood-color","#000");
+    flood.setAttribute("flood-opacity",".22");
+    flood.setAttribute("result","flood");
+    shadow.appendChild(flood);
+
+    const comp=document.createElementNS(ns,"feComposite");
+    comp.setAttribute("in","flood");
+    comp.setAttribute("in2","off");
+    comp.setAttribute("operator","in");
+    comp.setAttribute("result","shadowColor");
+    shadow.appendChild(comp);
+
+    const merge=document.createElementNS(ns,"feMerge");
+    const m1=document.createElementNS(ns,"feMergeNode");
+    m1.setAttribute("in","shadowColor");
+    const m2=document.createElementNS(ns,"feMergeNode");
+    m2.setAttribute("in","SourceGraphic");
+    merge.appendChild(m1);
+    merge.appendChild(m2);
+    shadow.appendChild(merge);
+
+    defs.appendChild(nodeGrad);
+    defs.appendChild(rodGrad);
+    defs.appendChild(shadow);
+    svg.appendChild(defs);
+
+    // rods: dark outer stroke + lighter inner stroke for cylindrical look
+    g.edges.forEach(e=>{
+      const a=g.pts[e.a], b=g.pts[e.b];
+
+      const outer=document.createElementNS(ns,"line");
+      outer.setAttribute("x1",a.sx);
+      outer.setAttribute("y1",a.sy);
+      outer.setAttribute("x2",b.sx);
+      outer.setAttribute("y2",b.sy);
+      outer.setAttribute("stroke","#064e68");
+      outer.setAttribute("stroke-width","10");
+      outer.setAttribute("stroke-linecap","round");
+      outer.setAttribute("filter","url(#softShadow)");
+      svg.appendChild(outer);
+
+      const inner=document.createElementNS(ns,"line");
+      inner.setAttribute("x1",a.sx);
+      inner.setAttribute("y1",a.sy);
+      inner.setAttribute("x2",b.sx);
+      inner.setAttribute("y2",b.sy);
+      inner.setAttribute("stroke","url(#rodGrad)");
+      inner.setAttribute("stroke-width","6.5");
+      inner.setAttribute("stroke-linecap","round");
+      svg.appendChild(inner);
+
+      const highlight=document.createElementNS(ns,"line");
+      highlight.setAttribute("x1",a.sx);
+      highlight.setAttribute("y1",a.sy-1.1);
+      highlight.setAttribute("x2",b.sx);
+      highlight.setAttribute("y2",b.sy-1.1);
+      highlight.setAttribute("stroke","#9ee0ef");
+      highlight.setAttribute("stroke-opacity",".32");
+      highlight.setAttribute("stroke-width","1.4");
+      highlight.setAttribute("stroke-linecap","round");
+      svg.appendChild(highlight);
+    });
+
+    // nodes depth sorted; larger and shaded
     [...g.pts].sort((a,b)=>a.z-b.z).forEach(p=>{
-      const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+      const c=document.createElementNS(ns,"circle");
       c.setAttribute("cx",p.sx);
       c.setAttribute("cy",p.sy);
-      c.setAttribute("r","10");
-      c.setAttribute("fill","#0d86aa");
-      c.setAttribute("stroke","#075b77");
+      c.setAttribute("r","12.5");
+      c.setAttribute("fill","url(#nodeGrad)");
+      c.setAttribute("stroke","#064e68");
       c.setAttribute("stroke-width","2");
+      c.setAttribute("filter","url(#softShadow)");
       svg.appendChild(c);
+
+      const hi=document.createElementNS(ns,"circle");
+      hi.setAttribute("cx",p.sx-3.4);
+      hi.setAttribute("cy",p.sy-4.1);
+      hi.setAttribute("r","3.2");
+      hi.setAttribute("fill","#d7f5fb");
+      hi.setAttribute("fill-opacity",".72");
+      svg.appendChild(hi);
     });
   }
 
