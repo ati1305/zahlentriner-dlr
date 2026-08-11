@@ -10,6 +10,9 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;background:#f4f4f4;color:#111;font-family:Arial,Helvetica,sans-serif}
 body{min-height:100dvh;display:grid;place-items:center;padding:14px}
+.top-progress{position:fixed;top:0;left:0;width:100%;height:10px;background:#e5e5e5;z-index:9999;display:none}
+.top-progress.show{display:block}
+.top-progress-bar{width:0%;height:100%;background:#444}
 .app{width:min(100%,680px)}
 .panel{background:#fff;border:1px solid #ccc;border-radius:10px;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,.07)}
 h1{margin:0 0 14px;text-align:center;font-size:clamp(24px,6vw,34px)}
@@ -38,6 +41,7 @@ button:disabled{opacity:.45}
 </style>
 </head>
 <body>
+<div id="topProgress" class="top-progress"><div id="topProgressBar" class="top-progress-bar"></div></div>
 <main class="app"><section class="panel">
 <h1>DLR Zahlentrainer</h1>
 
@@ -59,7 +63,6 @@ button:disabled{opacity:.45}
 <button id="start">Start</button>
 
 <div id="answerArea" class="answer-area">
-<div class="progress-shell"><div id="progressBar" class="progress-bar"></div></div>
 <div id="answerDisplay" class="answer-display">–</div>
 <div class="keypad">
 <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button>
@@ -100,7 +103,8 @@ function stopInputTimer(){
 }
 function startInputTimer(){
  stopInputTimer();
- const bar=$("progressBar"),duration=20000,start=performance.now();
+ const bar=$("topProgressBar"),duration=20000,start=performance.now();
+ $("topProgress").classList.add("show");
  bar.style.width="0%";
  function frame(now){
    const p=Math.min((now-start)/duration,1);
@@ -108,14 +112,14 @@ function startInputTimer(){
    if(p<1) progressRAF=requestAnimationFrame(frame);
  }
  progressRAF=requestAnimationFrame(frame);
- answerTimeout=setTimeout(()=>finish(true),duration);
+ answerTimeout=setTimeout(()=>finish(),duration);
 }
 
 async function startRound(){
  if(running)return;
  stopInputTimer();running=true;entered="";updateAnswer();
  $("start").disabled=true;$("answerArea").classList.remove("show");
- $("result").textContent="";$("result").className="result";$("progressBar").style.width="0%";
+ $("result").textContent="";$("result").className="result";$("topProgressBar").style.width="0%";
  target=makeDigits(Number($("length").value));
  const perDigit=Number($("speed").value);
  for(const d of target){
@@ -130,16 +134,16 @@ async function startRound(){
  $("start").disabled=false;running=false;
 }
 
-function finish(timedOut=false){
+function finish(){
  if(!$("answerArea").classList.contains("show"))return;
  stopInputTimer();
- const ok=!timedOut && entered===target;
+ const ok=entered===target;
  if(ok){
    stats.correct++;stats.streak++;stats.best=Math.max(stats.best,stats.streak);
    $("result").textContent="Richtig";$("result").className="result good";
  }else{
    stats.wrong++;stats.streak=0;
-   $("result").textContent=timedOut?`Zeit abgelaufen – richtig war ${target}`:`Falsch – richtig war ${target}`;
+   $("result").textContent=`Falsch – richtig war ${target}`;
    $("result").className="result bad";
  }
  $("answerArea").classList.remove("show");$("digit").textContent="–";saveStats();
@@ -149,7 +153,6 @@ document.querySelectorAll("[data-key]").forEach(b=>b.addEventListener("click",()
  const max=Number($("length").value);
  if(entered.length>=max)return;
  entered+=b.dataset.key;updateAnswer();
- if(entered.length===max)finish(false);
 }));
 $("correction").addEventListener("click",()=>{entered=entered.slice(0,-1);updateAnswer()});
 $("start").addEventListener("click",startRound);
