@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>DLR Konzentrationstrainer</title>
+<style>
+:root{
+  --blue:#bfe3f2;
+  --blue2:#8fc7dc;
+  --line:#9aa0a6;
+  --green:#76b947;
+  --red:#c13a2a;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body,button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fff;color:#111;font-family:Arial,Helvetica,sans-serif}
+body{min-height:100dvh}
+
+.site-nav{
+  height:40px;
+  padding:6px 8px 0;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:5px;
+}
+.site-nav a{
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid #aaa;border-radius:5px;background:#fff;color:#111;
+  text-decoration:none;font-size:11px;font-weight:700
+}
+.site-nav a.active{background:var(--blue);border-color:var(--blue2)}
+
+.app{
+  width:min(760px,100%);
+  height:calc(100dvh - 40px);
+  margin:0 auto;
+  padding:6px 10px 10px;
+  display:grid;
+  grid-template-rows:auto auto 1px minmax(0,1fr) auto auto;
+  gap:7px;
+}
+
+.header{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+.title{font-size:16px;font-weight:700}
+.stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;font-size:10px}
+.stats b{font-size:11px}
+
+.instruction{
+  text-align:center;
+  font-size:14px;
+  line-height:1.25
+}
+.rule{
+  margin-top:4px;
+  font-size:17px;
+  line-height:1.5
+}
+.rule .tri{font-size:22px}
+.rule .dot{font-size:21px}
+
+.divider{background:#7faec0;width:100%}
+
+.grid-wrap{
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.figure-grid{
+  width:min(420px,92vw);
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+.figure{
+  aspect-ratio:1/1;
+  border:1px solid transparent;
+  background:#fff;
+  padding:4px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.figure.selected{
+  border-color:#9ab7c3;
+  background:#f7fbfd;
+}
+.figure.correct-choice{
+  outline:3px solid rgba(118,185,71,.5);
+}
+.figure.wrong-choice{
+  outline:3px solid rgba(193,58,42,.45);
+}
+.figure svg{
+  width:100%;
+  height:100%;
+  overflow:visible;
+}
+
+.result{
+  min-height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:15px;
+  font-weight:700;
+}
+.result.good{color:#397a1e}
+.result.bad{color:#b42318}
+
+.next{
+  width:min(360px,100%);
+  margin:0 auto;
+  height:40px;
+  border:1px solid #777;
+  border-radius:5px;
+  background:#efefef;
+  color:#111;
+  font-size:14px;
+  font-weight:700
+}
+.next.pressed{background:var(--blue)}
+
+@media(max-width:520px){
+  .site-nav{height:38px}
+  .app{height:calc(100dvh - 38px);padding:4px 7px 8px;gap:5px}
+  .title{font-size:14px}
+  .stats{font-size:9px;gap:6px}
+  .instruction{font-size:12px}
+  .rule{font-size:15px}
+  .figure-grid{width:min(340px,88vw);gap:6px}
+  .result{min-height:28px;font-size:13px}
+  .next{height:36px}
+}
+@media(max-height:700px){
+  .figure-grid{width:min(300px,80vw);gap:5px}
+  .instruction{font-size:11px}
+  .rule{font-size:14px;line-height:1.2}
+}
+</style>
+</head>
+<body>
+
+<nav class="site-nav" aria-label="DLR Training Navigation">
+  <a href="index.html">Zahlen</a>
+  <a href="rechnen.html">Rechnen</a>
+  <a href="konzentration.html" class="active">Konzentration</a>
+</nav>
+
+<main class="app">
+  <div class="header">
+    <div class="title">DLR Konzentrationstrainer</div>
+    <div class="stats">
+      <span>R <b id="correct">0</b></span>
+      <span>F <b id="wrong">0</b></span>
+      <span>Quote <b id="rate">0%</b></span>
+      <span>Serie <b id="best">0</b></span>
+    </div>
+  </div>
+
+  <div class="instruction">
+    Markiere alle Figuren mit
+    <div class="rule">
+      <div><b>1×</b> <span class="tri">△</span></div>
+      <div><b>2×</b> <span class="dot">●</span></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="grid-wrap">
+    <div id="grid" class="figure-grid"></div>
+  </div>
+
+  <div id="result" class="result"></div>
+  <button id="next" class="next" type="button">Next</button>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const grid = document.getElementById("grid");
+  const next = document.getElementById("next");
+  const result = document.getElementById("result");
+
+  const correctEl = document.getElementById("correct");
+  const wrongEl = document.getElementById("wrong");
+  const rateEl = document.getElementById("rate");
+  const bestEl = document.getElementById("best");
+
+  let figures = [];
+  let evaluated = false;
+
+  let stats = {correct:0,wrong:0,streak:0,best:0};
+  try{
+    stats = JSON.parse(localStorage.getItem("dlrConcentrationStatsV1") || JSON.stringify(stats));
+  }catch(e){}
+
+  function saveStats(){
+    localStorage.setItem("dlrConcentrationStatsV1", JSON.stringify(stats));
+    correctEl.textContent = stats.correct;
+    wrongEl.textContent = stats.wrong;
+    bestEl.textContent = stats.best;
+    const total = stats.correct + stats.wrong;
+    rateEl.textContent = total ? Math.round(stats.correct / total * 100) + "%" : "0%";
+  }
+
+  function rand(min,max){
+    return Math.floor(Math.random()*(max-min+1))+min;
+  }
+  function pick(arr){
+    return arr[Math.floor(Math.random()*arr.length)];
+  }
+
+  const SHAPES = ["triangle","square","circle"];
+
+  function makeFigureData(forceTarget=false){
+    let shape = forceTarget ? "triangle" : pick(SHAPES);
+    let dots = forceTarget ? 2 : rand(0,3);
+
+    // A few decoys deliberately close to the target.
+    if(!forceTarget && Math.random()<0.45){
+      shape = Math.random()<0.55 ? "triangle" : pick(["square","circle"]);
+      dots = pick([1,2,3]);
+    }
+
+    const placements = [];
+    for(let i=0;i<dots;i++){
+      placements.push({
+        x: rand(22,78),
+        y: rand(20,80),
+        inside: Math.random()<0.55
+      });
+    }
+
+    return {
+      shape,
+      dots,
+      placements,
+      target: shape==="triangle" && dots===2,
+      selected:false
+    };
+  }
+
+  function generateFigures(){
+    // 9 figures, usually 2–4 correct ones.
+    const targetCount = rand(2,4);
+    const list = [];
+
+    for(let i=0;i<targetCount;i++){
+      list.push(makeFigureData(true));
+    }
+
+    while(list.length<9){
+      let f = makeFigureData(false);
+      if(f.target) continue;
+      list.push(f);
+    }
+
+    // Shuffle
+    for(let i=list.length-1;i>0;i--){
+      const j=rand(0,i);
+      [list[i],list[j]]=[list[j],list[i]];
+    }
+    return list;
+  }
+
+  function shapeSvg(shape){
+    if(shape==="triangle"){
+      return '<polygon points="50,18 20,78 80,78" fill="none" stroke="#2f4054" stroke-width="3"/>';
+    }
+    if(shape==="square"){
+      return '<rect x="23" y="22" width="54" height="56" fill="none" stroke="#2f4054" stroke-width="3"/>';
+    }
+    return '<circle cx="50" cy="50" r="29" fill="none" stroke="#2f4054" stroke-width="3"/>';
+  }
+
+  function dotSvg(p){
+    let x=p.x, y=p.y;
+    if(!p.inside){
+      // Bias outer dots toward edges.
+      const side=rand(0,3);
+      if(side===0){ x=rand(18,82); y=14; }
+      if(side===1){ x=86; y=rand(18,82); }
+      if(side===2){ x=rand(18,82); y=86; }
+      if(side===3){ x=14; y=rand(18,82); }
+    }
+    return `<circle cx="${x}" cy="${y}" r="6.5" fill="#2f4054"/>`;
+  }
+
+  function render(){
+    grid.innerHTML="";
+
+    figures.forEach((f,index)=>{
+      const btn=document.createElement("button");
+      btn.type="button";
+      btn.className="figure";
+      if(f.selected) btn.classList.add("selected");
+
+      if(evaluated && f.selected){
+        btn.classList.add(f.target ? "correct-choice" : "wrong-choice");
+      }
+
+      btn.innerHTML = `
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          ${shapeSvg(f.shape)}
+          ${f.placements.map(dotSvg).join("")}
+        </svg>
+      `;
+
+      btn.addEventListener("pointerdown",ev=>{
+        ev.preventDefault();
+        if(evaluated) return;
+        figures[index].selected=!figures[index].selected;
+        render();
+      },{passive:false});
+
+      grid.appendChild(btn);
+    });
+  }
+
+  function evaluate(){
+    const selected = figures.map((f,i)=>f.selected ? i : -1).filter(i=>i>=0);
+    const correctIndices = figures.map((f,i)=>f.target ? i : -1).filter(i=>i>=0);
+
+    const ok =
+      selected.length===correctIndices.length &&
+      selected.every(i=>figures[i].target);
+
+    if(ok){
+      stats.correct++;
+      stats.streak++;
+      stats.best=Math.max(stats.best,stats.streak);
+      result.textContent="Richtig";
+      result.className="result good";
+    }else{
+      stats.wrong++;
+      stats.streak=0;
+      result.textContent="Falsch";
+      result.className="result bad";
+    }
+
+    saveStats();
+    evaluated=true;
+    next.textContent="Nächste Aufgabe";
+    render();
+  }
+
+  function startNew(){
+    figures=generateFigures();
+    evaluated=false;
+    result.textContent="";
+    result.className="result";
+    next.textContent="Next";
+    render();
+  }
+
+  next.addEventListener("pointerdown",ev=>{
+    ev.preventDefault();
+    next.classList.add("pressed");
+    setTimeout(()=>next.classList.remove("pressed"),80);
+
+    if(evaluated){
+      startNew();
+    }else{
+      evaluate();
+    }
+  },{passive:false});
+
+  saveStats();
+  startNew();
+})();
+</script>
+</body>
+</html>
