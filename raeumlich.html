@@ -801,6 +801,49 @@ body{min-height:100dvh}
     return r;
   }
 
+  function pointOnQuadratic3D(a,c,b,t){
+    const u=1-t;
+    return {
+      x:u*u*a.x+2*u*t*c.x+t*t*b.x,
+      y:u*u*a.y+2*u*t*c.y+t*t*b.y,
+      z:u*u*a.z+2*u*t*c.z+t*t*b.z
+    };
+  }
+
+  function stableCurveControl(a,b,bend=0.3,side=1){
+    const mid={
+      x:(a.x+b.x)/2,
+      y:(a.y+b.y)/2,
+      z:(a.z+b.z)/2
+    };
+
+    const d=norm(sub(b,a));
+
+    // Choose a stable 3D perpendicular, not a screen-space bend.
+    let ref=Math.abs(dot(d,vec(0,0,1)))>.82 ? vec(0,1,0) : vec(0,0,1);
+    let perp=norm(cross(d,ref));
+
+    const length=Math.hypot(b.x-a.x,b.y-a.y,b.z-a.z);
+    return add(mid,mul(perp,length*bend*side));
+  }
+
+  function ringBasis(tiltDeg,seed=0){
+    // Deterministic 3D plane for a ring.
+    const tilt=deg(tiltDeg);
+    const spin=deg((seed*71)%360);
+
+    const normal=norm(vec(
+      Math.sin(tilt)*Math.cos(spin),
+      Math.sin(tilt)*Math.sin(spin),
+      Math.cos(tilt)
+    ));
+
+    let ref=Math.abs(normal.z)>.88 ? vec(1,0,0) : vec(0,0,1);
+    const u=norm(cross(normal,ref));
+    const v=norm(cross(normal,u));
+    return {u,v,normal};
+  }
+
   function projectedGeometry(m,camera){
     const radius=modelRadius(m);
     const basis=cameraBasis(camera);
@@ -810,7 +853,7 @@ body{min-height:100dvh}
     const focal=cameraDistance*1.02;
     const baseScale=96/Math.max(1,radius);
 
-    const pts=m.points.map((p,i)=>{
+    function projectWorldPoint(p){
       const rel=sub(p,cameraPos);
       const cx=dot(rel,basis.right);
       const cy=dot(rel,basis.up);
@@ -820,44 +863,80 @@ body{min-height:100dvh}
       const perspective=focal/depth;
 
       return {
-        i,x:cx,y:cy,z:cz,perspective,
+        x:cx,y:cy,z:cz,perspective,
         sx:210+cx*baseScale*perspective,
         sy:170-cy*baseScale*perspective
       };
-    });
+    }
 
-    const edges=m.edges.map(edge=>{
+    const pts=m.points.map((p,i)=>({i,...projectWorldPoint(p)}));
+
+    const edges=m.edges.map((edge,edgeIndex)=>{
       if(Array.isArray(edge)){
         const [a,b]=edge;
         const pa=pts[a],pb=pts[b];
         return {
-          type:"line",a,b,
+          type:"path",
+          sourceType:"line",
+          pathPts:[pa,pb],
           depth:(pa.z+pb.z)/2,
           perspective:(pa.perspective+pb.perspective)/2
         };
       }
 
       if(edge.type==="curve"){
-        const pa=pts[edge.a],pb=pts[edge.b];
+        const wa=m.points[edge.a];
+        const wb=m.points[edge.b];
+        const control=stableCurveControl(
+          wa,wb,
+          edge.bend ?? .35,
+          edge.side ?? 1
+        );
+
+        const pathPts=[];
+        const samples=18;
+        for(let i=0;i<=samples;i++){
+          const t=i/samples;
+          pathPts.push(projectWorldPoint(pointOnQuadratic3D(wa,control,wb,t)));
+        }
+
         return {
-          type:"curve",a:edge.a,b:edge.b,
-          bend:edge.bend ?? .35,
-          side:edge.side ?? 1,
-          depth:(pa.z+pb.z)/2,
-          perspective:(pa.perspective+pb.perspective)/2
+          type:"path",
+          sourceType:"curve",
+          pathPts,
+          depth:pathPts.reduce((s,p)=>s+p.z,0)/pathPts.length,
+          perspective:pathPts.reduce((s,p)=>s+p.perspective,0)/pathPts.length
         };
       }
 
       if(edge.type==="ring"){
-        const pc=pts[edge.center];
+        const center=m.points[edge.center];
+        const {u,v}=ringBasis(edge.tilt ?? 0,edge.center+edgeIndex);
+        const rr=edge.radius ?? .55;
+
+        const pathPts=[];
+        const samples=30;
+        for(let i=0;i<=samples;i++){
+          const a=(i/samples)*Math.PI*2;
+          const world=add(
+            center,
+            add(
+              mul(u,Math.cos(a)*rr),
+              mul(v,Math.sin(a)*rr)
+            )
+          );
+          pathPts.push(projectWorldPoint(world));
+        }
+
         return {
-          type:"ring",center:edge.center,
-          radius:edge.radius ?? .55,
-          tilt:edge.tilt ?? 0,
-          depth:pc.z,
-          perspective:pc.perspective
+          type:"path",
+          sourceType:"ring",
+          pathPts,
+          depth:pathPts.reduce((s,p)=>s+p.z,0)/pathPts.length,
+          perspective:pathPts.reduce((s,p)=>s+p.perspective,0)/pathPts.length
         };
       }
+
       return null;
     }).filter(Boolean).sort((a,b)=>b.depth-a.depth);
 
@@ -868,20 +947,45 @@ body{min-height:100dvh}
     const g1=projectedGeometry(m,c1);
     const g2=projectedGeometry(m,c2);
 
-    const mean=arr=>({
+    const nodeMean=arr=>({
       x:arr.reduce((s,p)=>s+p.sx,0)/arr.length,
       y:arr.reduce((s,p)=>s+p.sy,0)/arr.length
     });
 
-    const m1=mean(g1.pts), m2=mean(g2.pts);
-    let sum=0;
+    const m1=nodeMean(g1.pts);
+    const m2=nodeMean(g2.pts);
 
+    let nodeSum=0;
     for(let i=0;i<g1.pts.length;i++){
       const dx=(g1.pts[i].sx-m1.x)-(g2.pts[i].sx-m2.x);
       const dy=(g1.pts[i].sy-m1.y)-(g2.pts[i].sy-m2.y);
-      sum+=dx*dx+dy*dy;
+      nodeSum+=dx*dx+dy*dy;
     }
-    return Math.sqrt(sum/g1.pts.length);
+    const nodeDiff=Math.sqrt(nodeSum/g1.pts.length);
+
+    // Also compare sampled edge geometry so curves/rings count.
+    const sampleEdges=g=>g.edges.flatMap(e=>{
+      if(!e.pathPts) return [];
+      const step=Math.max(1,Math.floor(e.pathPts.length/5));
+      return e.pathPts.filter((_,i)=>i%step===0).slice(0,6);
+    });
+
+    const e1=sampleEdges(g1);
+    const e2=sampleEdges(g2);
+    const n=Math.min(e1.length,e2.length);
+
+    let edgeDiff=0;
+    if(n){
+      let s=0;
+      for(let i=0;i<n;i++){
+        const dx=e1[i].sx-e2[i].sx;
+        const dy=e1[i].sy-e2[i].sy;
+        s+=dx*dx+dy*dy;
+      }
+      edgeDiff=Math.sqrt(s/n);
+    }
+
+    return nodeDiff*.68+edgeDiff*.32;
   }
 
   function renderModel(svg,m,camera){
@@ -977,52 +1081,16 @@ body{min-height:100dvh}
       svg.appendChild(shine);
     }
 
-    // Back-to-front rendering gives actual visual depth.
+    // Back-to-front rendering of true 3D lines, curves and rings.
     g.edges.forEach(e=>{
-      if(e.type==="line"){
-        const a=g.pts[e.a],b=g.pts[e.b];
-        addPath(`M ${a.sx} ${a.sy} L ${b.sx} ${b.sy}`,e.perspective);
-        return;
+      if(e.type!=="path" || !e.pathPts || e.pathPts.length<2) return;
+
+      let d=`M ${e.pathPts[0].sx} ${e.pathPts[0].sy}`;
+      for(let i=1;i<e.pathPts.length;i++){
+        d+=` L ${e.pathPts[i].sx} ${e.pathPts[i].sy}`;
       }
 
-      if(e.type==="curve"){
-        const a=g.pts[e.a],b=g.pts[e.b];
-        const dx=b.sx-a.sx,dy=b.sy-a.sy;
-        const len=Math.max(1,Math.hypot(dx,dy));
-        const nx=-dy/len,ny=dx/len;
-        const amp=len*e.bend*e.side;
-        const cx=(a.sx+b.sx)/2+nx*amp;
-        const cy=(a.sy+b.sy)/2+ny*amp;
-        addPath(`M ${a.sx} ${a.sy} Q ${cx} ${cy} ${b.sx} ${b.sy}`,e.perspective);
-        return;
-      }
-
-      if(e.type==="ring"){
-        const c=g.pts[e.center];
-        const rx=e.radius*56*(e.perspective||1);
-        const ry=rx*(.38+.42*Math.abs(Math.cos(deg(e.tilt))));
-
-        const outer=document.createElementNS(ns,"ellipse");
-        outer.setAttribute("cx",c.sx);
-        outer.setAttribute("cy",c.sy);
-        outer.setAttribute("rx",rx);
-        outer.setAttribute("ry",ry);
-        outer.setAttribute("fill","none");
-        outer.setAttribute("stroke","#05485f");
-        outer.setAttribute("stroke-width",widthFor(e.perspective,9.2));
-        outer.setAttribute("filter","url(#softShadow)");
-        svg.appendChild(outer);
-
-        const inner=document.createElementNS(ns,"ellipse");
-        inner.setAttribute("cx",c.sx);
-        inner.setAttribute("cy",c.sy);
-        inner.setAttribute("rx",rx);
-        inner.setAttribute("ry",ry);
-        inner.setAttribute("fill","none");
-        inner.setAttribute("stroke","url(#rodGrad)");
-        inner.setAttribute("stroke-width",widthFor(e.perspective,5.8));
-        svg.appendChild(inner);
-      }
+      addPath(d,e.perspective);
     });
 
     [...g.pts].sort((a,b)=>a.z-b.z).forEach(p=>{
