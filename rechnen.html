@@ -53,8 +53,8 @@ body{min-height:100dvh}
   height:calc(100dvh - 74px);
   padding:4px 8px 8px;
   display:grid;
-  grid-template-rows:auto minmax(0,1fr) 32px 40px;
-  gap:4px;
+  grid-template-rows:auto auto auto 40px;
+  gap:8px;
 }
 
 .header{
@@ -69,9 +69,10 @@ body{min-height:100dvh}
 .stats b{font-size:10px}
 
 .task-area{
-  min-height:0;
+  min-height:120px;
   display:flex;align-items:center;justify-content:center;
-  overflow:visible
+  overflow:visible;
+  padding:18px 0 8px
 }
 .equation{
   display:flex;align-items:center;justify-content:center;
@@ -90,12 +91,13 @@ body{min-height:100dvh}
 .slot.selected{outline:2px solid var(--blue2)}
 
 .solution{
-  min-height:32px;
+  min-height:34px;
   display:flex;align-items:center;justify-content:center;
   text-align:center;
-  padding:2px 4px;
+  padding:2px 6px;
   color:#333;font-size:12px;font-weight:700;
-  overflow:hidden
+  overflow:hidden;
+  margin-top:2px
 }
 
 .next{
@@ -125,14 +127,7 @@ body{min-height:100dvh}
 }
 .popup button.pressed{background:var(--blue)}
 
-.feedback{
-  position:fixed;z-index:300;left:50%;top:82px;transform:translateX(-50%);
-  display:none;padding:5px 9px;border:1px solid #bbb;border-radius:12px;
-  background:#fff;font-size:12px;font-weight:700
-}
-.feedback.show{display:block}
-.feedback.good{color:#187a36}
-.feedback.bad{color:#b42318}
+.feedback{display:none}
 
 @media(min-width:700px){
   .site-nav{width:min(680px,100%);margin-left:auto;margin-right:auto}
@@ -147,7 +142,8 @@ body{min-height:100dvh}
 @media(max-height:700px){
   .site-nav{height:30px}
   .settings{height:30px}
-  .app{height:calc(100dvh - 66px);grid-template-rows:auto minmax(0,1fr) 28px 36px}
+  .app{height:calc(100dvh - 66px);grid-template-rows:auto auto auto 36px;gap:6px}
+  .task-area{min-height:100px;padding:12px 0 4px}
   .next{height:36px;min-height:36px}
   .solution{min-height:28px;font-size:11px}
 }
@@ -514,10 +510,10 @@ body{min-height:100dvh}
       saveStats();
     }
 
-    feedback.className="feedback show " + (ok ? "good" : "bad");
-    feedback.textContent=ok ? "Richtig" : "Falsch";
+    feedback.className="feedback";
+    feedback.textContent="";
 
-    solution.textContent="Rechenweg: " + formatSolution();
+    solution.textContent=(ok ? "Richtig · " : "Falsch · ") + formatSolution();
     next.textContent="Nächste Aufgabe";
 
     render();
