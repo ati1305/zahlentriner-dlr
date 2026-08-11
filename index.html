@@ -131,7 +131,7 @@ async function startRound(){
  $("digit").textContent="";
  $("answerArea").classList.add("show");
  startInputTimer();
- $("start").disabled=false;running=false;
+ running=false;
 }
 
 function finish(){
@@ -146,10 +146,15 @@ function finish(){
    $("result").textContent=`Falsch – richtig war ${target}`;
    $("result").className="result bad";
  }
- $("answerArea").classList.remove("show");$("digit").textContent="–";saveStats();
+ $("answerArea").classList.remove("show");
+ $("digit").textContent="–";
+ $("start").disabled=false;
+ saveStats();
 }
 
 document.querySelectorAll("[data-key]").forEach(b=>b.addEventListener("click",()=>{
+ // Gilt identisch für 7, 8, 9 und 10 Ziffern:
+ // Eingabe bleibt bis zum Ablauf der 20 Sekunden korrigierbar.
  const max=Number($("length").value);
  if(entered.length>=max)return;
  entered+=b.dataset.key;updateAnswer();
