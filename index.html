@@ -54,11 +54,13 @@ button:disabled{opacity:.45;cursor:not-allowed}
 }
 
 .keypad{
-  width:210px;
+  width:222px;
   margin:0 auto;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:4px
+  display:grid !important;
+  grid-template-columns:repeat(3,70px) !important;
+  grid-auto-flow:row !important;
+  justify-content:center;
+  gap:5px
 }
 .keypad button{
   min-height:40px;
@@ -72,8 +74,22 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .keypad button.pressed{
   background:#bfe3f2 !important
 }
+
+.keypad button[data-key="1"]{grid-column:1;grid-row:1}
+.keypad button[data-key="2"]{grid-column:2;grid-row:1}
+.keypad button[data-key="3"]{grid-column:3;grid-row:1}
+.keypad button[data-key="4"]{grid-column:1;grid-row:2}
+.keypad button[data-key="5"]{grid-column:2;grid-row:2}
+.keypad button[data-key="6"]{grid-column:3;grid-row:2}
+.keypad button[data-key="7"]{grid-column:1;grid-row:3}
+.keypad button[data-key="8"]{grid-column:2;grid-row:3}
+.keypad button[data-key="9"]{grid-column:3;grid-row:3}
+.keypad .zero-spacer{display:block}
+.keypad .zero-key{grid-column:2;grid-row:4}
+.keypad .correction{grid-column:1 / 4 !important;grid-row:5}
 .keypad .correction{
   grid-column:1/4;
+  grid-row:5;
   min-height:34px;
   margin-top:3px;
   background:#8fc7dc;
@@ -124,7 +140,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
     margin:7px 0
   }
   .digit{font-size:clamp(95px,20vh,150px)}
-  .keypad{width:210px;gap:5px}
+  .keypad{width:210px;grid-template-columns:repeat(3,66px) !important;gap:6px}
   .keypad button{min-height:44px;font-size:25px}
   .keypad .correction{
     grid-column:1/4;
@@ -144,10 +160,10 @@ button:disabled{opacity:.45;cursor:not-allowed}
   h1{font-size:22px;margin-bottom:6px}
   .stage{height:210px;margin:6px 0}
   .digit{font-size:150px}
-  .keypad{width:195px;gap:3px}
+  .keypad{width:222px;grid-template-columns:repeat(3,70px) !important;gap:5px}
   .keypad button{min-height:36px;font-size:20px}
   .keypad .correction{min-height:32px;font-size:13px}
-  .next-button{width:195px;min-height:34px;margin-top:5px}
+  .next-button{width:222px;min-height:36px;margin-top:6px}
   .stats{margin-top:5px}
   .stat b{font-size:16px}
   .stat span{font-size:10px}
@@ -237,9 +253,9 @@ button:disabled{opacity:.45;cursor:not-allowed}
     <button data-key="8">8</button>
     <button data-key="9">9</button>
 
-    <span></span>
-    <button data-key="0">0</button>
-    <span></span>
+    <span class="zero-spacer"></span>
+    <button data-key="0" class="zero-key">0</button>
+    <span class="zero-spacer"></span>
 
     <button id="correction" class="correction">Correction</button>
   </div>
