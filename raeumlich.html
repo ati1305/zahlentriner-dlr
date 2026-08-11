@@ -715,28 +715,82 @@ body{min-height:100dvh}
 
   function deg(d){ return d*Math.PI/180; }
 
-  function rotateXYZ(p,yawDeg,pitchDeg,rollDeg=0){
-    let x=p.x, y=p.y, z=p.z;
+  function vec(x,y,z){ return {x,y,z}; }
+  function add(a,b){ return vec(a.x+b.x,a.y+b.y,a.z+b.z); }
+  function sub(a,b){ return vec(a.x-b.x,a.y-b.y,a.z-b.z); }
+  function mul(a,s){ return vec(a.x*s,a.y*s,a.z*s); }
+  function dot(a,b){ return a.x*b.x+a.y*b.y+a.z*b.z; }
+  function cross(a,b){
+    return vec(
+      a.y*b.z-a.z*b.y,
+      a.z*b.x-a.x*b.z,
+      a.x*b.y-a.y*b.x
+    );
+  }
+  function norm(a){
+    const l=Math.hypot(a.x,a.y,a.z)||1;
+    return vec(a.x/l,a.y/l,a.z/l);
+  }
 
-    // yaw around vertical world axis
-    let a=deg(yawDeg), c=Math.cos(a), s=Math.sin(a);
-    let x1=x*c-y*s;
-    let y1=x*s+y*c;
-    let z1=z;
+  function rotateAroundAxis(v,axis,angleDeg){
+    const a=norm(axis);
+    const t=deg(angleDeg);
+    const c=Math.cos(t), s=Math.sin(t);
+    return add(
+      add(mul(v,c),mul(cross(a,v),s)),
+      mul(a,dot(a,v)*(1-c))
+    );
+  }
 
-    // pitch around camera-horizontal axis
-    a=deg(pitchDeg); c=Math.cos(a); s=Math.sin(a);
-    let x2=x1;
-    let y2=y1*c-z1*s;
-    let z2=y1*s+z1*c;
+  function makeCamera(yawDeg,pitchDeg,rollDeg=0){
+    const yaw=deg(yawDeg);
+    const pitch=deg(pitchDeg);
 
-    // slight roll for variation
-    a=deg(rollDeg); c=Math.cos(a); s=Math.sin(a);
-    let x3=x2*c-y2*s;
-    let y3=x2*s+y2*c;
-    let z3=z2;
+    const position=norm(vec(
+      Math.cos(pitch)*Math.cos(yaw),
+      Math.cos(pitch)*Math.sin(yaw),
+      Math.sin(pitch)
+    ));
 
-    return {x:x3,y:y3,z:z3};
+    const forward=norm(mul(position,-1));
+    let right=norm(cross(forward,vec(0,0,1)));
+    if(Math.hypot(right.x,right.y,right.z)<.01) right=vec(1,0,0);
+    let up=norm(cross(right,forward));
+
+    if(rollDeg){
+      right=rotateAroundAxis(right,forward,rollDeg);
+      up=rotateAroundAxis(up,forward,rollDeg);
+    }
+
+    return {position,up};
+  }
+
+  function cameraBasis(camera){
+    const forward=norm(mul(camera.position,-1));
+    const right=norm(cross(forward,camera.up));
+    const up=norm(cross(right,forward));
+    return {forward,right,up};
+  }
+
+  function orbitCamera(camera,axis,angleDeg){
+    return {
+      position:norm(rotateAroundAxis(camera.position,axis,angleDeg)),
+      up:norm(rotateAroundAxis(camera.up,axis,angleDeg))
+    };
+  }
+
+  function targetCameraFor(start,dir){
+    /*
+      Die vier Pfeile beziehen sich auf die sichtbare Startansicht:
+      links/rechts drehen um die sichtbare Hochachse,
+      oben/unten drehen um die sichtbare Querachse.
+    */
+    const basis=cameraBasis(start);
+
+    if(dir==="left")  return orbitCamera(start,basis.up,-90);
+    if(dir==="right") return orbitCamera(start,basis.up, 90);
+    if(dir==="up")    return orbitCamera(start,basis.right,-90);
+    return orbitCamera(start,basis.right,90);
   }
 
   function modelRadius(m){
@@ -749,22 +803,26 @@ body{min-height:100dvh}
 
   function projectedGeometry(m,camera){
     const radius=modelRadius(m);
-    const cameraDistance=radius*4.4+2.0;
-    const baseScale=94/Math.max(1,radius);
+    const basis=cameraBasis(camera);
+
+    const cameraDistance=radius*4.5+2.4;
+    const cameraPos=mul(camera.position,cameraDistance);
+    const focal=cameraDistance*1.02;
+    const baseScale=96/Math.max(1,radius);
 
     const pts=m.points.map((p,i)=>{
-      const r=rotateXYZ(p,camera.yaw,camera.pitch,camera.roll||0);
-      const denom=Math.max(.85,cameraDistance-r.z);
-      const perspective=cameraDistance/denom;
+      const rel=sub(p,cameraPos);
+      const cx=dot(rel,basis.right);
+      const cy=dot(rel,basis.up);
+      const cz=dot(rel,basis.forward);
+
+      const depth=Math.max(.8,cz);
+      const perspective=focal/depth;
 
       return {
-        i,
-        x:r.x,
-        y:r.y,
-        z:r.z,
-        perspective,
-        sx:210+r.x*baseScale*perspective,
-        sy:170-r.y*baseScale*perspective
+        i,x:cx,y:cy,z:cz,perspective,
+        sx:210+cx*baseScale*perspective,
+        sy:170-cy*baseScale*perspective
       };
     });
 
@@ -782,8 +840,7 @@ body{min-height:100dvh}
       if(edge.type==="curve"){
         const pa=pts[edge.a],pb=pts[edge.b];
         return {
-          type:"curve",
-          a:edge.a,b:edge.b,
+          type:"curve",a:edge.a,b:edge.b,
           bend:edge.bend ?? .35,
           side:edge.side ?? 1,
           depth:(pa.z+pb.z)/2,
@@ -794,17 +851,15 @@ body{min-height:100dvh}
       if(edge.type==="ring"){
         const pc=pts[edge.center];
         return {
-          type:"ring",
-          center:edge.center,
+          type:"ring",center:edge.center,
           radius:edge.radius ?? .55,
           tilt:edge.tilt ?? 0,
           depth:pc.z,
           perspective:pc.perspective
         };
       }
-
       return null;
-    }).filter(Boolean).sort((a,b)=>a.depth-b.depth);
+    }).filter(Boolean).sort((a,b)=>b.depth-a.depth);
 
     return {pts,edges,radius};
   }
@@ -818,10 +873,9 @@ body{min-height:100dvh}
       y:arr.reduce((s,p)=>s+p.sy,0)/arr.length
     });
 
-    const m1=mean(g1.pts);
-    const m2=mean(g2.pts);
-
+    const m1=mean(g1.pts), m2=mean(g2.pts);
     let sum=0;
+
     for(let i=0;i<g1.pts.length;i++){
       const dx=(g1.pts[i].sx-m1.x)-(g2.pts[i].sx-m2.x);
       const dy=(g1.pts[i].sy-m1.y)-(g2.pts[i].sy-m2.y);
@@ -1239,29 +1293,17 @@ body{min-height:100dvh}
     };
   }
 
-  function targetCameraFor(start,dir){
-    if(dir==="left"){
-      return {yaw:start.yaw-90,pitch:start.pitch,roll:start.roll};
-    }
-    if(dir==="right"){
-      return {yaw:start.yaw+90,pitch:start.pitch,roll:start.roll};
-    }
-    if(dir==="up"){
-      return {yaw:start.yaw,pitch:start.pitch+72,roll:start.roll};
-    }
-    return {yaw:start.yaw,pitch:start.pitch-72,roll:start.roll};
-  }
 
   function chooseTask(){
     for(let attempt=0;attempt<220;attempt++){
       // New task = newly generated topology, not merely a rotated preset.
       const candidate=generateGoodSpatialModel();
 
-      const startCamera={
-        yaw:rand(12,78),
-        pitch:rand(14,36),
-        roll:pick([-5,-3,0,0,0,3,5])
-      };
+      const startCamera=makeCamera(
+        rand(12,78),
+        rand(16,34),
+        pick([-4,0,0,0,4])
+      );
 
       const dir=pick(directions);
       const targetCamera=targetCameraFor(startCamera,dir);
@@ -1295,7 +1337,7 @@ body{min-height:100dvh}
     model=transformedModel(
       MODELS.find(m=>m.name==="asymmetric-cage") || MODELS[0]
     );
-    const startCamera={yaw:37,pitch:25,roll:0};
+    const startCamera=makeCamera(37,25,0);
     answerDir="right";
     renderModel(startSvg,model,startCamera);
     renderModel(targetSvg,model,targetCameraFor(startCamera,answerDir));
