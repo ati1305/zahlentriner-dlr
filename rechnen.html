@@ -343,6 +343,43 @@
   .site-nav a{min-height:30px;padding:4px 8px;font-size:13px}
 }
 
+
+    .task-settings{
+      width:min(690px,100%);
+      margin:4px auto 0;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:8px;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .task-settings label{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .task-settings select{
+      min-height:32px;
+      border:1px solid #aaa;
+      border-radius:6px;
+      background:#fff;
+      color:#111;
+      padding:4px 8px;
+      font:inherit;
+    }
+
+    .solution-line{
+      min-height:24px;
+      margin-top:4px;
+      text-align:center;
+      font-size:14px;
+      font-weight:700;
+      color:#444;
+    }
+
 </style>
 </head>
 
@@ -352,6 +389,18 @@
   <a href="index.html">Zahlentrainer</a>
   <a href="rechnen.html" class="active">Rechentrainer</a>
 </nav>
+
+
+<div class="task-settings">
+  <label>
+    Zahlen:
+    <select id="numberCountSelect">
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5" selected>5</option>
+    </select>
+  </label>
+</div>
 
 <div class="app">
   <div class="timer-track">
@@ -389,6 +438,7 @@
   </div>
 
   <div id="feedback" class="feedback"></div>
+  <div id="solutionLine" class="solution-line"></div>
 </div>
 
 <script>
@@ -406,6 +456,8 @@
   const nextBtn = document.getElementById("nextBtn");
   const popup = document.getElementById("operatorPopup");
   const feedbackEl = document.getElementById("feedback");
+  const solutionLineEl = document.getElementById("solutionLine");
+  const numberCountSelect = document.getElementById("numberCountSelect");
 
   const correctCountEl = document.getElementById("correctCount");
   const wrongCountEl = document.getElementById("wrongCount");
@@ -421,6 +473,7 @@
   // Never rendered and never entered by the user.
   let hiddenGroupStart = null;
   let hiddenGroupEnd = null;
+  let solutionOps = [];
 
   let roundActive = false;
   let roundStart = 0;
@@ -626,7 +679,7 @@
 
   function generateTask(){
     for(let attempt=0;attempt<5000;attempt++){
-      const numberCount=randInt(MIN_NUMBERS,MAX_NUMBERS);
+      const numberCount=Number(numberCountSelect.value);
       const nums=Array.from({length:numberCount},()=>randInt(2,15));
       const hiddenOps=createHiddenOps(numberCount);
       const group=chooseHiddenGroup(numberCount);
@@ -640,7 +693,8 @@
 
       if(!Number.isFinite(result)) continue;
       if(!Number.isInteger(result)) continue;
-      if(Math.abs(result)>MAX_ABS_RESULT) continue;
+      if(result < 0) continue;
+      if(result>MAX_ABS_RESULT) continue;
       if(result===0 && Math.random()<.7) continue;
 
       // Prefer a single mathematical interpretation.
@@ -650,7 +704,8 @@
         numbers:nums,
         target:result,
         groupStart:group.start,
-        groupEnd:group.end
+        groupEnd:group.end,
+        solutionOps:hiddenOps
       };
     }
 
@@ -658,8 +713,33 @@
       numbers:[7,2,3],
       target:27,
       groupStart:0,
-      groupEnd:1
+      groupEnd:1,
+      solutionOps:["+","*"]
     };
+  }
+
+
+  function formatGeneratedPath(){
+    if(!solutionOps.length) return "";
+
+    let parts=[];
+
+    for(let i=0;i<numbers.length;i++){
+      if(hiddenGroupStart===i) parts.push("(");
+
+      parts.push(String(numbers[i]));
+
+      if(hiddenGroupEnd===i) parts.push(")");
+
+      if(i<solutionOps.length){
+        parts.push(symbol(solutionOps[i]));
+      }
+    }
+
+    parts.push("=");
+    parts.push(String(target));
+
+    return parts.join(" ");
   }
 
   function renderEquation(){
@@ -807,6 +887,7 @@
     if(!roundActive) return;
 
     roundActive=false;
+    numberCountSelect.disabled=false;
     cancelAnimationFrame(animationFrame);
     popup.classList.remove("show");
     selectedGap=-1;
@@ -828,6 +909,7 @@
 
     updateStats();
     renderEquation();
+    solutionLineEl.textContent = "Rechenweg: " + formatGeneratedPath();
     showFeedback(isCorrect);
 
     const tokenAtEnd=roundToken;
@@ -869,12 +951,15 @@
     target=task.target;
     hiddenGroupStart=task.groupStart;
     hiddenGroupEnd=task.groupEnd;
+    solutionOps=task.solutionOps || [];
 
     enteredOps=Array(numbers.length-1).fill(null);
+    solutionLineEl.textContent="";
     selectedGap=-1;
 
     timerFill.style.width="0%";
     roundActive=true;
+    numberCountSelect.disabled=true;
     roundStart=performance.now();
 
     renderEquation();
