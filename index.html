@@ -47,6 +47,8 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .keypad .correction{
   grid-column:1/4;min-height:40px;margin-top:4px;background:#8fc7dc;font-size:15px;font-weight:700
 }
+.keypad button.key-flash{background:#bfe3f2 !important}
+.next-button{width:180px;margin:10px auto 0;display:block;min-height:44px;border-radius:0;border:1px solid #777;background:#f2f2f2;font-size:16px;font-weight:700}
 
 .top-progress{
   position:fixed;top:0;left:0;width:100%;height:10px;
@@ -99,7 +101,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <button id="start">Start</button>
 
 <div id="answerArea" class="answer-area">
-  <div id="answerDisplay" class="answer-display">–</div>
+  <div id="answerDisplay" class="answer-display">Eingabe läuft</div>
 
   <div class="keypad">
     <button data-key="1">1</button>
@@ -120,6 +122,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 
     <button id="correction" class="correction">Correction</button>
   </div>
+  <button id="next" class="next-button">Next</button>
 </div>
 
 <div id="result" class="result"></div>
@@ -173,9 +176,7 @@ function sleep(ms){
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function updateAnswer(){
-  $("answerDisplay").textContent = entered || "–";
-}
+function updateAnswer(){ $("answerDisplay").textContent = "Eingabe läuft"; }
 
 function stopAnswerTimer(){
   if(answerTimeout){
@@ -216,6 +217,8 @@ function startAnswerTimer(){
     evaluateRound();
   }, ANSWER_MS);
 }
+
+function flashKey(button){button.classList.add("key-flash");setTimeout(()=>button.classList.remove("key-flash"),180)}
 
 async function startRound(){
   if(running || answerPhase) return;
@@ -285,6 +288,7 @@ function evaluateRound(){
 document.querySelectorAll("[data-key]").forEach(button => {
   button.addEventListener("click", () => {
     if(!answerPhase) return;
+    flashKey(button);
 
     const maxLength = Number($("length").value);
 
@@ -299,13 +303,42 @@ document.querySelectorAll("[data-key]").forEach(button => {
 
 $("correction").addEventListener("click", () => {
   if(!answerPhase) return;
+  flashKey($("correction"));
 
   // Correction entfernt genau die letzte Eingabe.
   entered = entered.slice(0, -1);
   updateAnswer();
 });
 
+
+function nextRoundNow(){
+  if(!answerPhase) return;
+  stopAnswerTimer();
+  answerPhase = false;
+
+  const ok = entered === target;
+  if(ok){
+    stats.correct++;
+    stats.streak++;
+    stats.best = Math.max(stats.best, stats.streak);
+  }else{
+    stats.wrong++;
+    stats.streak = 0;
+  }
+  saveStats();
+
+  $("answerArea").classList.remove("show");
+  $("topProgress").classList.remove("show");
+  $("topProgressBar").style.width = "0%";
+  $("result").textContent = "";
+  $("digit").textContent = "–";
+  $("start").disabled = false;
+
+  setTimeout(() => startRound(), 120);
+}
+
 $("start").addEventListener("click", startRound);
+$("next").addEventListener("click", nextRoundNow);
 
 saveStats();
 
