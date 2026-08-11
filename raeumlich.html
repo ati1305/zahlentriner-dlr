@@ -342,8 +342,187 @@ body{min-height:100dvh}
         [0,8],[8,9],[9,3],[3,10],[10,11],[11,7],
         [1,8],[4,10],[6,11]
       ]
+    },
+
+    /* zusätzliche Modelle, inspiriert von den übrigen Beispielaufgaben */
+
+    {
+      name:"flat-rectangle",
+      points:[
+        v(-1.5,-.8,0),v(1.5,-.8,0),v(-1.5,.8,0),v(1.5,.8,0),
+        v(-.6,-.2,.25),v(.6,.2,.25)
+      ],
+      edges:[
+        [0,1],[0,2],[1,3],[2,3],
+        [0,4],[2,4],[4,5],[5,1],[5,3]
+      ]
+    },
+    {
+      name:"long-ladder",
+      points:[
+        v(-1.7,-.5,0),v(-1.1,-.5,0),v(-.5,-.5,0),v(.1,-.5,0),v(.7,-.5,0),v(1.3,-.5,0),
+        v(-1.7,.5,.25),v(-1.1,.5,.4),v(-.5,.5,.55),v(.1,.5,.35),v(.7,.5,.65),v(1.3,.5,.5)
+      ],
+      edges:[
+        [0,1],[1,2],[2,3],[3,4],[4,5],
+        [6,7],[7,8],[8,9],[9,10],[10,11],
+        [0,6],[1,7],[2,8],[3,9],[4,10],[5,11],
+        [1,8],[3,10]
+      ]
+    },
+    {
+      name:"forked-tree",
+      points:[
+        v(-1.4,0,0),v(-.8,0,.15),v(-.2,0,.25),v(.4,0,.35),v(1.0,0,.45),
+        v(-.5,.7,.7),v(-.5,-.7,.85),
+        v(.2,.7,1.0),v(.2,-.7,.9),
+        v(.9,.55,1.25),v(.9,-.55,1.15)
+      ],
+      edges:[
+        [0,1],[1,2],[2,3],[3,4],
+        [1,5],[1,6],
+        [2,7],[2,8],
+        [4,9],[4,10],
+        [5,7],[6,8]
+      ]
+    },
+    {
+      name:"twisted-cube",
+      points:[
+        v(-1,-1,0),v(1,-1,.2),v(-1,1,.3),v(1,1,0),
+        v(-.8,-.8,1.2),v(.9,-.7,1.4),v(-.9,.9,1.1),v(.8,.8,1.3),
+        v(0,0,.65)
+      ],
+      edges:[
+        [0,1],[0,2],[1,3],[2,3],
+        [4,5],[4,6],[5,7],[6,7],
+        [0,4],[1,5],[2,6],[3,7],
+        [0,8],[3,8],[4,8],[7,8],
+        [1,6],[2,5]
+      ]
+    },
+    {
+      name:"diamond-chain",
+      points:[
+        v(-1.5,0,0),v(-1,.7,.35),v(-1,-.7,.25),v(-.4,0,.55),
+        v(.2,.7,.8),v(.2,-.7,.65),v(.8,0,.95),
+        v(1.3,.6,1.15),v(1.3,-.6,1.05)
+      ],
+      edges:[
+        [0,1],[0,2],[1,3],[2,3],
+        [3,4],[3,5],[4,6],[5,6],
+        [6,7],[6,8],[7,8]
+      ]
+    },
+    {
+      name:"offset-box",
+      points:[
+        v(-1.3,-.8,0),v(-.2,-.8,.1),v(-1.3,.4,.2),v(-.2,.4,.4),
+        v(.3,-.4,.6),v(1.4,-.4,.5),v(.3,.8,.9),v(1.4,.8,.8),
+        v(0,0,1.45)
+      ],
+      edges:[
+        [0,1],[0,2],[1,3],[2,3],
+        [4,5],[4,6],[5,7],[6,7],
+        [1,4],[3,6],
+        [3,8],[4,8],[6,8]
+      ]
+    },
+    {
+      name:"triangular-prism",
+      points:[
+        v(-1.2,-.8,0),v(-.2,-.8,0),v(-.7,.3,.7),
+        v(.3,-.8,.3),v(1.3,-.8,.3),v(.8,.3,1.0),
+        v(.05,.7,.4),v(.8,.9,.65)
+      ],
+      edges:[
+        [0,1],[1,2],[2,0],
+        [3,4],[4,5],[5,3],
+        [0,3],[1,4],[2,5],
+        [2,6],[6,7],[7,5]
+      ]
+    },
+    {
+      name:"crossed-bridge",
+      points:[
+        v(-1.5,-.5,0),v(-.8,.5,.2),v(-.1,-.5,.4),v(.6,.5,.6),v(1.3,-.5,.8),
+        v(-.8,-.6,1.0),v(-.1,.6,1.2),v(.6,-.6,1.1)
+      ],
+      edges:[
+        [0,1],[1,2],[2,3],[3,4],
+        [0,5],[5,6],[6,7],[7,4],
+        [1,5],[2,6],[3,7],
+        [1,6],[2,7]
+      ]
+    },
+    {
+      name:"staircase",
+      points:[
+        v(-1.4,-.7,0),v(-.7,-.7,0),v(-.7,0,.35),v(0,0,.35),
+        v(0,.7,.7),v(.7,.7,.7),v(.7,0,1.05),v(1.4,0,1.05),
+        v(-.7,.7,.9),v(.7,-.7,1.25)
+      ],
+      edges:[
+        [0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],
+        [2,8],[8,4],
+        [3,9],[9,6]
+      ]
+    },
+    {
+      name:"arched-loop",
+      points:[
+        v(-1.3,-.5,0),v(-.7,-.8,.2),v(0,-.9,.4),v(.7,-.8,.6),v(1.3,-.5,.8),
+        v(1,.2,1.15),v(.4,.7,1.35),v(-.4,.7,1.15),v(-1,.2,.75),
+        v(0,0,.75)
+      ],
+      edges:[
+        [0,1],[1,2],[2,3],[3,4],
+        [4,5],[5,6],[6,7],[7,8],[8,0],
+        [1,9],[3,9],[6,9],[8,9]
+      ]
+    },
+    {
+      name:"asymmetric-cage",
+      points:[
+        v(-1.2,-1,0),v(.2,-1,.1),v(1.2,-.5,.25),
+        v(-1.2,.7,.2),v(.1,.9,.35),v(1.2,.6,.5),
+        v(-.8,-.5,1.2),v(.4,-.4,1.45),v(-.6,.6,1.15),v(.7,.5,1.3),
+        v(0,0,.7)
+      ],
+      edges:[
+        [0,1],[1,2],[0,3],[3,4],[4,5],[2,5],
+        [6,7],[6,8],[7,9],[8,9],
+        [0,6],[1,7],[3,8],[5,9],
+        [0,10],[2,10],[4,10],[7,10],[8,10]
+      ]
+    },
+    {
+      name:"sparse-kite",
+      points:[
+        v(-1.3,0,0),v(-.5,-.7,.25),v(-.5,.7,.35),v(.3,0,.7),
+        v(1.1,-.6,.95),v(1.1,.6,1.1),v(1.5,0,.55)
+      ],
+      edges:[
+        [0,1],[0,2],[1,3],[2,3],
+        [3,4],[3,5],[4,6],[5,6]
+      ]
+    },
+    {
+      name:"central-star",
+      points:[
+        v(0,0,.7),
+        v(-1.2,-.8,0),v(-1.2,.8,.2),v(1.2,-.8,.35),v(1.2,.8,.55),
+        v(-.5,0,1.45),v(.6,0,1.55),
+        v(0,-1.15,.8),v(0,1.15,1.0)
+      ],
+      edges:[
+        [0,1],[0,2],[0,3],[0,4],
+        [0,5],[0,6],[0,7],[0,8],
+        [1,3],[2,4],[5,6],[7,8]
+      ]
     }
   ];
+
 
   const directions = ["up","right","down","left"];
   const azimuths = {
@@ -550,15 +729,44 @@ body{min-height:100dvh}
     });
   }
 
+  function transformedModel(base){
+    // Spiegelung und kleine Achsenvariation erzeugen weitere Varianten,
+    // ohne die Topologie des Modells zu verändern.
+    const mirrorX = Math.random() < 0.5 ? -1 : 1;
+    const mirrorY = Math.random() < 0.5 ? -1 : 1;
+    const stretchZ = 0.88 + Math.random() * 0.28;
+
+    return {
+      name: base.name,
+      points: base.points.map(p => ({
+        x: p.x * mirrorX,
+        y: p.y * mirrorY,
+        z: p.z * stretchZ
+      })),
+      edges: base.edges
+    };
+  }
+
   function chooseTask(){
-    model = pick(MODELS);
+    model = transformedModel(pick(MODELS));
 
-    // Start view stays the same reference direction.
-    const startYaw=45;
+    // Startansicht leicht variieren, damit dasselbe Modell nicht
+    // immer exakt gleich aussieht.
+    const baseStart = pick([30,45,60]);
 
-    // Target corresponds to one of four surrounding directions.
     answerDir = pick(directions);
-    const targetYaw = azimuths[answerDir];
+
+    // Zielansicht ist immer dieselbe Figur aus einer der vier
+    // orthogonalen Blickrichtungen relativ zur Startansicht.
+    const offsets = {
+      up: 180,
+      right: 270,
+      down: 0,
+      left: 90
+    };
+
+    const startYaw = baseStart;
+    const targetYaw = baseStart + offsets[answerDir];
 
     renderModel(startSvg,model,startYaw);
     renderModel(targetSvg,model,targetYaw);
