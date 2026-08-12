@@ -186,7 +186,7 @@ body{min-height:100dvh}
 
   <div id="solution" class="solution"></div>
 
-  <button id="next" class="next" type="button">Next</button>
+  <button id="next" class="next" type="button">Bestätigen</button>
 </main>
 
 <div id="popup" class="popup">
@@ -338,12 +338,10 @@ body{min-height:100dvh}
 
       let gs=null, ge=null;
 
-      // Ca. 30 % der Aufgaben verwenden intern eine kleine Klammer,
-      // immer nur über zwei benachbarte Zahlen.
-      if(count>=3 && Math.random()<0.30){
-        gs=rand(0,count-2);
-        ge=gs+1;
-      }
+      // Keine versteckten Klammern: ausgewertet wird genau der sichtbare Ausdruck
+      // nach normaler Punkt-vor-Strich-Rechnung.
+      gs=null;
+      ge=null;
 
       // Glatte lokale Divisionen bevorzugen.
       let badDivision=false;
@@ -388,6 +386,17 @@ body{min-height:100dvh}
       if(i<solutionOps.length) parts.push(symbol(solutionOps[i]));
     }
 
+    parts.push("=");
+    parts.push(String(target));
+    return parts.join(" ");
+  }
+
+  function formatEntered(){
+    const parts=[];
+    for(let i=0;i<nums.length;i++){
+      parts.push(String(nums[i]));
+      if(i<enteredOps.length) parts.push(enteredOps[i] ? symbol(enteredOps[i]) : "?");
+    }
     parts.push("=");
     parts.push(String(target));
     return parts.join(" ");
@@ -483,7 +492,7 @@ body{min-height:100dvh}
 
   function checkAnswer(){
     if(enteredOps.some(op=>!op)) return false;
-    const value=evalTask(nums,enteredOps,groupStart,groupEnd);
+    const value=evalNormal(nums,enteredOps);
     return Number.isFinite(value) && Math.abs(value-target)<1e-9;
   }
 
@@ -515,7 +524,7 @@ body{min-height:100dvh}
     feedback.className="feedback";
     feedback.textContent="";
 
-    solution.textContent=(ok ? "Richtig · " : "Falsch · ") + formatSolution();
+    solution.textContent=(ok ? "Richtig · " + formatEntered() : "Falsch · richtig wäre: " + formatSolution());
     next.textContent="Nächste Aufgabe";
 
     render();
@@ -555,7 +564,7 @@ body{min-height:100dvh}
     roundActive=true;
 
     solution.textContent="";
-    next.textContent="Next";
+    next.textContent="Bestätigen";
     timerFill.style.width="0%";
 
     render();
@@ -572,6 +581,11 @@ body{min-height:100dvh}
     if(awaitingNext){
       startTask();
     }else if(roundActive){
+      if(enteredOps.some(op=>!op)){
+        feedback.className="feedback";
+        feedback.textContent="Bitte zuerst alle Rechenzeichen setzen.";
+        return;
+      }
       finishTask(false);
     }
   },{passive:false});
