@@ -112,7 +112,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .top-progress.show{display:block}
 .top-progress-bar{height:100%;width:0%;background:#444}
 
-.result{min-height:22px;margin-top:6px;text-align:center;font-size:16px;font-weight:700}
+.result{min-height:22px;margin-top:6px;text-align:center;font-size:15px;font-weight:700;line-height:1.25}
 .good{color:#187a36}
 .bad{color:#b42318}
 .hint{margin-top:10px;text-align:center;color:#6b7280;font-size:13px}
@@ -248,7 +248,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
     <button id="correction" class="correction">Correction</button>
   </div>
 
-  <button id="next" class="next-button">Next</button>
+  <button id="next" class="next-button">Bestätigen</button>
 </div>
 
 <div id="result" class="result"></div>
@@ -272,10 +272,11 @@ let running = false;
 let answerPhase = false;
 let answerTimeout = null;
 let progressRAF = null;
+let roundFinished = false;
 
 const DISPLAY_MS = 1500;
 const GAP_MS = 200;
-const ANSWER_MS = 20000;
+const ANSWER_MS = 30000;
 
 const stats = JSON.parse(
   localStorage.getItem("dlrStatsV8") ||
@@ -354,8 +355,10 @@ async function startRound(){
 
   running = true;
   entered = "";
+  roundFinished = false;
 
   $("start").disabled = true;
+  $("next").textContent = "Bestätigen";
   $("answerArea").classList.remove("show");
   $("topProgress").classList.remove("show");
   $("topProgressBar").style.width = "0%";
@@ -377,6 +380,10 @@ async function startRound(){
 
   running = false;
   answerPhase = true;
+
+  document.querySelectorAll("[data-key]").forEach(btn => btn.disabled = false);
+  $("correction").disabled = false;
+  $("next").textContent = "Bestätigen";
 
   startAnswerTimer();
 }
@@ -402,36 +409,40 @@ function finishRound(){
 
   stopAnswerTimer();
   answerPhase = false;
+  roundFinished = true;
 
   const ok = recordCurrentAnswer();
+  const shownEntry = entered.length ? entered : "keine Eingabe";
 
   $("result").textContent = ok
-    ? "Richtig"
-    : `Falsch – richtig war ${target}`;
-  $("result").className = ok
-    ? "result good"
-    : "result bad";
+    ? `Richtig – ${target}`
+    : `Falsch – deine Eingabe: ${shownEntry} · richtig: ${target}`;
+  $("result").className = ok ? "result good" : "result bad";
 
-  $("answerArea").classList.remove("show");
+  document.querySelectorAll("[data-key]").forEach(btn => btn.disabled = true);
+  $("correction").disabled = true;
+
   $("topProgress").classList.remove("show");
   $("topProgressBar").style.width = "0%";
   $("digit").textContent = "–";
-  $("start").disabled = false;
+
+  $("next").textContent = "Nächste Aufgabe";
+  $("start").disabled = true;
 }
 
 function nextRoundNow(){
-  if(!answerPhase) return;
+  if(!roundFinished) return;
 
-  stopAnswerTimer();
-  answerPhase = false;
+  roundFinished = false;
 
-  recordCurrentAnswer();
+  document.querySelectorAll("[data-key]").forEach(btn => btn.disabled = false);
+  $("correction").disabled = false;
 
   $("answerArea").classList.remove("show");
-  $("topProgress").classList.remove("show");
-  $("topProgressBar").style.width = "0%";
   $("result").textContent = "";
+  $("result").className = "result";
   $("digit").textContent = "–";
+  $("next").textContent = "Bestätigen";
   $("start").disabled = false;
 
   setTimeout(startRound, 100);
@@ -469,16 +480,26 @@ $("correction").addEventListener("pointerdown", event => {
 
 $("next").addEventListener("pointerdown", event => {
   event.preventDefault();
-  if(!answerPhase) return;
 
   pressVisual($("next"));
-  nextRoundNow();
+
+  if(answerPhase){
+    finishRound();
+    return;
+  }
+
+  if(roundFinished){
+    nextRoundNow();
+  }
 });
 ["pointerup","pointercancel","pointerleave"].forEach(evt => {
   $("next").addEventListener(evt, () => releaseVisual($("next")));
 });
 
-$("start").addEventListener("click", startRound);
+$("start").addEventListener("pointerdown", event => {
+  event.preventDefault();
+  startRound();
+});
 
 saveStats();
 
