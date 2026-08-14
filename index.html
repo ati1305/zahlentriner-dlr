@@ -194,6 +194,27 @@ button:disabled{opacity:.45;cursor:not-allowed}
   .site-nav a{min-height:30px;padding:4px 8px;font-size:13px}
 }
 
+
+.mode-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.exam-info{
+  min-height:18px;
+  margin-top:5px;
+  text-align:center;
+  font-size:12px;
+  font-weight:700;
+  color:#555;
+}
+@media(max-width:520px){
+  .mode-grid{grid-template-columns:1fr 1fr;gap:6px}
+  .mode-grid label{font-size:11px}
+  .mode-grid select{min-height:34px;padding:5px 6px;font-size:12px}
+  .exam-info{font-size:11px;min-height:16px}
+}
+
 </style>
 </head>
 
@@ -215,15 +236,28 @@ button:disabled{opacity:.45;cursor:not-allowed}
 
 <h1>DLR Zahlentrainer</h1>
 
-<label>
-  Anzahl Ziffern
-  <select id="length">
-    <option value="7">7 Ziffern</option>
-    <option value="8">8 Ziffern</option>
-    <option value="9">9 Ziffern</option>
-    <option value="10" selected>10 Ziffern</option>
-  </select>
-</label>
+<div class="mode-grid">
+  <label>
+    Modus
+    <select id="mode">
+      <option value="training" selected>Training</option>
+      <option value="exam">Prüfungssimulation</option>
+    </select>
+  </label>
+
+  <label id="lengthLabel">
+    Anzahl Ziffern
+    <select id="length">
+      <option value="6">6 Ziffern</option>
+      <option value="7">7 Ziffern</option>
+      <option value="8">8 Ziffern</option>
+      <option value="9">9 Ziffern</option>
+      <option value="10" selected>10 Ziffern</option>
+    </select>
+  </label>
+</div>
+
+<div id="examInfo" class="exam-info"></div>
 
 <div class="stage">
   <div id="digit" class="digit">–</div>
@@ -274,6 +308,21 @@ let answerTimeout = null;
 let progressRAF = null;
 let roundFinished = false;
 
+const EXAM_SEQUENCE = [
+  6,6,
+  7,7,7,
+  8,8,
+  9,
+  8,
+  9,
+  8,
+  10,10,10,10,10
+];
+let examIndex = 0;
+let examCorrect = 0;
+let examWrong = 0;
+let examRunning = false;
+
 const DISPLAY_MS = 1500;
 const GAP_MS = 200;
 const ANSWER_MS = 30000;
@@ -293,6 +342,60 @@ function saveStats(){
   $("rate").textContent = total
     ? Math.round(stats.correct / total * 100) + " %"
     : "0 %";
+}
+
+function isExamMode(){
+  return $("mode").value === "exam";
+}
+
+function currentLength(){
+  return isExamMode()
+    ? EXAM_SEQUENCE[Math.min(examIndex, EXAM_SEQUENCE.length - 1)]
+    : Number($("length").value);
+}
+
+function updateModeUI(){
+  const exam = isExamMode();
+
+  $("lengthLabel").style.opacity = exam ? ".45" : "1";
+  $("length").disabled = exam;
+
+  if(exam){
+    const pos = Math.min(examIndex + 1, EXAM_SEQUENCE.length);
+    const len = EXAM_SEQUENCE[Math.min(examIndex, EXAM_SEQUENCE.length - 1)];
+    $("examInfo").textContent = examRunning
+      ? `Prüfung ${pos}/${EXAM_SEQUENCE.length} · ${len} Ziffern · ohne Zeitlimit`
+      : `16 Aufgaben · ohne Zeitlimit`;
+    $("start").textContent = examRunning ? "Prüfung läuft" : "Prüfung starten";
+  }else{
+    $("examInfo").textContent = "Training · 30 Sekunden Eingabezeit";
+    $("start").textContent = "Start";
+  }
+}
+
+function finishExam(){
+  examRunning = false;
+  roundFinished = false;
+  answerPhase = false;
+  running = false;
+
+  $("answerArea").classList.remove("show");
+  $("topProgress").classList.remove("show");
+  $("topProgressBar").style.width = "0%";
+  $("digit").textContent = "–";
+
+  const total = examCorrect + examWrong;
+  const quote = total ? Math.round(examCorrect / total * 100) : 0;
+
+  $("result").textContent =
+    `Prüfung beendet – ${examCorrect} richtig · ${examWrong} falsch · ${quote} %`;
+  $("result").className = examWrong === 0 ? "result good" : "result";
+
+  $("start").disabled = false;
+  $("next").textContent = "Bestätigen";
+
+  examIndex = 0;
+  updateModeUI();
 }
 
 function makeDigits(n){
@@ -326,6 +429,12 @@ function stopAnswerTimer(){
 function startAnswerTimer(){
   stopAnswerTimer();
 
+  if(isExamMode()){
+    $("topProgress").classList.remove("show");
+    $("topProgressBar").style.width = "0%";
+    return;
+  }
+
   const progress = $("topProgress");
   const bar = $("topProgressBar");
 
@@ -353,19 +462,27 @@ function startAnswerTimer(){
 async function startRound(){
   if(running || answerPhase) return;
 
+  if(isExamMode() && !examRunning){
+    examRunning = true;
+    examIndex = 0;
+    examCorrect = 0;
+    examWrong = 0;
+  }
+
   running = true;
   entered = "";
   roundFinished = false;
 
   $("start").disabled = true;
   $("next").textContent = "Bestätigen";
+  updateModeUI();
   $("answerArea").classList.remove("show");
   $("topProgress").classList.remove("show");
   $("topProgressBar").style.width = "0%";
   $("result").textContent = "";
   $("result").className = "result";
 
-  target = makeDigits(Number($("length").value));
+  target = makeDigits(currentLength());
 
   for(const d of target){
     $("digit").textContent = d;
@@ -400,6 +517,11 @@ function recordCurrentAnswer(){
     stats.streak = 0;
   }
 
+  if(isExamMode() && examRunning){
+    if(ok) examCorrect++;
+    else examWrong++;
+  }
+
   saveStats();
   return ok;
 }
@@ -414,9 +536,13 @@ function finishRound(){
   const ok = recordCurrentAnswer();
   const shownEntry = entered.length ? entered : "keine Eingabe";
 
+  const examPrefix = isExamMode()
+    ? `Aufgabe ${examIndex + 1}/${EXAM_SEQUENCE.length} · `
+    : "";
+
   $("result").textContent = ok
-    ? `Richtig – ${target}`
-    : `Falsch – deine Eingabe: ${shownEntry} · richtig: ${target}`;
+    ? `${examPrefix}Richtig – ${target}`
+    : `${examPrefix}Falsch – deine Eingabe: ${shownEntry} · richtig: ${target}`;
   $("result").className = ok ? "result good" : "result bad";
 
   document.querySelectorAll("[data-key]").forEach(btn => btn.disabled = true);
@@ -443,8 +569,22 @@ function nextRoundNow(){
   $("result").className = "result";
   $("digit").textContent = "–";
   $("next").textContent = "Bestätigen";
-  $("start").disabled = false;
 
+  if(isExamMode() && examRunning){
+    examIndex++;
+
+    if(examIndex >= EXAM_SEQUENCE.length){
+      finishExam();
+      return;
+    }
+
+    $("start").disabled = true;
+    updateModeUI();
+    setTimeout(startRound, 100);
+    return;
+  }
+
+  $("start").disabled = false;
   setTimeout(startRound, 100);
 }
 
@@ -455,7 +595,7 @@ document.querySelectorAll("[data-key]").forEach(button => {
 
     pressVisual(button);
 
-    const maxLength = Number($("length").value);
+    const maxLength = currentLength();
     if(entered.length >= maxLength) return;
 
     entered += button.dataset.key;
@@ -501,7 +641,19 @@ $("start").addEventListener("pointerdown", event => {
   startRound();
 });
 
+$("mode").addEventListener("change", () => {
+  if(running || answerPhase || roundFinished || examRunning){
+    $("mode").value = examRunning ? "exam" : "training";
+    return;
+  }
+  examIndex = 0;
+  examCorrect = 0;
+  examWrong = 0;
+  updateModeUI();
+});
+
 saveStats();
+updateModeUI();
 
 /* Alte GitHub-Pages-Service-Worker/Cache-Versionen entfernen. */
 (async () => {
