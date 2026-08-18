@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>English Test Trainer – Grammar + Vocabulary</title>
+<style>
+:root{
+  --bg:#f6f8fb;--card:#fff;--text:#172033;--muted:#667085;--border:#d7dde7;
+  --accent:#4da3d9;--accent2:#dff1ff;--ok:#e8f7ea;--okb:#85c98f;--bad:#fdecec;--badb:#e69a9a;
+  --syn:#2f80ed;--ant:#d64545
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+.app{max-width:980px;margin:0 auto;padding:20px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}
+h1{font-size:24px;margin:0}.pill{border:1px solid var(--border);background:#fff;border-radius:999px;padding:8px 12px;font-size:14px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px;box-shadow:0 8px 24px rgba(0,0,0,.05)}
+.menu{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:18px}
+.mode{border:1px solid var(--border);border-radius:14px;padding:18px;background:#fff;cursor:pointer;text-align:left}
+.mode:hover{border-color:var(--accent);transform:translateY(-1px)}.mode h3{margin:0 0 8px;font-size:18px}.mode p{margin:0;color:var(--muted);line-height:1.35}
+.hidden{display:none!important}.progress{height:12px;background:#e9edf3;border-radius:999px;overflow:hidden;margin:10px 0 24px}
+.bar{height:100%;width:0;background:var(--accent);transition:width .2s}.meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:14px}
+.signal{display:inline-block;background:#fff4c2;border:1px solid #e6cf72;border-radius:8px;padding:2px 6px;font-weight:700}
+.target-syn{color:var(--syn);font-weight:700}.target-ant{color:var(--ant);font-weight:700}
+.question{font-size:27px;line-height:1.45;margin:26px 0 20px}.instruction{font-size:18px;margin:4px 0 6px;font-weight:700}
+.answers{display:grid;gap:12px}.answer{width:100%;text-align:left;border:1px solid var(--border);background:#fff;border-radius:12px;padding:15px 16px;font-size:19px;cursor:pointer}
+.answer:hover{border-color:var(--accent);background:#f8fcff}.answer.selected{border-color:var(--accent);background:var(--accent2)}
+.answer.correct{border-color:var(--okb);background:var(--ok)}.answer.wrong{border-color:var(--badb);background:var(--bad)}
+.explain{margin-top:18px;border-radius:12px;padding:15px 16px;background:#f4f6f8;line-height:1.45}.explain strong{display:block;margin-bottom:4px}
+.controls{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}button.ctrl{border:0;border-radius:12px;padding:13px 18px;font-size:16px;cursor:pointer}
+.primary{background:var(--accent);color:#fff}.secondary{background:#e9edf3;color:#273044}.danger{background:#fff;border:1px solid var(--border)!important}
+.result{text-align:center;padding:20px 8px}.big{font-size:54px;font-weight:800;margin:8px 0}
+.breakdown{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px;text-align:left}.breakdown div{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:#fff}
+.timer{font-weight:700;color:#344054}.legend{font-size:14px;color:var(--muted);margin-top:12px}
+
+.site-nav{max-width:980px;margin:12px auto 0;padding:0 20px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.site-nav a{display:flex;align-items:center;justify-content:center;min-height:36px;border:1px solid var(--border);border-radius:7px;background:#fff;color:var(--text);text-decoration:none;font-size:13px;font-weight:700}
+.site-nav a.active{background:var(--accent2);border-color:var(--accent)}
+@media(max-width:600px){.site-nav{padding:0 12px;gap:4px}.site-nav a{font-size:10px;min-height:34px}}
+@media(max-width:760px){.menu{grid-template-columns:1fr}.question{font-size:22px}.answer{font-size:18px}.app{padding:12px}.panel{padding:18px}}
+</style>
+</head>
+<body>
+<nav class="site-nav" aria-label="DLR Training Navigation">
+  <a href="index.html">Zahlen</a>
+  <a href="rechnen.html">Rechnen</a>
+  <a href="konzentration.html">Konzentration</a>
+  <a href="raeumlich.html">Räumlich</a>
+  <a href="englisch.html" class="active">Englisch</a>
+</nav>
+
+<div class="app">
+  <div class="top">
+    <h1>English Test Trainer</h1>
+    <div class="pill" id="modeLabel">Start</div>
+  </div>
+
+  <section class="panel" id="start">
+    <h2 style="margin-top:0">Alles in einer Datei: Grammar + Vocabulary</h2>
+    <p style="color:var(--muted);line-height:1.5">
+      Enthalten sind die beiden Testblöcke aus deinen Bildern:
+      <strong>Grammar / Fill in the gaps</strong> sowie
+      <strong>Vocabulary / Similar & Opposite Meaning</strong>.
+    </p>
+    <div class="menu">
+      <button class="mode" onclick="startMode('grammar-learn')">
+        <h3>Grammar – Lernmodus</h3>
+        <p>Ohne Zeitdruck, Signalwörter markiert, Erklärung nach jeder Aufgabe.</p>
+      </button>
+      <button class="mode" onclick="startMode('vocab-learn')">
+        <h3>Vocabulary – Lernmodus</h3>
+        <p>Synonyme und Antonyme mit Erklärung und deutscher Bedeutung.</p>
+      </button>
+      <button class="mode" onclick="startMode('mixed-quick')">
+        <h3>Gemischt – Schnellmodus</h3>
+        <p>Grammar + Vocabulary gemischt, 30 Sekunden pro Aufgabe.</p>
+      </button>
+      <button class="mode" onclick="startMode('exam')">
+        <h3>Komplette Prüfungssimulation</h3>
+        <p>30 Aufgaben: 15 Grammar + 15 Vocabulary, gemischt und ohne Hilfe.</p>
+      </button>
+    </div>
+    <div class="legend">Empfehlung: erst beide Lernmodi, dann Gemischt, zuletzt Prüfungssimulation.</div>
+  </section>
+
+  <section class="panel hidden" id="quiz">
+    <div class="meta">
+      <div id="counter">Aufgabe 1</div>
+      <div id="category">Kategorie</div>
+      <div class="timer" id="timer"></div>
+    </div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="instruction hidden" id="instruction"></div>
+    <div class="question" id="question"></div>
+    <div class="answers" id="answers"></div>
+    <div class="explain hidden" id="explain"></div>
+    <div class="controls">
+      <button class="ctrl danger" onclick="goHome()">Beenden</button>
+      <button class="ctrl primary hidden" id="nextBtn" onclick="nextQuestion()">Nächste Aufgabe</button>
+    </div>
+  </section>
+
+  <section class="panel hidden" id="result">
+    <div class="result">
+      <h2>Auswertung</h2>
+      <div class="big" id="scoreBig">0/30</div>
+      <div id="scoreText"></div>
+      <div class="breakdown" id="breakdown"></div>
+      <div class="controls" style="justify-content:center">
+        <button class="ctrl secondary" onclick="goHome()">Zurück zum Start</button>
+        <button class="ctrl primary" onclick="restart()">Nochmal</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const GRAMMAR = [
+{t:"grammar",c:"Modalverben",q:"She ___ do the exercise again. Everything is perfect.",a:["does not need to","do not have to","need not to","needs not"],r:0,s:"Everything is perfect",e:"She → does not need to + Verb."},
+{t:"grammar",c:"Zeitformen",q:"I ___ my holidays in Spain last year.",a:["spent","have spent","had spent","had been spending"],r:0,s:"last year",e:"'last year' → Simple Past."},
+{t:"grammar",c:"Zeitformen",q:"At the moment we ___ a new car.",a:["are developing","develop","have been developing","are being developed"],r:0,s:"At the moment",e:"'at the moment' → Present Continuous."},
+{t:"grammar",c:"Adverbien",q:"Our university is ___ organized. All facilities are ___ located.",a:["well / conveniently","good / convenient","well / convenient","good / conveniently"],r:0,s:"organized / located",e:"well organized; conveniently located."},
+{t:"grammar",c:"Passiv",q:"According to the law an employee's salary ___ on a monthly basis.",a:["is paid","is being paid","is payed","is being payed"],r:0,s:"salary",e:"Das Gehalt wird bezahlt → Present Simple Passive: is paid."},
+{t:"grammar",c:"Präpositionen",q:"Taxes were increased ___ 9%. This may result ___ negative reactions.",a:["by / in","for / to","by / to","for / in"],r:0,s:"increased / result",e:"increase by; result in."},
+{t:"grammar",c:"Passiv",q:"I think that many new hotels ___ in this part of the city.",a:["will be built","will have built","would have been build","will be build"],r:0,s:"hotels",e:"Future Passive: will be + past participle."},
+{t:"grammar",c:"Zeitformen",q:"When I arrived at the office, the meeting ___.",a:["had already started","has already been started","has already started","was started"],r:0,s:"When I arrived / already",e:"Frühere Vergangenheit → Past Perfect."},
+{t:"grammar",c:"Adverbien",q:"Since he is ___ qualified he can find a good job ___.",a:["highly / easily","high / easy","highly / easy","high / easily"],r:0,s:"qualified / find",e:"highly qualified; easily beschreibt 'find'."},
+{t:"grammar",c:"Gerund/Infinitiv",q:"Our boss insisted on us ___ a letter. He also suggested ___ to Poland.",a:["sending / flying","to send / to fly","sending / to fly","to send / flying"],r:0,s:"insisted on / suggested",e:"insist on + -ing; suggest + -ing."},
+{t:"grammar",c:"Pronomen",q:"Dr. Fuller is a great professor. Are you a student of ___?",a:["his","he","him","himself"],r:0,s:"student of",e:"a student of his = einer seiner Studenten."},
+{t:"grammar",c:"Präpositionen",q:"Congratulations ___ getting the job! Please phone us up ___ June 29 at the latest.",a:["on / by","for / until","on / until","for / by"],r:0,s:"Congratulations / at the latest",e:"congratulations on; by = spätestens bis."},
+{t:"grammar",c:"Präpositionen",q:"Peter is very interested ___ politics. He reads a lot of newspapers ___ current affairs.",a:["in / on","on / on","in / at","on / at"],r:0,s:"interested / newspapers",e:"interested in; newspapers/articles on a topic."},
+{t:"grammar",c:"Gerund/Infinitiv",q:"I hope you do not mind ___ next to Sarah. I want you ___ to know her better.",a:["sitting / to get","to sit / to get","sitting / getting","to sit / getting"],r:0,s:"mind / want you",e:"mind + -ing; want someone + to + Verb."},
+{t:"grammar",c:"Relativsätze",q:"That is the building ___ we acquired three years ago.",a:["which","who","whose","whom"],r:0,s:"building",e:"Für Sachen/Gegenstände → which."},
+
+{t:"grammar",c:"Zeitformen",q:"We ___ the new office two months ago.",a:["opened","have opened","had opened","open"],r:0,s:"two months ago",e:"'ago' → Simple Past."},
+{t:"grammar",c:"Zeitformen",q:"Right now the engineers ___ the system.",a:["are testing","test","have tested","were testing"],r:0,s:"Right now",e:"'right now' → Present Continuous."},
+{t:"grammar",c:"Passiv",q:"The invoices ___ every Friday.",a:["are sent","send","are sending","have send"],r:0,s:"every Friday",e:"Regelmäßig + Passiv → are sent."},
+{t:"grammar",c:"Präpositionen",q:"The accident resulted ___ a long delay.",a:["in","to","on","by"],r:0,s:"resulted",e:"Feste Verbindung: result in."},
+{t:"grammar",c:"Gerund/Infinitiv",q:"She suggested ___ earlier.",a:["leaving","to leave","leave","left"],r:0,s:"suggested",e:"suggest + -ing."}
+];
+
+const VOCAB = [
+{t:"vocab",c:"Vocabulary – Similar",kind:"similar",word:"get",q:"May I ask you to repeat that? I am sorry but I did not get that.",a:["obtain","understand","receive","find"],r:1,de:"get = hier: verstehen",e:"Im Satz bedeutet 'get' nicht bekommen, sondern verstehen."},
+{t:"vocab",c:"Vocabulary – Similar",kind:"similar",word:"reply",q:"In his reply he pointed out the reasons for the current situation.",a:["rearrangement","answer","offer","replacement"],r:1,de:"reply = Antwort",e:"reply und answer sind hier bedeutungsgleich."},
+{t:"vocab",c:"Vocabulary – Similar",kind:"similar",word:"irrefutable",q:"It is irrefutable that the number of tourists coming to Paris has increased substantially.",a:["undaunted","undeniable","inaccurate","improbable"],r:1,de:"irrefutable = unbestreitbar",e:"undeniable = nicht zu leugnen, unbestreitbar."},
+{t:"vocab",c:"Vocabulary – Similar",kind:"similar",word:"candidly",q:"Our neighbour answered my questions candidly.",a:["frankly","staunchly","anxiously","reflectively"],r:0,de:"candidly = offen/ehrlich",e:"frankly = offen, ehrlich."},
+{t:"vocab",c:"Vocabulary – Opposite",kind:"opposite",word:"obligatory",q:"If you want to take part in this course, it is obligatory to register for it in time.",a:["optional","advantageous","preparatory","perilous"],r:0,de:"obligatory = verpflichtend",e:"Gegenteil: optional = freiwillig/wahlweise."},
+{t:"vocab",c:"Vocabulary – Opposite",kind:"opposite",word:"polite",q:"She always addresses her customers in a very polite way.",a:["frank","shy","rude","embarrassing"],r:2,de:"polite = höflich",e:"Gegenteil: rude = unhöflich."},
+{t:"vocab",c:"Vocabulary – Opposite",kind:"opposite",word:"shy",q:"I am under the impression that Susan is extremely shy.",a:["informal","demanding","frank","self-confident"],r:3,de:"shy = schüchtern",e:"Gegenteil: self-confident = selbstbewusst."},
+{t:"vocab",c:"Vocabulary – Opposite",kind:"opposite",word:"simple",q:"At the exam I had to answer simple questions.",a:["unexpected","intelligent","important","complex"],r:3,de:"simple = einfach",e:"Gegenteil: complex = komplex/schwierig."},
+{t:"vocab",c:"Vocabulary – Opposite",kind:"opposite",word:"adjourn",q:"Let's adjourn this discussion. We are getting side-tracked now.",a:["instigate","endorse","proceed with","jeopardize"],r:2,de:"adjourn = vertagen/unterbrechen",e:"Gegenteil im Kontext: proceed with = fortfahren mit."},
+{t:"vocab",c:"Vocabulary – Opposite",kind:"opposite",word:"viable",q:"This seems to be a viable option to solve the problem.",a:["tempting","impracticable","intriguing","relentless"],r:1,de:"viable = praktikabel/machbar",e:"Gegenteil: impracticable = nicht praktikabel."},
+{t:"vocab",c:"Vocabulary – Opposite",kind:"opposite",word:"adroit",q:"It goes without saying that our professor is very adroit at giving presentations.",a:["inexperienced","inefficient","unsure","inept"],r:3,de:"adroit = geschickt/gewandt",e:"Gegenteil: inept = ungeschickt/unfähig."},
+{t:"vocab",c:"Vocabulary – Similar",kind:"similar",word:"outrageous",q:"His behaviour at the party was outrageous.",a:["cowardly","restrained","appalling","gratifying"],r:2,de:"outrageous = empörend/skandalös",e:"appalling = entsetzlich/erschreckend."},
+{t:"vocab",c:"Vocabulary – Similar",kind:"similar",word:"demands",q:"Success in business demands discipline and hard work.",a:["offers","requires","reveals","obtains"],r:1,de:"demands = erfordert",e:"requires = erfordert."},
+{t:"vocab",c:"Vocabulary – Similar",kind:"similar",word:"differentiate",q:"We should really differentiate between private and public issues.",a:["equalize","distinguish","balance","conclude"],r:1,de:"differentiate = unterscheiden",e:"distinguish = unterscheiden."},
+{t:"vocab",c:"Vocabulary – Similar",kind:"similar",word:"vigour",q:"We were impressed by the vigour with which she was singing the songs.",a:["persistence","enthusiasm","virtue","magnitude"],r:1,de:"vigour = Energie/Elan",e:"Von den angebotenen Antworten passt enthusiasm am besten."},
+
+{t:"vocab",c:"Vocabulary – Similar",kind:"similar",word:"substantial",q:"The company made a substantial improvement this year.",a:["significant","minor","temporary","uncertain"],r:0,de:"substantial = erheblich/bedeutend",e:"significant = bedeutend/erheblich."},
+{t:"vocab",c:"Vocabulary – Opposite",kind:"opposite",word:"scarce",q:"Fresh water is scarce in this region.",a:["abundant","expensive","clean","useful"],r:0,de:"scarce = knapp",e:"Gegenteil: abundant = reichlich vorhanden."},
+{t:"vocab",c:"Vocabulary – Similar",kind:"similar",word:"rapidly",q:"The situation changed rapidly.",a:["quickly","quietly","rarely","carefully"],r:0,de:"rapidly = schnell",e:"quickly = schnell."},
+{t:"vocab",c:"Vocabulary – Opposite",kind:"opposite",word:"reluctant",q:"He was reluctant to accept the offer.",a:["eager","careful","unable","silent"],r:0,de:"reluctant = widerwillig/zögerlich",e:"Gegenteil: eager = eifrig/begierig."},
+{t:"vocab",c:"Vocabulary – Similar",kind:"similar",word:"accurate",q:"The information in the report is accurate.",a:["precise","doubtful","general","old"],r:0,de:"accurate = genau/richtig",e:"precise = präzise/genau."}
+];
+
+let state={mode:null,list:[],i:0,score:0,answered:false,timer:null,timeLeft:0,stats:{}};
+const shuffle=a=>[...a].sort(()=>Math.random()-0.5);
+
+function startMode(mode){
+  state.mode=mode;state.i=0;state.score=0;state.answered=false;state.stats={};
+  if(mode==="grammar-learn") state.list=shuffle(GRAMMAR);
+  else if(mode==="vocab-learn") state.list=shuffle(VOCAB);
+  else if(mode==="mixed-quick") state.list=shuffle([...GRAMMAR,...VOCAB]).slice(0,30);
+  else {
+    const g=shuffle(GRAMMAR).slice(0,15), v=shuffle(VOCAB).slice(0,15);
+    state.list=shuffle([...g,...v]);
+  }
+  document.getElementById("start").classList.add("hidden");
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+  document.getElementById("modeLabel").textContent={
+    "grammar-learn":"Grammar Lernen","vocab-learn":"Vocabulary Lernen",
+    "mixed-quick":"Gemischt Schnell","exam":"Prüfung"
+  }[mode];
+  render();
+}
+
+function render(){
+  clearTimer();state.answered=false;
+  const q=state.list[state.i],total=state.list.length;
+  document.getElementById("counter").textContent=`Aufgabe ${state.i+1} von ${total}`;
+  document.getElementById("category").textContent=q.c;
+  document.getElementById("bar").style.width=`${(state.i/total)*100}%`;
+  const ins=document.getElementById("instruction");
+  if(q.t==="vocab"){
+    ins.classList.remove("hidden");
+    ins.innerHTML=q.kind==="similar"
+      ? 'Find a word with a <span class="target-syn">similar meaning</span>.'
+      : 'Find a word with an <span class="target-ant">opposite meaning</span>.';
+  } else ins.classList.add("hidden");
+
+  let qt=q.q;
+  const learn=state.mode==="grammar-learn"||state.mode==="vocab-learn";
+  if(learn && q.t==="grammar" && q.s){
+    const parts=q.s.split(" / ");
+    parts.forEach(s=>{
+      const esc=s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      qt=qt.replace(new RegExp(esc,'i'),m=>`<span class="signal">${m}</span>`);
+    });
+  }
+  if(q.t==="vocab"){
+    const esc=q.word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    const cls=q.kind==="similar"?"target-syn":"target-ant";
+    qt=qt.replace(new RegExp(`\\b${esc}\\b`,'i'),m=>`<span class="${cls}">${m}</span>`);
+  }
+  document.getElementById("question").innerHTML=qt;
+  const box=document.getElementById("answers");box.innerHTML="";
+  q.a.forEach((txt,idx)=>{
+    const b=document.createElement("button");b.className="answer";b.textContent=txt;b.onclick=()=>choose(idx,b);box.appendChild(b);
+  });
+  document.getElementById("explain").classList.add("hidden");
+  document.getElementById("nextBtn").classList.add("hidden");
+  if(state.mode==="mixed-quick"){
+    state.timeLeft=30;document.getElementById("timer").textContent="30 s";
+    state.timer=setInterval(()=>{
+      state.timeLeft--;document.getElementById("timer").textContent=`${state.timeLeft} s`;
+      if(state.timeLeft<=0){clearTimer();timeoutQuestion();}
+    },1000);
+  } else if(state.mode==="exam") document.getElementById("timer").textContent="";
+  else document.getElementById("timer").textContent="ohne Zeitlimit";
+}
+
+function choose(idx){
+  if(state.answered)return;state.answered=true;clearTimer();
+  const q=state.list[state.i],ok=idx===q.r;
+  if(!state.stats[q.c])state.stats[q.c]={ok:0,total:0};
+  state.stats[q.c].total++;if(ok){state.score++;state.stats[q.c].ok++}
+  const buttons=[...document.querySelectorAll(".answer")];
+  buttons.forEach((b,i)=>{
+    b.disabled=true;
+    if(state.mode!=="exam"){
+      if(i===q.r)b.classList.add("correct");
+      if(i===idx&&i!==q.r)b.classList.add("wrong");
+    } else if(i===idx)b.classList.add("selected");
+  });
+  if(state.mode==="exam")setTimeout(nextQuestion,180);
+  else{
+    const ex=document.getElementById("explain");
+    let extra=q.de?`<br><em>${q.de}</em>`:"";
+    ex.innerHTML=`<strong>${ok?"✅ Richtig":"❌ Falsch – richtig ist: "+q.a[q.r]}</strong>${q.e}${extra}`;
+    ex.classList.remove("hidden");document.getElementById("nextBtn").classList.remove("hidden");
+  }
+}
+
+function timeoutQuestion(){
+  if(state.answered)return;state.answered=true;
+  const q=state.list[state.i];
+  if(!state.stats[q.c])state.stats[q.c]={ok:0,total:0};state.stats[q.c].total++;
+  [...document.querySelectorAll(".answer")].forEach((b,i)=>{b.disabled=true;if(i===q.r)b.classList.add("correct")});
+  const ex=document.getElementById("explain");
+  ex.innerHTML=`<strong>⏱️ Zeit abgelaufen – richtig ist: ${q.a[q.r]}</strong>${q.e}`;
+  ex.classList.remove("hidden");document.getElementById("nextBtn").classList.remove("hidden");
+}
+function nextQuestion(){state.i++;if(state.i>=state.list.length)finish();else render();}
+function finish(){
+  clearTimer();document.getElementById("quiz").classList.add("hidden");document.getElementById("result").classList.remove("hidden");
+  const total=state.list.length,pct=Math.round(state.score/total*100);
+  document.getElementById("scoreBig").textContent=`${state.score}/${total}`;
+  document.getElementById("scoreText").textContent=`${pct}% richtig. `+(pct>=90?"Sehr stark.":pct>=75?"Gut. Fehlerbereiche gezielt wiederholen.":pct>=60?"Solide Basis, weiter automatisieren.":"Erst Lernmodi wiederholen.");
+  const bd=document.getElementById("breakdown");bd.innerHTML="";
+  Object.entries(state.stats).sort().forEach(([k,v])=>{
+    const d=document.createElement("div");d.innerHTML=`<strong>${k}</strong><br>${v.ok}/${v.total} richtig`;bd.appendChild(d);
+  });
+}
+function clearTimer(){if(state.timer){clearInterval(state.timer);state.timer=null}}
+function goHome(){clearTimer();document.getElementById("quiz").classList.add("hidden");document.getElementById("result").classList.add("hidden");document.getElementById("start").classList.remove("hidden");document.getElementById("modeLabel").textContent="Start"}
+function restart(){startMode(state.mode)}
+</script>
+</body>
+</html>
